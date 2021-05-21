@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "pos2D.h"
-//#include "mem.h"
+#include "mem.h"
 
 /* ********** grid Struct ********** */
 typedef struct grid{
