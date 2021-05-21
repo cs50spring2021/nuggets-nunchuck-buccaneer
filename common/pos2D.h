@@ -8,12 +8,6 @@
  * Nunchuck-buccaneers, May 2021
  */
 
-<<<<<<< HEAD
-=======
-#ifndef __POS2D_H
-#define __POS2D_H
-
->>>>>>> abcd76e (upaded some headers and what-not)
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -92,5 +86,5 @@ int pos2D_getX(pos2D_t* pos);
  */
 int pos2D_getY(pos2D_t* pos);
 
-#endif //__POS2D_H
+
 
