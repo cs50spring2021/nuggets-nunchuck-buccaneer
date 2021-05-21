@@ -25,14 +25,15 @@ typedef struct map map_t;
  * 
  * Caller provides:
  *      - the path to a file containing a properly formatted map.txt file
- * 
+ *
  * We return:
+ *      - NULL on error
  *      - a pointer to a newly minted map_t, with instatiated base and game grids
  *
  * Caller is responsible for:
  *      - later calling map_delete on the returned map pointer
  */
-map_t* mape_new(char* mapFile);
+map_t* map_new(char* mapFile);
 
 /* ********** map_getVisibleMap() ********** */
 /* combine the gameGrid and a sightGrid, return a grid of what is visible
@@ -42,6 +43,7 @@ map_t* mape_new(char* mapFile);
  *      - a valid pointer to a sightGrid
  *
  * We return:
+ *      - NULL on error
  *      - a pointer to a grid of what on the gameGrid is see-able
  * 
  * Caller is responsible for:
