@@ -36,7 +36,8 @@ grid_t* grid_new(char* readString)
     }
 
     // create a copy of the passed map string
-    char* map = mem_malloc_assert(sizeof(readString), "grid_new(): "
+    int buffer = (strlen(readString) + 1) * sizeof(char);
+    char* map = mem_malloc_assert(buffer, "grid_new(): "
             "out of memory\n");
     strcpy(map, readString);
     
@@ -71,7 +72,7 @@ void grid_delete(grid_t* grid)
 {
     // NULL pointer checking
     if (grid == NULL) {
-        fprintf(stderr, "grid_delete(): null pointer passed\n");
+        fprintf(stderr, "grid_delete(): null pointer 'grid' passed\n");
         return;
     }
     if (grid->map == NULL) {
@@ -91,11 +92,11 @@ char grid_getPos(grid_t* grid, pos2D_t* pos)
 {
     // NULL pointer checking
     if (grid == NULL) {
-        fprintf(stderr, "grid_getPos(): passed NULL grid\n");
+        fprintf(stderr, "grid_getPos(): passed NULL 'grid'\n");
         return 0;
     }
     if (pos == NULL) {
-        fprintf(stderr, "grid_getPos(): passed NULL pos\n");
+        fprintf(stderr, "grid_getPos(): passed NULL 'pos'\n");
         return 0;
     }
 
@@ -114,7 +115,7 @@ char grid_getPos(grid_t* grid, pos2D_t* pos)
         return 0;
     } 
     if (y < 0 || y >= grid->height) {
-        fprintf(stderr, "grid_getPos(): y coordinate %d  out of range. The  "
+        fprintf(stderr, "grid_getPos(): y coordinate %d  out of range. The "
                 "height is %d\n", y, grid->height);
         return 0;
     } 
@@ -136,15 +137,15 @@ void grid_setPos(grid_t* grid, pos2D_t* pos, char value)
 {
     // NULL pointer check
     if (grid == NULL) {
-        fprintf(stderr, "grid_setPos(): NULL pointer grid passed\n");
+        fprintf(stderr, "grid_setPos(): NULL pointer 'grid' passed\n");
         return;
     }
     if (pos == NULL) {
-        fprintf(stderr, "grid_setPos(): NULL pointer pos passed\n");
+        fprintf(stderr, "grid_setPos(): NULL pointer 'pos' passed\n");
         return;
     }
     if (value == '\0') {
-        fprintf(stderr, "grid_setPos(): NULL (\\0) value passed\n");
+        fprintf(stderr, "grid_setPos(): NULL (\\0) 'value' passed\n");
         return;
     }
 
@@ -182,7 +183,7 @@ char* grid_toString(grid_t* grid)
 {
     // NULL pointer check
     if (grid == NULL) {
-        fprintf(stderr, "grid_setPos(): NULL pointer grid passed\n");
+        fprintf(stderr, "grid_setPos(): NULL pointer 'grid' passed\n");
         return NULL;
     }
     if (grid->map == NULL) {
@@ -191,7 +192,8 @@ char* grid_toString(grid_t* grid)
     }
 
     // make a copy of grid->map
-    char* map_cpy = mem_malloc_assert(sizeof(grid->map), "grid_toString(): "
+    int buffer = (strlen(grid->map) + 1) * sizeof(char);
+    char* map_cpy = mem_malloc_assert(buffer, "grid_toString(): "
             "out of memeory\n");
     strcpy(map_cpy, grid->map);
     return map_cpy;
