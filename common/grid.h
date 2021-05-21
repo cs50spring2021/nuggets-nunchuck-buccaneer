@@ -12,6 +12,9 @@
 
 #ifndef __GRID_H
 #define __GRID_H
+
+typedef struct grid grid_t;
+
 /******************* grid_new *********************
 Builds a new grid from a string of characters
 Caller Provides:
