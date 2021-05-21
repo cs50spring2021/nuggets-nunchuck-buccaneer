@@ -7,8 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pos2D.h"
-#include <readline/readline.h>
+#include "file.h"
 #include "string.h"
+#include "mem.h"
 
 /********************* main ****************/
 int
@@ -27,7 +28,7 @@ main(int argc, char* argv[])
     printf("Use commands <n> and <s> to create new pos2D or set pos2D values\n");
     printf("\n");
     char* line;
-    while ((line = readline(NULL)) != NULL) {
+    while ((line = file_readline(stdin)) != NULL) {
         printf("pos2D: ");
         char* info[3];
         char* cmd = strtok(line, " ");
@@ -51,7 +52,8 @@ main(int argc, char* argv[])
             pos2D_set(pos, atoi(info[1]), atoi(info[2]));
         }
         printf("pos2D: %d, %d\n", pos2D_getX(pos), pos2D_getY(pos));
-        free(line);
+        mem_free(line);
+        pos2D_delete(pos);
     }
 
     return 0; // successful run
