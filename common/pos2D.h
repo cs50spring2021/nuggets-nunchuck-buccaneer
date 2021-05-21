@@ -8,10 +8,11 @@
  * Nunchuck-buccaneers, May 2021
  */
 
-#ifndef __HASHTABLE_H
-#define __HASHTABLE_H
+#ifndef __POS2D_H
+#define __POS2D_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 /**************** global types ****************/
@@ -39,13 +40,10 @@ pos2D_t* pos2D_new(int x, int y);
 /* Create a new (x,y) position point
  *
  * Caller provides:
- *   number of slots to be used for the hashtable (must be > 0).
+ *   x and y values > 0
  * We return:
- *   pointer to the new hashtable; return NULL if error.
- * We guarantee:
- *   hashtable is initialized empty.
- * Caller is responsible for:
- *   later calling hashtable_delete.
+ *   return true if set; return false if error.
+ */
 bool pos2D_set(pos2D_t* pos, int x, int y);
 
 /**************** pos2D_delete ****************/
@@ -59,7 +57,7 @@ bool pos2D_set(pos2D_t* pos, int x, int y);
  *   We check whether the pos2D struct provided actually exists, if it doesn't
  *   we just exit out of this function.
  */
-void pos2D_delete(pos2D_t*);
+void pos2D_delete(pos2D_t* pos);
 
 /**************** pos2D_getX ****************/
 /* Gets the x-coordinate for a pointer struct.
@@ -70,7 +68,7 @@ void pos2D_delete(pos2D_t*);
  *   int - positive int within the dimensions of the map if the struct was valid
  *         negative int if the struct passed to the function is invalid
  */
-int pos2D_getX(pos2D_t*);
+int pos2D_getX(pos2D_t* pos);
 
 /**************** pos2D_getY ****************/
 /* Gets the y-coordinate for a pointer struct.
@@ -81,7 +79,7 @@ int pos2D_getX(pos2D_t*);
  *   int - positive int within the dimensions of the map if the struct was valid
  *         negative int if the struct passed to the function is invalid
  */
-int pos2D_getY(pos2D_t*);
+int pos2D_getY(pos2D_t* pos);
 
 
 
