@@ -8,8 +8,8 @@
  * Nunchuck-buccaneers, May 2021
  */
 
-#ifndef __HASHTABLE_H
-#define __HASHTABLE_H
+#ifndef __POS2D_H
+#define __POS2D_H
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -46,6 +46,7 @@ pos2D_t* pos2D_new(int x, int y);
  *   hashtable is initialized empty.
  * Caller is responsible for:
  *   later calling hashtable_delete.
+ */
 bool pos2D_set(pos2D_t* pos, int x, int y);
 
 /**************** pos2D_delete ****************/
@@ -83,5 +84,5 @@ int pos2D_getX(pos2D_t*);
  */
 int pos2D_getY(pos2D_t*);
 
-
+#endif //__POS2D_H
 
