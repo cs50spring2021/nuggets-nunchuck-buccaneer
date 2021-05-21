@@ -9,6 +9,9 @@
     CS50, 5/19/2021
 
 */
+
+typedef struct grid grid_t;
+
 /******************* grid_new *********************
 Builds a new grid from a string of characters
 Caller Provides:
