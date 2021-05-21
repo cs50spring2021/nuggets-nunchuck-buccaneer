@@ -28,7 +28,7 @@ pos2D_new(int x, int y)
         fprintf(stderr, "pos2D_new: invalid x or y input -- must be > 0\n");
         return NULL;
     }
-    pos2D_t* pos = malloc(sizeof(pos2D_t), "memory allocation error\n");
+    pos2D_t* pos = malloc(sizeof(pos2D_t));
     pos->x = x;
     pos->y = y;
     return pos;
