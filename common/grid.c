@@ -36,10 +36,9 @@ grid_t* grid_new(char* readString)
     }
 
     // create a copy of the passed map string
-    char* map = mem_malloc_assert(sizeof(char*), "grid_new(): "
+    char* map = mem_malloc_assert(sizeof(readString), "grid_new(): "
             "out of memory\n");
-    int buff = strlen(readString) +  1;
-    strcpy(map, readString, buff);
+    strcpy(map, readString);
     
     // loop through every character of the map
     // the width is the number of chars before the first new line
@@ -154,19 +153,19 @@ void grid_setPos(grid_t* grid, pos2D_t* pos, char value)
     int y;
     if ((x = pos2D_getX(pos)) < 0 || (y = pos2D_getY(pos)) < 0) {
         fprintf(stderr, "grid_getPos(): pos has invalid contents\n");
-        return 0;
+        return;
     }
 
     // check that the point is in bounds
     if (x < 0 || x >= grid->width) {
         fprintf(stderr, "grid_getPos(): x coordinate %d  out of range. The "
                 "width is %d\n", x, grid->width);
-        return 0;
+        return;
     } 
     if (y < 0 || y >= grid->height) {
         fprintf(stderr, "grid_getPos(): y coordinate %d  out of range. The  "
                 "height is %d\n", y, grid->height);
-        return 0;
+        return;
     } 
 
     // set the char of the provided position to the provided value
@@ -184,17 +183,17 @@ char* grid_toString(grid_t* grid)
     // NULL pointer check
     if (grid == NULL) {
         fprintf(stderr, "grid_setPos(): NULL pointer grid passed\n");
-        return;
+        return NULL;
     }
     if (grid->map == NULL) {
         fprintf(stderr, "grid_setPos(): NULL grid->map\n");
-        return;
+        return NULL;
     }
 
     // make a copy of grid->map
-    char* map_cpy = mem_malloc_assert(sizeof(char*));
-    int buff = strlen(grid->map) + 1;
-    strcpy(map_cpy, grid->map, buff);
+    char* map_cpy = mem_malloc_assert(sizeof(grid->map), "grid_toString(): "
+            "out of memeory\n");
+    strcpy(map_cpy, grid->map);
     return map_cpy;
 }
 
