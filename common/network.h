@@ -8,16 +8,8 @@
  * Nunchuck Buccaneers, May 2021
  */
 
-/********************* global variables *********************/
-/* none */
-
-/************************* functions *************************/
-
-/********************** local functions **********************/
-/* none */
-
-/********************** global functions *********************/
 /******************** function prototypes ********************/
+
 /********************* startNetworkServer ********************/
 /*
  * startNetworkServer - handles starting the network on the
