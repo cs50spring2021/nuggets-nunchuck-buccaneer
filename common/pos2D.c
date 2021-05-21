@@ -10,7 +10,6 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "mem.h"
 
 /************************** struct **************************/
 typedef struct pos2D {
