@@ -8,9 +8,6 @@
  * Nunchuck-buccaneers, May 2021
  */
 
-#ifndef __POS2D_H
-#define __POS2D_H
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
