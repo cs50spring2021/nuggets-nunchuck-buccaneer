@@ -13,8 +13,7 @@
 #include "pos2D.h"
 #include "grid.h"
 
-//NEED TO DO THE IMPLEMENTATION
-//NEED TO FO THE TESTING
+//NEED TO DO THE TESTING
 
 /**************** file-local global variables ****************/
 
@@ -59,7 +58,7 @@ bool visibility_getVisibility(pos2D_t* start, pos2D_t* end, grid_t* baseGrid){
 
 
 /******************* checkLineVerticles *********************
-Checks line of sight for an the verticle axis between two points can be flipped to check the horizontal
+Checks line of sight for  the verticle walls between two points it can be flipped to check the horizontal
 Caller Provides:
     A start position to check
     An end position to check
