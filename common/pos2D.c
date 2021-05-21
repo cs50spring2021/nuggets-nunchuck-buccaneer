@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "mem.h"
 
 /************************** struct **************************/
 typedef struct pos2D {
@@ -29,7 +30,7 @@ pos2D_new(int x, int y)
         fprintf(stderr, "pos2D_new: invalid x or y input -- must be > 0\n");
         return NULL;
     }
-    pos2D_t* pos = malloc(sizeof(pos2D_t));
+    pos2D_t* pos = mem_malloc_assert(sizeof(pos2D_t), "memory allocation error\n");
     pos->x = x;
     pos->y = y;
     return pos;
@@ -59,7 +60,7 @@ pos2D_delete(pos2D_t* pos)
         exit (1);
     }
 
-    free(pos);
+    mem_free(pos);
 }
 
 
