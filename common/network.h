@@ -45,8 +45,9 @@ void startNetworkClient(char* serverHost, char* port);
 
 /********************* tokenizeMessage() *********************/
 /*
- * tokenizeMessage - handles tokenizing the message passed from
- * client to server.
+ * tokenizeMessage - parses the message sent from server to client or from
+ * client to server. It breaks each individual word of the message a part and
+ * inserts it into an array.
  * 
  * Inputs:
  *     * message - char* containing the keystrokes sent from the
