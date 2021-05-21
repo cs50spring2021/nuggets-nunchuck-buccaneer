@@ -39,15 +39,7 @@ pos2D_t* pos2D_new(int x, int y);
  * Caller provides:
  *   x and y values > 0
  * We return:
-<<<<<<< HEAD
  *   return true if set; return false if error.
-=======
- *   pointer to the new hashtable; return NULL if error.
- * We guarantee:
- *   hashtable is initialized empty.
- * Caller is responsible for:
- *   later calling hashtable_delete.
->>>>>>> abcd76e (upaded some headers and what-not)
  */
 bool pos2D_set(pos2D_t* pos, int x, int y);
 
