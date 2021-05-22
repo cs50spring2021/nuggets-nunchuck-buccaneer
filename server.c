@@ -8,6 +8,15 @@
     CS50, 5/12/2021
 
 */
+
+#include <stdio.h>
+#include "pos2D.h"
+#include "message.h"
+#include "gameinfo.h"
+
+static void parseArgs();
+
+
 /******************* main *********************
 parses args, uses networkServer to start server, initializes Game, start networkServer(MessageLoop)
 Caller Provides:
@@ -16,7 +25,19 @@ We Do:
 	exit 1 on an unrecoverable error and print a message informing about error,
 	exit 0 when we leave cleanly, Runs the server for Nuggets and waits for input
 */
-int main(const int argc, char *argv[]);
+int main(const int argc, char *argv[]){
+	// Check Num Args
+	if(argc != 3){
+		fprintf(stderr, "Usage: ./server map.txt [seed]")
+		exit(1);
+	}
+	// Parse the args
+	parseArgs();
+}
+
+static void parseArgs(){
+	
+}
 
 /******************* initializeGame *********************
 Makes the map places gold on the map and initializes a gameInfo struct
