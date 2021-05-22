@@ -16,30 +16,33 @@
 #include "file.h"
 #include "visibility.h"
 
-
+static void testSpot(pos2D_t* player, FILE* map, grid_t* grid);
 
 int main(){
     printf("Visibility Test\n");
     FILE* map = fopen("../maps/hole.txt", "r");
     grid_t* grid = grid_new(file_readUntil(map, NULL));
+    printf("Open Floor Test\n");
+    pos2D_t* player = pos2D_new(13,13);
+    testSpot(player, map, grid);
+    printf("Corridor Exit Test\n");
+    pos2D_set(player,39,16);
+    testSpot(player, map, grid);
+    printf("Corridor Test\n");
+    pos2D_set(player,43,16);
+    testSpot(player, map, grid);
+    fclose(map);
+    pos2D_delete(player);
+}
+
+
+static void testSpot(pos2D_t* player, FILE* map, grid_t* grid){
     rewind(map);
     grid_t* sight = grid_new(file_readUntil(map, NULL));
-    fclose(map);
-
-    pos2D_t* player = pos2D_new(13,13);
-    grid_setPos(sight, player, 'X');
-    int xd = 14;
-    int yd = 10;
-    pos2D_t* spotd = pos2D_new(xd, yd);
-    if(!visibility_getVisibility(player, spotd, grid)){
-        grid_setPos(sight, spotd, 'Z');
-    } else {
-        grid_setPos(sight, spotd, '%');
-    }
-    pos2D_t* gridWH = grid_getWidthheight(grid);
+    grid_setPos(sight, player, '@');
+    pos2D_t* gridWH = grid_getWidthheight(sight);
     for(int y = 0; y < pos2D_getY(gridWH); y++){
         for(int x = 0; x < pos2D_getX(gridWH); x++){
-            //printf("%d, %d\n", x, y);
             pos2D_t* spot = pos2D_new(x, y);
             if(!visibility_getVisibility(player, spot, grid)){
                 grid_setPos(sight, spot, 'O');
@@ -48,5 +51,4 @@ int main(){
         }
     }
     printf(grid_toString(sight));
-    pos2D_delete(player);
 }

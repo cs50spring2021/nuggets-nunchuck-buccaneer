@@ -43,7 +43,7 @@ We Return:
 bool visibility_getVisibility(pos2D_t* start, pos2D_t* end, grid_t* baseGrid){
     // Check Args
     if(start == NULL || end == NULL || baseGrid == NULL){
-        fprintf(stderr, "visibility_getVisibility: Null args passed");
+        //fprintf(stderr, "visibility_getVisibility: Null args passed");
         return false;
     }
     // Get reversed points for X and Y axis
@@ -51,7 +51,8 @@ bool visibility_getVisibility(pos2D_t* start, pos2D_t* end, grid_t* baseGrid){
     pos2D_t* endReversed = pos2D_new(pos2D_getY(end), pos2D_getX(end));
     // Check the verticle axis for both the original points and the reversed axis points
     //If both are visible then point is visible
-    bool visible = (checkLineVerticles(false, start, end, baseGrid) && checkLineVerticles(true, startReversed, endReversed, baseGrid));
+    bool visible = (checkLineVerticles(false, start, end, baseGrid));
+    visible = visible && checkLineVerticles(true, startReversed, endReversed, baseGrid);
     // Delete reversed Points
     pos2D_delete(startReversed);
     pos2D_delete(endReversed);
@@ -77,7 +78,7 @@ static bool checkLineVerticles(bool flipPosXY, pos2D_t* start, pos2D_t* end, gri
     int changeX = pos2D_getX(end) -  pos2D_getX(start);
     int changeY = pos2D_getY(end) -  pos2D_getY(start);
     double slope = ((double)changeY) / ((double)changeX);
-    printf("cX: %d cY: %d Slope: %f\n", changeX, changeY, slope);
+    //fprintf(stderr, "cX: %d cY: %d Slope: %f\n", changeX, changeY, slope);
     //Check if directly above
     if(changeX == 0){
         return true;
@@ -89,11 +90,12 @@ static bool checkLineVerticles(bool flipPosXY, pos2D_t* start, pos2D_t* end, gri
     } else {
         xDiff--;
     }
+    //fprintf(stderr, "X: %d, Y: %d\n", pos2D_getX(end),pos2D_getY(end));
     //loop towards end x from start x until 1 away from end
     while(abs(xDiff - changeX) >= 1){
-        printf("X: %d\n", pos2D_getX(start) + xDiff);
         //Find the Y of the line for that x
-        double lineY = ((double)pos2D_getX(start)) + ((double)xDiff) * slope;
+        double lineY = ((double)pos2D_getY(start)) + ((double)xDiff) * slope;
+        //fprintf(stderr, "Y: %lf\n", lineY);
         //Check if hits an exact square
         if(round(lineY) == lineY){
             //Create a new point to hold the pos of intersection
