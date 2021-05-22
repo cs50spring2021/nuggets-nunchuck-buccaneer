@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 #include "pos2D.h"
 #include "grid.h"
 
@@ -25,10 +26,12 @@
 
 /**************** local functions ****************/
 
+static bool checkLineVerticles(bool flipPosXY, pos2D_t* start, pos2D_t* end, grid_t* baseGrid);
+
 /**************** functions ****************/
 
 /******************* visibility_getVisibility *********************
-Module that provides a function to check if one point is visible from another given a map.
+Module that provides a function to check if one point is visible from another given a base grid.
 Caller Provides:
     A start position to check
     An end position to check
@@ -45,7 +48,7 @@ bool visibility_getVisibility(pos2D_t* start, pos2D_t* end, grid_t* baseGrid){
     }
     // Get reversed points for X and Y axis
     pos2D_t* startReversed = pos2D_new(pos2D_getY(start), pos2D_getX(start));
-    pos2D_t* endReversed = pos2D_new(pos2D_getY(start), pos2D_getX(start));
+    pos2D_t* endReversed = pos2D_new(pos2D_getY(end), pos2D_getX(end));
     // Check the verticle axis for both the original points and the reversed axis points
     //If both are visible then point is visible
     bool visible = (checkLineVerticles(false, start, end, baseGrid) && checkLineVerticles(true, startReversed, endReversed, baseGrid));
@@ -73,7 +76,12 @@ static bool checkLineVerticles(bool flipPosXY, pos2D_t* start, pos2D_t* end, gri
     // Find the slope of the line
     int changeX = pos2D_getX(end) -  pos2D_getX(start);
     int changeY = pos2D_getY(end) -  pos2D_getY(start);
-    float slope = ((float)changeX) / ((float)changeY);
+    double slope = ((double)changeY) / ((double)changeX);
+    printf("cX: %d cY: %d Slope: %f\n", changeX, changeY, slope);
+    //Check if directly above
+    if(changeX == 0){
+        return true;
+    }
     //Skip the origin pos
     int xDiff = 0; 
     if(changeX > 0){
@@ -82,9 +90,10 @@ static bool checkLineVerticles(bool flipPosXY, pos2D_t* start, pos2D_t* end, gri
         xDiff--;
     }
     //loop towards end x from start x until 1 away from end
-    while(abs(xDiff - changeX) > 1){
+    while(abs(xDiff - changeX) >= 1){
+        printf("X: %d\n", pos2D_getX(start) + xDiff);
         //Find the Y of the line for that x
-        float lineY = pos2D_getX(start) + xDiff * slope;
+        double lineY = ((double)pos2D_getX(start)) + ((double)xDiff) * slope;
         //Check if hits an exact square
         if(round(lineY) == lineY){
             //Create a new point to hold the pos of intersection
@@ -117,8 +126,8 @@ static bool checkLineVerticles(bool flipPosXY, pos2D_t* start, pos2D_t* end, gri
                 underPoint = pos2D_new(round(lineY - 0.5f), pos2D_getX(start) + xDiff);
             }
             //Get characters for the over and under pos
-            char over = map_getBasePos(baseGrid, overPoint);
-            char under = map_getBasePos(baseGrid, underPoint);
+            char over = grid_getPos(baseGrid, overPoint);
+            char under = grid_getPos(baseGrid, underPoint);
             //Delete points
             pos2D_delete(overPoint);
             pos2D_delete(underPoint);

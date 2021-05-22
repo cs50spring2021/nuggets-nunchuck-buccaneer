@@ -8,7 +8,7 @@
 
 */
 /******************* visibility_getVisibility *********************
-Module that provides a function to check if one point is visible from another given a map.
+Module that provides a function to check if one point is visible from another given a base grid.
 Caller Provides:
     A start position to check
     An end position to check
@@ -17,4 +17,4 @@ We Return:
     True if the square is visible:
     False if square is not visible or there is an error
 */
-bool visibility_getVisibility(pos2D_t* start, pos2D_t* end, map_t* map);
+bool visibility_getVisibility(pos2D_t* start, pos2D_t* end, grid_t* baseGrid);
