@@ -18,6 +18,7 @@
 #include "message.h"
 #include "visibility.h"
 #include "string.h"
+#include "map.h"
 
 /*********************** local types **********************/
 typedef struct playerInfo {
@@ -183,4 +184,4 @@ int gameInfo_getSeed(gameInfo_t* info);
  * Caller is responsible for:
  *     nothing.
  */
-void gameInfo_delete(gameInfo_t* info)
+void gameInfo_delete(gameInfo_t* info);
