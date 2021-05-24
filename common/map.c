@@ -214,10 +214,6 @@ pos2D_t* map_randomEmptySquare(map_t* map)
         fprintf(stderr, "map_randomEmptySquare(): NULL 'map' passed\n");
         return NULL;
     }
-    if (seed < 0) {
-        fprintf(stderr, "map_randomEmptySquare(): invalid 'seed' passed\n");
-        return NULL;
-    }
 
     char* gameString = grid_toString(map->gameGrid);
     // strlen + 1 so that % gridLength includes the last (not \0) character
@@ -245,7 +241,7 @@ pos2D_t* map_randomEmptySquare(map_t* map)
 
 /* ********** map_putOneGold() ********* */
 /* see map.h for description */
-void map_putOneGold(map_t* map, int seed) 
+void map_putOneGold(map_t* map) 
 {
     // NULL pointer check
     if (map == NULL) {
@@ -254,7 +250,7 @@ void map_putOneGold(map_t* map, int seed)
     }
     
     // get the pos of a random empty square
-    pos2D_t* randPos = map_randomEmptySquare(map, seed);
+    pos2D_t* randPos = map_randomEmptySquare(map);
 
     // set the char of that index on the game Map to the gold symbol '*'
     grid_setPos(map->gameGrid, randPos, '*');
