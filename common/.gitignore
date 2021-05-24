@@ -15,7 +15,7 @@ core
 # Object files and libraries
 *.o
 *.a
-a.out
+*.out
 
 # Emacs backup and scratch files
 *~

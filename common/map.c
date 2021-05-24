@@ -20,6 +20,7 @@
 #include "pos2D.h"
 #include "grid.h"
 #include "mem.h"
+#include "gameInfo.h"
 
 /* ******************************************************** */
 
@@ -175,7 +176,7 @@ void map_setPlayerPos(map_t* map, pos2D_t* pos, playerInfo_t* player)
     }
     
     // Check for NULL pointers in player->ID
-    if (player->playerID == NULL) {
+    if (player->playerID == '\0') {
         fprintf(stderr, "map_setPlayerPos(): NULL pointer 'player->playerID'\n");
     return;
     }
