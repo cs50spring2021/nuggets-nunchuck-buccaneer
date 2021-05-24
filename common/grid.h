@@ -10,6 +10,10 @@
 
 */
 
+
+#ifndef __GRID_H
+#define __GRID_H
+
 typedef struct grid grid_t;
 
 /******************* grid_new *********************
@@ -33,16 +37,17 @@ Caller Provides:
 We Do:
     Free the grid and it's contents, if grid provided is NULL we do nothing
 */
-void grid_delete(grid_t*);
+void grid_delete(grid_t* grid);
 
 
 /******************* grid_getPos *********************
-Gets the value of a particular grid spot but gives all wall chars as '*'
+Gets the value of a particular grid spot but gives all wall chars as '+'
 Caller Provides:
     A grid struct to look into
     A pos to look into that grid struct
 We Return:
-    Null on out of bounds or error otherwise we return the character found in the grid
+    Null (0) on out of bounds or error otherwise we return the character found in 
+        the grid
     All wall characters should be returned as '+'
     Just a char primitive
 */
@@ -84,3 +89,5 @@ Caller is responsible For:
     Later freeing the returned pos2D
 */
 pos2D_t* grid_getWidthheight(grid_t* grid);
+
+#endif // __GRID_H

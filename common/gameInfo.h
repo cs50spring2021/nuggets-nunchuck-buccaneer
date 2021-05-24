@@ -20,6 +20,10 @@
 #include "message.h"
 #include "visibility.h"
 #include "string.h"
+#include "map.h"
+
+#ifndef __GAMEINFO_H
+#define __GAMEINFO_H
 
 /*********************** local types **********************/
 typedef struct playerInfo {
@@ -189,3 +193,6 @@ bool gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address);
  *     nothing.
  */
 void gameInfo_delete(gameInfo_t* info);
+
+#endif // __GAMEINFO_H
+

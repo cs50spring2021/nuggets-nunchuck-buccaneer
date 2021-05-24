@@ -173,7 +173,7 @@ gameInfo_getPlayer(gameInfo_t* info, addr_t* address)
     playerInfo_t* player = NULL;
     int i = 0;
     while (player == NULL && i < info.numPlayers) {
-        if (address == info.players[i]) {
+        if (message_eqAddr(address, info.players[i].address)) {
             player = info.players[i];
         }
         i++;
