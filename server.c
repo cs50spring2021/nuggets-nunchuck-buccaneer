@@ -12,9 +12,11 @@
 // INCLUSIONS
 
 #include <stdio.h>
+#include <unistd.h>
 #include "pos2D.h"
 #include "message.h"
 #include "gameInfo.h"
+
 
 //CONSTANTS
 
@@ -56,7 +58,7 @@ int main(const int argc, char *argv[]){
 	} else {
 		srand(getpid());
 	}
-	gameInfo_new();
+	//gameInfo_new();
 }
 
 /******************* parseArgs - helper for main *********************

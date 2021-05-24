@@ -1,3 +1,5 @@
+gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common   -c -o server.o server.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common server.o common/common.a support/support.a  -o server
 bash -v testing.sh
 #!/bin/bash
 #
