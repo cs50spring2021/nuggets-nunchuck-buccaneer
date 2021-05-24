@@ -5,7 +5,7 @@
 # 05/21/21
 #
 
-OBJS = grid.o pos2D.o mem.o
+OBJS = grid.o pos2D.o mem.o map.o
 TESTS = gridtest.o
 LIB = common.a
 LLIBS = 
@@ -27,6 +27,7 @@ gridtest: $(OBJS) $(TESTS)
 grid.o: grid.h pos2D.h mem.h
 pos2D.o: pos2D.h
 mem.o: mem.h
+map.o: map.h file.h pos2D.h grid.h mem.h
 gridtest.o: mem.o pos2D.o grid.o grid.h pos2D.h pos2D.h
 
 test-grid:
