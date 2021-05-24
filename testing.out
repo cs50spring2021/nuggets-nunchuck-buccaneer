@@ -1,7 +1,1 @@
-gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common   -c -o server.o server.c
-gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common server.o common/common.a support/support.a  -o server
-server.o: In function `main':
-/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/server.c:63: undefined reference to `gameInfo_newGameInfo'
-collect2: error: ld returned 1 exit status
-Makefile:23: recipe for target 'server' failed
-make: *** [server] Error 1
+make: *** No rule to make target 'common/common.a', needed by 'server'.  Stop.
