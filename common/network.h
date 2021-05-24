@@ -43,6 +43,18 @@ void startNetworkServer(gameInfo_t* gameInfo);
  */
 void startNetworkClient(char* serverHost, char* port);
 
+/* ***************** numWords() ********************** */
+/*
+ * numWords - This function counts the number of words in the message.
+ *
+ * Inputs:
+ *     * char* string - a message sent either from client to server or server
+ *                      to client.
+ * 
+ * Outputs: 
+ *     * int numWords - the number of words that were in the message
+ */
+ 
 /********************* tokenizeMessage() *********************/
 /*
  * tokenizeMessage - parses the message sent from server to client or from
@@ -52,11 +64,12 @@ void startNetworkClient(char* serverHost, char* port);
  * Inputs:
  *     * message - char* containing the keystrokes sent from the
  *       client to the server.
+ *     * numWords - int the number of separate words found in a message.
  * Output:
  *     * char** tokens - char** pointing to tokens from the original
  *       message string passed to the server.
  */
-char** tokenizeMessage(const char* message);
+char** tokenizeMessage(const char* message, int numWords);
 
 /********************** handleMessage() **********************/
 /*
