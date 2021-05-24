@@ -21,7 +21,7 @@ $(LIB): $(OBJS)
 	ar cr $(LIB) $(OBJS)
 
 gridtest: $(OBJS) gridtest.o
-	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
 
 visibilitytest: $(OBJS) visibilitytest.o
 	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@

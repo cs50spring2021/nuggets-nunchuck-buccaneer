@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 #include "mem.h"
 #include "pos2D.h"
 #include "grid.h"
@@ -19,6 +20,7 @@
 #include "message.h"
 #include "visibility.h"
 #include "string.h"
+#include "map.h"
 
 #ifndef __GAMEINFO_H
 #define __GAMEINFO_H
@@ -65,7 +67,7 @@ gameInfo_t* gameInfo_newGameInfo(int piles, int score, char* mapFile);
  * Caller is responsible for:
  *     later calling gameInfo_removePlayer.
  */
-bool gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos);
+bool gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos, char* username);
 
 /****************** gameInfo_addSpectator *****************/
 /*
@@ -132,7 +134,7 @@ bool gameInfo_pickupGold(gameInfo_t* info, addr_t* address);
  *     char* representing the scoreboard,
  *     NULL if errors encountered.
  * Caller is responsible for:
- *     nothing.
+ *     nothing
  */
 char* gameInfo_createScoreBoard(gameInfo_t* info);
 
@@ -149,7 +151,7 @@ char* gameInfo_createScoreBoard(gameInfo_t* info);
  * Caller is responsible for:
  *     nothing.
  */
-char* gameInfo_topBar(gameInfo_t* info, addr_t* address);
+char* gameInfo_topBar(gameInfo_t* info, addr_t* address, char* message);
 
 /******************** gameInfo_getMap *********************/
 /*
@@ -176,9 +178,23 @@ map_t* gameInfo_getMap(gameInfo_t* info);
  */
 int gameInfo_getSeed(gameInfo_t* info);
 
+/**************** gameInfo_updateSightGrid ****************/
+/* 
+ * Updates sightGrid for the player
+ * Caller provides:
+ *     gameInfo struct,
+ *     address for player.
+ * We return:
+ *     true if sightGrid is updated,
+ *     false if any errors are encountered.
+ * Caller is responsible for:
+ *     nothing.
+ */
+bool gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address);
+
 /********************* gameInfo_delete ********************/
 /*
- * Adds a player to the gameInfo player array
+ * Free all things stored in memory
  * Caller provides:
  *     desired gameInfo struct.
  * We return:
@@ -190,3 +206,4 @@ int gameInfo_getSeed(gameInfo_t* info);
 void gameInfo_delete(gameInfo_t* info);
 
 #endif // __GAMEINFO_H
+
