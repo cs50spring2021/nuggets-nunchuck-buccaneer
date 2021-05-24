@@ -27,7 +27,7 @@ pos2D_t*
 pos2D_new(int x, int y)
 {
     if (x < 0 || y < 0) {
-        fprintf(stderr, "pos2D_new: invalid x or y input -- must be > 0\n");
+        fprintf(stderr, "pos2D_new: invalid x or y input -- must be >= 0\n");
         return NULL;
     }
     pos2D_t* pos = mem_malloc_assert(sizeof(pos2D_t), "memory allocation error\n");
