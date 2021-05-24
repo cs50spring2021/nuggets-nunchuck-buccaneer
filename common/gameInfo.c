@@ -16,6 +16,7 @@
 #include "mem.h"
 #include "pos2D.h"
 #include "grid.h"
+#include "map.h"
 #include "message.h"
 #include "visibility.h"
 #include "string.h"
