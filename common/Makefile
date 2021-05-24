@@ -4,8 +4,10 @@
 # CS50-Spring 2021
 # 05/21/21
 #
+
 S = ../support
 OBJS = grid.o pos2D.o mem.o visibility.o file.o gameInfo.o
+
 LIB = common.a
 LLIBS = $S/support.a
 
@@ -33,8 +35,9 @@ grid.o: grid.h pos2D.h mem.h
 visibility.o: visibility.h pos2D.h grid.h mem.h
 pos2D.o: pos2D.h
 mem.o: mem.h
+map.o: map.h file.h pos2D.h grid.h mem.h gameInfo.h
 file.o: file.h
-gridtest.o: mem.o pos2D.o grid.o grid.h pos2D.h pos2D.h
+gridtest.o: mem.o pos2D.o grid.o grid.h pos2D.h
 visibilitytest.o: pos2D.o grid.o grid.h pos2D.h file.h mem.h
 gameInfo.o: mem.h pos2D.h grid.h $S/message.h visibility.h map.h
 
