@@ -50,6 +50,12 @@ int main(const int argc, char *argv[]){
 	int seed = -1;
 	parseArgs(argc, argv, &mapFilePath, &seed);
 	printf("Seed: %d\n", seed);
+	//Do randomness initialization
+	if(seed == -1){
+		srand(seed);
+	} else {
+		srand(getpid());
+	}
 	gameInfo_new();
 }
 
