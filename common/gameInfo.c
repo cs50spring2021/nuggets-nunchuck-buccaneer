@@ -277,7 +277,7 @@ gameInfo_topBar(gameInfo_t* info, addr_t* address, char* message)
     }
     // grab the top bar for the player and print out to a char*
     char playerTopLine[100];
-    sprintf("Player %c has %d nuggets (%d nuggets unclaimed). %s", i+65, gameInfo_getPlayer(info, address).score, info.goldScore, message); // need to update to handle messages
+    sprintf("Player %c has %d nuggets (%d nuggets unclaimed). %s", gameInfo_getPlayer(info, address).playerID+65, gameInfo_getPlayer(info, address).score, info.goldScore, message); // need to update to handle messages
     
     return playerTopLine;
 }
@@ -296,21 +296,6 @@ gameInfo_getMap(gameInfo_t* info)
     // return the game map
     return info.map;
 ]
-
-/******************* gameInfo_getSeed *********************/
-/* see gameInfo.h for description */
-int
-gameInfo_getSeed(gameInfo_t* info)
-{
-    // arg checking
-    if (info == NULL) {
-        fprintf(stderr, "gameInfo_getSeed: NULL gameInfo pointer\n");
-        return -1;
-    }
-
-    // seed value changes with actions
-    return info.goldScore % info.goldPiles;
-}
 
 /**************** gameInfo_updateSightGrid ****************/
 /* see gameInfo.h for description */
