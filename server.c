@@ -20,11 +20,11 @@
 
 //CONSTANTS
 
-int maxNameLength = 50;   // max number of chars in playerName
-int maxPlayers = 26;      // maximum number of players
-int goldTotal = 250;      // amount of gold in the game
-int goldMinNumPiles = 10; // minimum number of gold piles
-int goldMaxNumPiles = 30; // maximum number of gold piles
+const int maxNameLength = 50;   // max number of chars in playerName
+const int maxPlayers = 26;      // maximum number of players
+const int goldTotal = 250;      // amount of gold in the game
+const int goldMinNumPiles = 10; // minimum number of gold piles
+const int goldMaxNumPiles = 30; // maximum number of gold piles
 
 // LOCAL FUNCTIONS, PROTOTYPES
 
@@ -51,14 +51,16 @@ int main(const int argc, char *argv[]){
 	char* mapFilePath = NULL;
 	int seed = -1;
 	parseArgs(argc, argv, &mapFilePath, &seed);
-	printf("Seed: %d\n", seed);
 	//Do randomness initialization
 	if(seed == -1){
 		srand(seed);
 	} else {
 		srand(getpid());
 	}
-	//gameInfo_new();
+	//Generate Random gold pile numbers
+	int piles = goldMinNumPiles + (rand() / (goldMaxNumPiles - goldMinNumPiles));
+	printf("PILES: %d\n", piles);
+	gameInfo_newGameInfo(piles, goldTotal, mapFilePath);
 }
 
 /******************* parseArgs - helper for main *********************
