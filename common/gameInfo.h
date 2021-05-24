@@ -19,6 +19,7 @@
 #include "message.h"
 #include "visibility.h"
 #include "string.h"
+#include "map.h"
 
 /*********************** local types **********************/
 typedef struct playerInfo {
