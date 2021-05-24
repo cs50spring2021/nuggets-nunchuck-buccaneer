@@ -207,7 +207,7 @@ void map_setPlayerPos(map_t* map, pos2D_t* pos, playerInfo_t* player)
 
 /* ********** map_randomEmptySquare() ********** */
 /* see map.h for description */
-pos2D_t* map_randomEmptySquare(map_t* map, int seed)
+pos2D_t* map_randomEmptySquare(map_t* map)
 {   
     // NULL pointer check
     if (map == NULL) {
@@ -219,8 +219,6 @@ pos2D_t* map_randomEmptySquare(map_t* map, int seed)
         return NULL;
     }
 
-    // Seed the random number generator
-    srand((int) seed);
     char* gameString = grid_toString(map->gameGrid);
     // strlen + 1 so that % gridLength includes the last (not \0) character
     int gridLength = strlen(gameString) + 1;
@@ -252,10 +250,6 @@ void map_putOneGold(map_t* map, int seed)
     // NULL pointer check
     if (map == NULL) {
         fprintf(stderr, "map_putOneGold(): NULL 'map' passed\n");
-        return;
-    }
-    if (seed < 0) {
-        fprintf(stderr, "map_putOneGold(): invalid 'seed' passed\n");
         return;
     }
     

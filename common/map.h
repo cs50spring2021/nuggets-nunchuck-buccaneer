@@ -121,7 +121,7 @@ void map_setPlayerPos(map_t* map, pos2D_t* pos, playerInfo_t* player);
  * Caller is responsible for:
  *      - later freeing the returned pos2D_t
  */
-pos2D_t* map_randomEmptySquare(map_t* map, int seed);
+pos2D_t* map_randomEmptySquare(map_t* map);
  
 /* ********** map_putOneGold() ********** */
 /* place a single pile of gold on an empty spot on the map
@@ -136,7 +136,7 @@ pos2D_t* map_randomEmptySquare(map_t* map, int seed);
  * We do:
  *      - change one random open slot of the gameGrid to a gold pile '*'
  */
-void map_putOneGold(map_t* map, int seed);
+void map_putOneGold(map_t* map);
 
 /* ********** map_getWidthHeight() ********** */
 /* get the width and hight of the baseGrid (same as gameGrid)
