@@ -106,12 +106,12 @@ bool handleTimeout(void* arg);
 /*********************** handleInput() ************************/
 /*
  * handleInput - should read once from stdin and process it.
+ *               Also compares input to an array of valid key strokes to see if
+ *               it is an acceptable key stroke to send.
  *
  * Inputs:
- *     * void* arg - anything we want to pass through, i.e., gameInfo
- *       struct --> allows access to gameInfo for either side if needed.
- *       could also (more likely) be the server address, but void* arg 
- *       allows for flexibility in that regard.
+ *     * void* arg - anything we want to pass through, in this case we will
+ *                   be passing in the server address.
  * Output:
  *     * boolean:
  *          * true to terminate looping - game quit or game over.
