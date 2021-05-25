@@ -6,7 +6,7 @@
 C = ./common
 S = ./support
 OBJS = server.o servertest.o
-LIBS = 
+LIBS = -lm
 LLIBS = $C/common.a $S/support.a
 
 CFLAGS = -Wall -pedantic -std=c11 -ggdb $(TESTING) -I$S -I$C

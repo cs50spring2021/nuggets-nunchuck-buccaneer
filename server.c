@@ -32,6 +32,8 @@ static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* see
 static gameInfo_t* initializeGame(char* mapFile);
 static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir);
 static pos2D_t* dirToMovement(pos2D_t* start, char dir);
+static void sendDisplays(gameInfo_t* gameinfo);
+static void endGame(gameInfo_t* gameinfo);
 
 // FUNCTIONS
 
@@ -151,7 +153,7 @@ We Return:
 */
 bool movePlayer(gameInfo_t* gameinfo, addr_t* player, char input){
 	//Check Args
-	if(gameinfo == NULL || player == NULL || input == NULL){
+	if(gameinfo == NULL || player == NULL){
 		fprintf(stderr, "movePlayer: Invalid Args passed");
 		return NULL;
 	}
@@ -187,7 +189,7 @@ We Return:
 */
 static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir){
 	//Check args
-	if(gameinfo == NULL || addr == NULL || dir == NULL){
+	if(gameinfo == NULL || addr == NULL){
 		fprintf(stderr, "shortMove: Invalid Args passed");
 		return false;
 	}
@@ -195,7 +197,12 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir){
 	playerInfo_t* player = gameInfo_getPlayer(gameinfo, addr);
 	pos2D_t* toPos = dirToMovement(player->pos, dir);
 	map_t* map = gameInfo_getMap(gameinfo);
-	map_
+	char current = map_getGamePos(map, toPos);
+	//Check if out of bounds
+	if(current == '\0'){
+		return false;
+	}
+	//Check if 
 	pos2D_delete(toPos);
 }
 
@@ -280,7 +287,7 @@ We Do:
 	Send each player a line containing their current nuggets and the nuggets left to collect in the game with their visable map contained below 
 	it. To get the visible map we use the sightmaps from each playerinfo struct to combine into get VisibleMap
 */
-void sendDisplays(gameInfo_t* gameinfo){
+static void sendDisplays(gameInfo_t* gameinfo){
 	return;
 }
 
@@ -292,6 +299,6 @@ We Do:
 	Send a new display to each player that contains the endgame scoreboard constructed from gameinfo
 	Send a quit message to all players
 */
-void endGame(gameInfo_t* gameinfo){
+static void endGame(gameInfo_t* gameinfo){
 	return;
 }
