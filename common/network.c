@@ -68,11 +68,19 @@ startNetworkClient(char* serverHost, char* port, FILE* errorFile, char* name)
   char* message;            // the initial join message sent to the server
 
   // allocating memory for the two variables
-  serverAddress = mem_malloc_assert(sizeof(serverAddress, "error: issue " 
-  "encountered while allocating memory for the server address.\n"));
-  message = mem_malloc_assert(sizeof(char*) * strlen(name)) + 1, "error: issue" 
-  " encountered while allocating memory for the message that's sent to"
-  " the server.\n");
+  serverAddress = mem_malloc_assert(sizeof(adrr_t));
+  if (serverAddress == NULL) {
+    fprintf(stderr, "error: issue encountered while allocating memory for the"
+                    " server address.\n");
+    exit(1);
+  }
+
+  message = mem_malloc_assert(sizeof(char*) * strlen(name) + 1);
+  if (message == NULL) {
+    fprintf(stderr, "error: issue encountered while allocating memory for"
+    " the message that's sent to the server.\n");
+    exit(2);
+  }
 
   sprintf(message, "PLAY %s", name);
 
@@ -81,19 +89,13 @@ startNetworkClient(char* serverHost, char* port, FILE* errorFile, char* name)
     // error occurred while initalizing the client's connection
     fprintf(stderr, "error: issue encountered while initializing the"
                        " client's connection\n");
-    exit(1);
+    exit(3);
   }
   if (!message_setAddr(serverHost, serverPort, &serverAddress)) {
     fprintf(stderr, "error: issue encountered likely due to a bad hostname or"
                     " port number\n");
-    exit(2);
+    exit(4);
   }
-
-  /* checks the dimensions of the user's screen to ensure they're compatible
-  with the map's dimensions */
-  checkDimensions
-  getDimensions
-
 
   // user joins the server
   message_send(serverAddress, message);
@@ -103,7 +105,7 @@ startNetworkClient(char* serverHost, char* port, FILE* errorFile, char* name)
                     handleMessage)) {
     // message_loop is false: a fatal error stopped it from continuing to loop.
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
-    exit(3);
+    exit(5);
   }
 
   message_done();
@@ -298,7 +300,13 @@ handleMessage(void* arg, const addr_t from, const char* message)
 bool
 handleTimeout(void* arg)
 {
-  
+  if (arg != NULL) {
+    quitClient("");
+    return true;
+  }
+
+  // keep looping in message_loop
+  return false;
 }
 
 /**************** handleInput() ****************/
@@ -306,7 +314,34 @@ handleTimeout(void* arg)
 bool
 handleInput(void* arg);
 {
-  
+  // character array for valid keystroke input.
+  char array[] = {'h', 'l', 'k', 'j', 'y', 'u', 'b', 'n', 'q', 'H', 'L', 'K',
+                  'J', 'Y', 'U', 'B', 'N', 'Q'};
+  int arrayItems = 18;              // number of items in the above array
+  char* message;
+  addr_t* address = arg;
+
+  message = mem_malloc_assert(sizeof(char*) * strlen(name) + 1);
+  if (message == NULL) {
+    fprintf(stderr, "error: issue encountered while allocating memory for"
+    " the message that's sent to the server.\n");
+    return true;
+  }
+
+  char key = '\0';
+  scanf("%c", key);
+
+  // loops over all of the valid keystrokes that can be inputted
+  for (int i = 0; i < arrayItems; i++) {
+    if (key == array[i]) {
+      sprintf(message, "KEY %c", name);
+      message_send(address, message);
+      return false;
+    }
+  }
+
+  // if a message wasn't sent, the key inputted was not a valid keystroke
+  return false;
 }
 
 /* ***************** str2int ********************** */
