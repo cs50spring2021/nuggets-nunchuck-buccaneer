@@ -34,7 +34,8 @@ typedef struct gameInfo gameInfo_t;
  * Caller provides:
  *     piles of gold remaining in the game,
  *     total score remaining in the game,
- *     the mapFile .txt file passed in to display
+ *     the mapFile .txt file passed in to display,
+ *     seed for random functions in the game.
  * We return:
  *     pointer to a gameInfo struct,
  *     NULL if an error occurred while creating the pointer.

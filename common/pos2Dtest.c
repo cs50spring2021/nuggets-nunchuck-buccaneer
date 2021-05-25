@@ -28,7 +28,8 @@ main(int argc, char* argv[])
     printf("Use commands <n> and <s> to create new pos2D or set pos2D values\n");
     printf("\n");
     char* line;
-    while ((line = file_readline(stdin)) != NULL) {
+    pos2D_t* pos = NULL;
+    while ((line = file_readLine(stdin)) != NULL) {
         printf("pos2D: ");
         char* info[3];
         char* cmd = strtok(line, " ");
@@ -40,7 +41,6 @@ main(int argc, char* argv[])
         }
 
         printf("\n");
-        pos2D_t* pos = NULL;
         if (strcmp(info[0], "n") == 0) {
             pos = pos2D_new(atoi(info[1]), atoi(info[2]));
         } 
@@ -53,8 +53,8 @@ main(int argc, char* argv[])
         }
         printf("pos2D: %d, %d\n", pos2D_getX(pos), pos2D_getY(pos));
         mem_free(line);
-        pos2D_delete(pos);
     }
+    pos2D_delete(pos);
 
     return 0; // successful run
 }
