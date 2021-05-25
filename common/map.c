@@ -20,7 +20,7 @@
 #include "pos2D.h"
 #include "grid.h"
 #include "mem.h"
-#include "gameInfo.h"
+#include "playerInfo.h"
 
 /* ******************************************************** */
 

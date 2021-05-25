@@ -8,10 +8,13 @@
  * 05/19/21
  */
 
-
+//#ifndef __MAP_H
+//#define __MAP_H
 
 #include <stdio.h>
 #include "grid.h"
+#include "playerInfo.h"
+
 
 /* ***************************************************************** */
 
@@ -20,9 +23,7 @@
  */
 typedef struct map map_t;
 
-#ifndef __MAP_H
-#define __MAP_H
-#include "gameInfo.h"
+
 /* ***************************************************************** */
 
 /* ********** map_new() ********** */
@@ -173,4 +174,4 @@ pos2D_t* map_getWidthheight(map_t* map);
  */
 void map_delete(map_t* map);
 
-#endif // __MAP_H
+//#endif // __MAP_H
