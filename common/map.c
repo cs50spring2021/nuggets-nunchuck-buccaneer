@@ -99,6 +99,8 @@ grid_t* map_getVisibleMap(map_t* map, grid_t* sightGrid)
     if ((width = pos2D_getX(wH_gameGrid)) != (width2 = pos2D_getX(wH_sightGrid))) {
         fprintf(stderr, "map_getVisibleMap(): grids width missmatch, "
                 "gameGrid: %d, sightGrid %d\n", width, width2);
+        pos2D_delete(wH_gameGrid);
+        pos2D_delete(wH_sightGrid);
         return NULL;
     }
     int height;
@@ -106,9 +108,12 @@ grid_t* map_getVisibleMap(map_t* map, grid_t* sightGrid)
     if ((height = pos2D_getY(wH_gameGrid)) != (height2 = pos2D_getY(wH_sightGrid))) {
         fprintf(stderr, "map_getVisibleMap(): grids height missmatch, "
                 " gameGrid: %d, sightGrid %d\n", height, height2);
+        pos2D_delete(wH_gameGrid);
+        pos2D_delete(wH_sightGrid);
         return NULL;
     }
-    
+    pos2D_delete(wH_gameGrid);
+    pos2D_delete(wH_sightGrid);
     // take the map grids as strings, start an outGrid
     char* gameString = grid_toString(map->gameGrid);
     char* baseString = grid_toString(map->baseGrid);
@@ -123,15 +128,15 @@ grid_t* map_getVisibleMap(map_t* map, grid_t* sightGrid)
         // assign char to outString[i] based on sightSring[i]
         if (sightString[i] == '\n') {
             outString[i] = '\n';
-        } else if (sightString[i] == 0) {
+        } else if (sightString[i] == '0') {
             outString[i] = ' ';
-        } else if (sightString[i] == 1) {
+        } else if (sightString[i] == '1') {
             outString[i] = baseString[i];
-        } else if (sightString[i] == 2) {
+        } else if (sightString[i] == '2') {
             outString[i] = gameString[i];
         } else {
             fprintf(stderr, "map_getVisibleMap(): sightGrid contains unexpected "
-                    "character %c", sightString[i]);
+                    "character '%c'\n", sightString[i]);
             outString[i] = sightString[i];
         }
         i++;
@@ -145,6 +150,7 @@ grid_t* map_getVisibleMap(map_t* map, grid_t* sightGrid)
     
     // create the new outGrid and return it
     grid_t* outGrid = grid_new(outString);
+    free(outString);
     return outGrid;
 }
 
@@ -152,7 +158,10 @@ grid_t* map_getVisibleMap(map_t* map, grid_t* sightGrid)
 /* see map.h for decription */
 char map_getGamePos(map_t* map, pos2D_t* pos)
 {
-    //NOTE: all errors handled in grid_getPos()
+    if (map == NULL) {
+        fprintf(stderr, "map_getGamePos(): HULL 'map' passed");
+        return '\0';
+    }
     char c = grid_getPos(map->gameGrid, pos);
     return c;
 }
@@ -202,6 +211,7 @@ void map_setPlayerPos(map_t* map, pos2D_t* pos, playerInfo_t* player)
             // if it is not, then a player has taken their spot
             // so we don't over write them
     }
+    pos2D_delete(old_pos);
     return;
 }
 
@@ -214,16 +224,12 @@ pos2D_t* map_randomEmptySquare(map_t* map)
         fprintf(stderr, "map_randomEmptySquare(): NULL 'map' passed\n");
         return NULL;
     }
-    if (seed < 0) {
-        fprintf(stderr, "map_randomEmptySquare(): invalid 'seed' passed\n");
-        return NULL;
-    }
 
     char* gameString = grid_toString(map->gameGrid);
     // strlen + 1 so that % gridLength includes the last (not \0) character
     int gridLength = strlen(gameString) + 1;
     
-    // select random spots in the rid until an empty one is found
+    // select random spots in the grid until an empty one is found
     int randIndex = (rand() % gridLength);
     char c;
     while ((c = gameString[randIndex]) != '.') {
@@ -235,17 +241,19 @@ pos2D_t* map_randomEmptySquare(map_t* map)
 
     // get the gridWidth, calculate the x,y coordinates of the point
     int gridWidth = pos2D_getX(widthHeight);
-    int y = (int)floor(randIndex/gridWidth);
-    int x = randIndex - ((gridWidth + 1) * y);
+    int y = (int)floor(randIndex/(gridWidth+1));
+    int x = randIndex - ((gridWidth + 1) * (y));
 
     // return a pos2D of the point
     pos2D_t* randPos = pos2D_new(x, y);
+    free(gameString);
+    pos2D_delete(widthHeight);
     return randPos;
 }
 
 /* ********** map_putOneGold() ********* */
 /* see map.h for description */
-void map_putOneGold(map_t* map, int seed) 
+void map_putOneGold(map_t* map) 
 {
     // NULL pointer check
     if (map == NULL) {
@@ -254,10 +262,11 @@ void map_putOneGold(map_t* map, int seed)
     }
     
     // get the pos of a random empty square
-    pos2D_t* randPos = map_randomEmptySquare(map, seed);
+    pos2D_t* randPos = map_randomEmptySquare(map);
 
     // set the char of that index on the game Map to the gold symbol '*'
     grid_setPos(map->gameGrid, randPos, '*');
+    pos2D_delete(randPos);
     return;
 }
 
@@ -284,7 +293,7 @@ void map_delete(map_t* map)
         return;
     }
     grid_delete(map->baseGrid);
-    grid_delete(map->baseGrid);
+    grid_delete(map->gameGrid);
     free(map);
     return;
 }
