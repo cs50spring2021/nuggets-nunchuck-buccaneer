@@ -8,6 +8,8 @@
  * 05/19/21
  */
 
+
+
 #include <stdio.h>
 #include "grid.h"
 
@@ -18,6 +20,9 @@
  */
 typedef struct map map_t;
 
+#ifndef __MAP_H
+#define __MAP_H
+#include "gameInfo.h"
 /* ***************************************************************** */
 
 /* ********** map_new() ********** */
@@ -25,14 +30,29 @@ typedef struct map map_t;
  * 
  * Caller provides:
  *      - the path to a file containing a properly formatted map.txt file
- * 
+ *
  * We return:
+ *      - NULL on error
  *      - a pointer to a newly minted map_t, with instatiated base and game grids
  *
  * Caller is responsible for:
  *      - later calling map_delete on the returned map pointer
  */
-map_t* mape_new(char* mapFile);
+map_t* map_new(char* mapFile);
+
+
+/* ********** map_getBaseGrid(map_t* map) ********** */
+/* getter for the held basegrid
+ * 
+ * Caller provides:
+ *      - a valid pointer to a map
+ * 
+ * We return:
+ *      - NULL on error
+ *      - a pointer to the held baseGrid
+ */
+grid_t* map_getBaseGrid(map_t* map);
+
 
 /* ********** map_getVisibleMap() ********** */
 /* combine the gameGrid and a sightGrid, return a grid of what is visible
@@ -40,9 +60,11 @@ map_t* mape_new(char* mapFile);
  * Caller provides:
  *      - a valid pointer to an initialized map
  *      - a valid pointer to a sightGrid
+ *      - sightGrid and map->gameGrid must have the same dimensions
  *
  * We return:
- *      - a pointer to a grid of what on the gameGrid is see-able
+ *      - NULL on error
+ *      - a pointer to a grid of what is see-able on the gameGrid
  * 
  * Caller is responsible for:
  *      - later calling grid_delete on the returned grid_t pointer
@@ -53,13 +75,14 @@ grid_t* map_getVisibleMap(map_t* map, grid_t* sightGrid);
 /* return the character in gameGrid at a specific position
  * 
  * Caller provides:
+ *      - NULL char '\0' on error
  *      - a valid pointer to a map_t
  *      - a valid pointer to a pos2D_t
  * 
  * We return:
  *      - the char at that pos
  */
-char map_getGamePos(pos2D_t*);
+char map_getGamePos(map_t* map, pos2D_t* pos);
 
 /* ********** map_setPlayerPos() ********** */
 /* sets the position of a player to the new position on gameGrid
@@ -67,17 +90,26 @@ char map_getGamePos(pos2D_t*);
  * Caller provides:
  *      - a valid pointer to a map_t
  *      - a valid pointer to a pos2D_t
- *      - a valid pointer to the addr_t of a player
+ *      - a valid pointer to the a playerInfo_t object
  *
  * We return:
  *      - nothing
  * 
  * We do:
+ *      - nothing if error
  *      - set the charcter in gameGrid at pos to the playerID
+ *      - update the pos2D in the playerInfo Struct
+ *          - and free the old pos2D of the player
  *      - if the player was on the map previoulsy, set the char where the 
  *        player used to be back to what it is on the baseGrid
+ *          - UNLESS the players current spot is occupied by a player other
+ *            than themselves. (so when players swap positions they do not write
+ *            over the first one to move)
+ *
+ * NOTE: the caller is responsible for making sure that the player doesn't
+ *       run through any walls 
  */
-void map_setPlayerPos(map_t* map, pos2D_t* pos, addr_t* player);
+void map_setPlayerPos(map_t* map, pos2D_t* pos, playerInfo_t* player);
 
 /* ********** map_randomEmptySquare() ********** */
 /* return a random empty square from the map
@@ -85,20 +117,23 @@ void map_setPlayerPos(map_t* map, pos2D_t* pos, addr_t* player);
  *
  * Caller provides:
  *      - a valid pointer to a map_t
+ *      - a valid int seed, to seed random numbers
  *
  * We return:
+ *      - NULL on error
  *      - a pointer to a pos2D_t of an slot that is currently empty '.'
  * 
  * Caller is responsible for:
  *      - later freeing the returned pos2D_t
  */
 pos2D_t* map_randomEmptySquare(map_t* map);
-
-/* ********** map_putGold() ********** */
+ 
+/* ********** map_putOneGold() ********** */
 /* place a single pile of gold on an empty spot on the map
  * 
  * Caller provides:
  *      - a valid pointer to a map_t
+ *      - a valid int seed, to seed random numbers
  * 
  * We return:
  *      - nothing
@@ -115,9 +150,9 @@ void map_putOneGold(map_t* map);
  *      - a valid pointer to a map_t
  * 
  * We return:
+ *      - NULL on error
  *      - a pointer to a pos2D_t which contains the width in the x-coordinate and
  *        the height in the y-coordinate
- * 
  * Caller is responsible for:
  *      - later caling pos2D_delete() on the returned pos
  */
@@ -137,3 +172,5 @@ pos2D_t* map_getWidthheight(map_t* map);
  *      - free the map
  */
 void map_delete(map_t* map);
+
+#endif // __MAP_H

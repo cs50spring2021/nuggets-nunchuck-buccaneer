@@ -15,7 +15,7 @@ core
 # Object files and libraries
 *.o
 *.a
-a.out
+*.out
 
 # Emacs backup and scratch files
 *~
@@ -36,5 +36,5 @@ Icon?
 
 ###########################################################################
 # custom additions below here; see also .gitignore files in subdirectories.
-server
-maps/unreadable.txt
+gridtest
+maptest
