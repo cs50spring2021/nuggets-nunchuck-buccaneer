@@ -20,7 +20,6 @@
 #include "message.h"
 #include "visibility.h"
 #include "string.h"
-#include "map.h"
 
 #ifndef __GAMEINFO_H
 #define __GAMEINFO_H
