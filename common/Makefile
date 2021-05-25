@@ -9,7 +9,7 @@ S = ../support
 OBJS = grid.o pos2D.o mem.o visibility.o file.o gameInfo.o
 
 LIB = common.a
-LLIBS = $S/support.a
+LLIBS = ../support.a
 
 CFLAGS = -Wall -pedantic -std=c11 -ggdb $(FLAGS) -I$S
 CC = gcc
@@ -38,12 +38,14 @@ grid.o: grid.h pos2D.h mem.h
 visibility.o: visibility.h pos2D.h grid.h mem.h
 pos2D.o: pos2D.h
 mem.o: mem.h
-map.o: map.h file.h pos2D.h grid.h mem.h gameInfo.h
+map.o: map.h file.h pos2D.h grid.h mem.h gameInfo.h playerInfo.h
 file.o: file.h
 gridtest.o: mem.o pos2D.o grid.o grid.h pos2D.h
 visibilitytest.o: pos2D.o grid.o grid.h pos2D.h file.h mem.h
 maptest.o: mem.o map.h grid.h
-gameInfo.o: mem.h pos2D.h grid.h $S/message.h visibility.h map.h
+playerInfo.o:
+gameInfo.o: mem.h pos2D.h grid.h visibility.h playerInfo.h map.o
+gameInfoTest.o: pos2D.h grid.h playerInfo.h gameInfo.o map.o
 
 
 test-grid: gridtest
@@ -55,10 +57,14 @@ test-visibility: visibilitytest
 test-map: maptest
 	valgrind --leak-check=full --show-leak-kinds=all ./maptest
 
+test-gameInfo: gameInfoTest
+	valgrind --leak-check=full --show-leak-kinds=all ./gameInfoTest
+
 clean:
 	rm -rf *.dSYM
 	rm -rf  *.o
 	rm -rf gridtest
 	rm -rf visibilitytest
 	rm -rf maptest
+	rm -rf gameInfoTest
 	rm -rf common.a
