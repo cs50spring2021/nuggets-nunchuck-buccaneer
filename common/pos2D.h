@@ -12,6 +12,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#ifndef __POS2D_H
+#define __POS2D_H
+
 /**************** global types ****************/
 typedef struct pos2D pos2D_t;
 
@@ -79,4 +82,4 @@ int pos2D_getX(pos2D_t* pos);
 int pos2D_getY(pos2D_t* pos);
 
 
-
+#endif // __POS2D_H
