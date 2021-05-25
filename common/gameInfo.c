@@ -85,7 +85,7 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos, char* userna
         currSpot = mapString[i];
         if (currSpot == '\n') sightGridString_init[i] = '\n'; // new line
         else if (currSpot == '\0') sightGridString_init[i] = '\0'; // end of the string
-        else sightGridString_init[i] = '0'; // empty spot
+        else sightGridString_init[i] = '2'; // empty spot
     }
     
     // create the empty sightGrid
