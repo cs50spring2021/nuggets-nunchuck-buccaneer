@@ -7,6 +7,9 @@
  * Nunchuck Buccaneers, May 2021
  */
 
+#ifndef __PLAYERINFO_H
+#define __PLAYERINFO_H
+
  /*********************** types **********************/
 typedef struct playerInfo {
     grid_t* sightGrid;
@@ -16,3 +19,5 @@ typedef struct playerInfo {
     addr_t* address;
     char* username;
 } playerInfo_t;
+
+#endif // __PLAYERINFO_H
