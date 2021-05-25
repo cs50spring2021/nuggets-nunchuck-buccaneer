@@ -16,20 +16,14 @@
 #include "mem.h"
 #include "pos2D.h"
 #include "grid.h"
+#include "map.h"
 #include "message.h"
 #include "visibility.h"
+#include "playerInfo.h"
 #include "string.h"
-#include "map.h"
 
-/*********************** local types **********************/
-typedef struct playerInfo {
-    grid_t* sightGrid;
-    pos2D_t* pos;
-    int score;
-    int playerID;
-    addr_t* address;
-    char* username;
-} playerInfo_t;
+#ifndef __GAMEINFO_H
+#define __GAMEINFO_H
 
 /********************** global types **********************/
 typedef struct gameInfo gameInfo_t;
@@ -41,7 +35,8 @@ typedef struct gameInfo gameInfo_t;
  * Caller provides:
  *     piles of gold remaining in the game,
  *     total score remaining in the game,
- *     the mapFile .txt file passed in to display
+ *     the mapFile .txt file passed in to display,
+ *     seed for random functions in the game.
  * We return:
  *     pointer to a gameInfo struct,
  *     NULL if an error occurred while creating the pointer.
@@ -162,18 +157,6 @@ char* gameInfo_topBar(gameInfo_t* info, addr_t* address, char* message);
  */
 map_t* gameInfo_getMap(gameInfo_t* info);
 
-/********************* gameInfo_getSeed *******************/
-/*
- * Generates a random seed for random behaviors in game functions
- * Caller provides:
- *     desired gameInfo struct.
- * We return:
- *     int for random seed.
- * Caller is responsible for:
- *     nothing.
- */
-int gameInfo_getSeed(gameInfo_t* info);
-
 /**************** gameInfo_updateSightGrid ****************/
 /* 
  * Updates sightGrid for the player
@@ -200,3 +183,6 @@ bool gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address);
  *     nothing.
  */
 void gameInfo_delete(gameInfo_t* info);
+
+#endif // __GAMEINFO_H
+
