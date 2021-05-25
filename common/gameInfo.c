@@ -367,6 +367,20 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
     return true;
 }
 
+/******************* gameInfo_getGoldPiles *******************/
+/* see gameInfo.h for description */
+int 
+gameInfo_getGoldPiles(gameInfo_t* info)
+{
+    // arg checking
+    if (info == NULL) {
+        fprintf(stderr, "gameInfo_getGoldPiles: NULL gameInfo pointer\n");
+        return -1;
+    }
+
+    return info->goldPiles;
+}
+
 /********************* gameInfo_delete ********************/
 /* see gameInfo.h for description */
 void

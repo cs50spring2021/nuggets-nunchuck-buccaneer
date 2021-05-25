@@ -171,6 +171,18 @@ map_t* gameInfo_getMap(gameInfo_t* info);
  */
 bool gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address);
 
+/******************* gameInfo_getGoldPiles *******************/
+/*
+ * Getter for gold amount in gameInfo struct
+ * Caller provides:
+ *     desired gameInfo struct,
+ * We return:
+ *     gold piles left over
+ * Caller is responsible for:
+ *     nothing.
+ */
+int gameInfo_getGoldPiles(gameInfo_t* info);
+
 /********************* gameInfo_delete ********************/
 /*
  * Free all things stored in memory
