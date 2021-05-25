@@ -12,28 +12,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h>
 #include "mem.h"
 #include "pos2D.h"
 #include "grid.h"
 #include "map.h"
 #include "message.h"
 #include "visibility.h"
+#include "playerInfo.h"
 #include "string.h"
-#include "map.h"
 
 #ifndef __GAMEINFO_H
 #define __GAMEINFO_H
-
-/*********************** local types **********************/
-typedef struct playerInfo {
-    grid_t* sightGrid;
-    pos2D_t* pos;
-    int score;
-    int playerID;
-    addr_t* address;
-    char* username;
-} playerInfo_t;
 
 /********************** global types **********************/
 typedef struct gameInfo gameInfo_t;
@@ -165,18 +154,6 @@ char* gameInfo_topBar(gameInfo_t* info, addr_t* address, char* message);
  *     nothing.
  */
 map_t* gameInfo_getMap(gameInfo_t* info);
-
-/********************* gameInfo_getSeed *******************/
-/*
- * Generates a random seed for random behaviors in game functions
- * Caller provides:
- *     desired gameInfo struct.
- * We return:
- *     int for random seed.
- * Caller is responsible for:
- *     nothing.
- */
-int gameInfo_getSeed(gameInfo_t* info);
 
 /**************** gameInfo_updateSightGrid ****************/
 /* 
