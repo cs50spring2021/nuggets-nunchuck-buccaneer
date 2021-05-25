@@ -57,10 +57,8 @@ int main(const int argc, char *argv[]){
 	} else {
 		srand(getpid());
 	}
-	//Generate Random gold pile numbers
-	int piles = goldMinNumPiles + (rand() / (goldMaxNumPiles - goldMinNumPiles));
-	printf("PILES: %d\n", piles);
-	gameInfo_newGameInfo(piles, goldTotal, mapFilePath);
+	gameInfo_t* gameInfo = initializeGame(mapFilePath);
+	startNetworkServer(gameInfo);
 }
 
 /******************* parseArgs - helper for main *********************
@@ -114,6 +112,11 @@ Caller is Responsible For:
 	Later calling gameInfo_delete
 */
 gameInfo_t* initializeGame(char* mapFile){
+	//Generate Random gold pile numbers
+	int piles = goldMinNumPiles + (rand() / (goldMaxNumPiles - goldMinNumPiles));
+	printf("PILES: %d\n", piles);
+	gameInfo_t* gameInfo = mem_assert(gameInfo_newGameInfo(piles, goldTotal, mapFile),"Server Main: mem gameInfo");
+	//ADD GOLD
 	return NULL;
 }
 
