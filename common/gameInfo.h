@@ -19,20 +19,11 @@
 #include "map.h"
 #include "message.h"
 #include "visibility.h"
+#include "playerInfo.h"
 #include "string.h"
 
 #ifndef __GAMEINFO_H
 #define __GAMEINFO_H
-
-/*********************** local types **********************/
-typedef struct playerInfo {
-    grid_t* sightGrid;
-    pos2D_t* pos;
-    int score;
-    int playerID;
-    addr_t* address;
-    char* username;
-} playerInfo_t;
 
 /********************** global types **********************/
 typedef struct gameInfo gameInfo_t;

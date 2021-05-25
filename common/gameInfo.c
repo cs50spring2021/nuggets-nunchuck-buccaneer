@@ -12,26 +12,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h>
 #include "mem.h"
 #include "pos2D.h"
 #include "grid.h"
 #include "map.h"
 #include "message.h"
 #include "visibility.h"
+#include "playerInfo.h"
 #include "string.h"
-
-/*********************** local types **********************/
-/*
-typedef struct playerInfo {
-    grid_t* sightGrid;
-    pos2D_t* pos;
-    int score;
-    int playerID;
-    addr_t* address;
-    char* username;
-} playerInfo_t;
-*/
 
 /********************** global types **********************/
 typedef struct gameInfo {
@@ -126,12 +114,30 @@ gameInfo_addSpectator(gameInfo_t* info, addr_t* address)
 
     // insert a new player with null information into the players array
     playerInfo_t* spectator = mem_malloc_assert(sizeof(playerInfo_t), "memory allocation error\n");
-    spectator->sightGrid = NULL;
     spectator->pos = NULL;
     spectator->score = 0;
     spectator->playerID = 25;
     spectator->address = address;
     spectator->username = "spectator";
+
+    // create fully visible sightgrid
+    // create the spectator's initial sightGrid
+    char* mapString = grid_toString(map_getBaseGrid(gameInfo_getMap(info)));
+    char* sightGridString_init = mem_malloc_assert(strlen(mapString) + 1, "gameInfo_addSpectator: memory allocation error\n");
+
+    // create an empty sightGrid string
+    char currSpot;
+    for (int i = 0; i < strlen(mapString); i++) {
+        currSpot = mapString[i];
+        if (currSpot == '\n') sightGridString_init[i] = '\n'; // new line
+        else if (currSpot == '\0') sightGridString_init[i] = '\0'; // end of the string
+        else sightGridString_init[i] = '0'; // empty spot
+    }
+    
+    // create the empty sightGrid
+    grid_t* sightGridNew = grid_new(sightGridString_init);
+    spectator->sightGrid = sightGridNew;
+
 
     info->players[25] = spectator;
 }
@@ -220,6 +226,17 @@ gameInfo_pickupGold(gameInfo_t* info, addr_t* address)
     return true;
 }
 
+/******************* scoreboardCmpFunc ********************/
+/* comparator for scoreboard qsort */
+int
+scoreboardCmpFunc(const void* player1, const void* player2)
+{
+    playerInfo_t* player1P = (playerInfo_t*) player1;
+    playerInfo_t* player2P = (playerInfo_t*) player2;
+
+    return player1P->score - player2P->score;
+}
+
 /*************** gameInfo_createScoreBoard ****************/
 /* see gameInfo.h for description */
 char* 
@@ -242,8 +259,8 @@ gameInfo_createScoreBoard(gameInfo_t* info)
     }
 
     // sort and create a string
-    // qsort(scoreboard, info->numPlayers, sizeof(playerInfo_t), scoreboardCmpFunc);
-    char scoreboardLine[info->numPlayers * 50]; // 50 chars for each line
+    qsort(scoreboard, info->numPlayers, sizeof(playerInfo_t), scoreboardCmpFunc);
+    char* scoreboardLine = mem_calloc_assert(info->numPlayers, 50, "memory allocation error\n"); // 50 chars for each line
 
     // print out players in decreasing order to a string
     sprintf(scoreboardLine, "GAME OVER: \n");
@@ -252,17 +269,6 @@ gameInfo_createScoreBoard(gameInfo_t* info)
     }
 
     return scoreboardLine;
-}
-
-/******************* scoreboardCmpFunc ********************/
-/* comparator for scoreboard qsort */
-int
-scoreboardCmpFunc(const void* player1, const void* player2)
-{
-    int player1Score = (int) player1;
-    int player2Score = (int) player2;
-
-    return player1Score - player2Score;
 }
 
 /******************** gameInfo_topBar *********************/
@@ -281,9 +287,9 @@ gameInfo_topBar(gameInfo_t* info, addr_t* address, char* message)
         message = " ";
     }
     // grab the top bar for the player and print out to a char*
-    char playerTopLine[100];
     playerInfo_t* player = gameInfo_getPlayer(info, address);
-    sprintf(playerTopLine, "Player %c has %d nuggets (%d nuggets unclaimed). %s", player->playerID+65, player->score, info->goldScore, message); // need to update to handle messages
+    char* playerTopLine = mem_malloc_assert(100, "memory allocation error\n");
+    sprintf(playerTopLine, "Player %c has %d nuggets (%d nuggets unclaimed). %s", (player->playerID)+65, player->score, info->goldScore, message); // need to update to handle messages
     
     return playerTopLine;
 }
@@ -313,9 +319,6 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
         fprintf(stderr, "gameInfo_updateSightGrid: NULL/invalid gameInfo pointer or address pointer\n");
         return false;
     }
-
-    // grab the player
-    playerInfo_t* player = gameInfo_getPlayer(info, address);
     /* 
      * update the player's sightGrid
      * 
@@ -325,6 +328,7 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
      */
 
     // mapString
+    playerInfo_t* player = gameInfo_getPlayer(info, address);
     char* gridString = grid_toString(player->sightGrid);
 
     // loop to set all non '\n' chars to 0, 1, or 2
