@@ -90,7 +90,7 @@ char map_getGamePos(map_t* map, pos2D_t* pos);
  * Caller provides:
  *      - a valid pointer to a map_t
  *      - a valid pointer to a pos2D_t
- *      - a valid pointer to the addr_t of a player
+ *      - a valid pointer to the a playerInfo_t object
  *
  * We return:
  *      - nothing
@@ -98,11 +98,16 @@ char map_getGamePos(map_t* map, pos2D_t* pos);
  * We do:
  *      - nothing if error
  *      - set the charcter in gameGrid at pos to the playerID
+ *      - update the pos2D in the playerInfo Struct
+ *          - and free the old pos2D of the player
  *      - if the player was on the map previoulsy, set the char where the 
  *        player used to be back to what it is on the baseGrid
  *          - UNLESS the players current spot is occupied by a player other
  *            than themselves. (so when players swap positions they do not write
  *            over the first one to move)
+ *
+ * NOTE: the caller is responsible for making sure that the player doesn't
+ *       run through any walls 
  */
 void map_setPlayerPos(map_t* map, pos2D_t* pos, playerInfo_t* player);
 

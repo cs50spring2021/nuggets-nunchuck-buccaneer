@@ -22,7 +22,7 @@ all:
 server: $(OBJS) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
-server.o: server.c $C/pos2D.h $S/message.h
+server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h
 
 .PHONY: test valgrind clean
 
