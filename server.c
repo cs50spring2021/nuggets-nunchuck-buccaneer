@@ -37,7 +37,7 @@ static void endGame(gameInfo_t* gameinfo);
 
 // FUNCTIONS
 
-bool movePlayer(gameInfo_t* gameinfo, addr_t* player, char input);
+bool movePlayer(gameInfo_t*  gameinfo, addr_t* player, char input);
 
 /******************* main *********************
 parses args, uses networkServer to start server, initializes Game, start networkServer(MessageLoop)
@@ -260,9 +260,34 @@ We Do:
 	places them into a random empty spot
 	on the map
 */
-void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName, pos2D_t* terminalSize){
-	return;
-}
+void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName, pos2D_t* terminalSize) {
+	//Check args
+	if (gameinfo == NULL || addr == NULL || termianlSize == NULL) {
+		fprintf(stderr, "shortMove: Invalid Args passed");
+		return false;
+	}
+	char* message;
+	int nrows = 0; 
+  int ncols = 0; 
+	
+	message = mem_malloc_assert(sizeof(char*) * strlen(name) + 1);
+  if (message == NULL) {
+    fprintf(stderr, "error: issue encountered while allocating memory for"
+    " the message that's sent to the server.\n");
+    exit(1);
+  }
+  char key = '\0';
+  scanf("%c", key);
+
+
+
+
+
+	// if player name is not provided, add the user as a spectator
+	if (playerName == NULL) {
+		gameInfo_addSpectator(gameinfo, player);
+	}
+
 
 /******************* leaveUser *********************
 gets a player and removes them from the game
