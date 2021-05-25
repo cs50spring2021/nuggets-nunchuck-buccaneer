@@ -44,6 +44,7 @@ gridtest.o: mem.o pos2D.o grid.o grid.h pos2D.h
 visibilitytest.o: pos2D.o grid.o grid.h pos2D.h file.h mem.h
 maptest.o: mem.o map.h grid.h
 gameInfo.o: mem.h pos2D.h grid.h $S/message.h visibility.h map.h
+gameInfoTest.o: pos2D.h grid.h map.h playerInfo.h gameInfo.h $S/message.h
 
 
 test-grid: gridtest
