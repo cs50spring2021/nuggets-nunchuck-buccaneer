@@ -16,7 +16,7 @@
 #include "pos2D.h"
 #include "message.h"
 #include "gameInfo.h"
-
+#include <ctype.h>
 
 //CONSTANTS
 
@@ -29,12 +29,16 @@ const int goldMaxNumPiles = 30; // maximum number of gold piles
 // LOCAL FUNCTIONS, PROTOTYPES
 
 static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* seed);
+static gameInfo_t* initializeGame(char* mapFile);
+static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir);
+static pos2D_t* dirToMovement(pos2D_t* start, char dir);
 
 // FUNCTIONS
 
+bool movePlayer(gameInfo_t* gameinfo, addr_t* player, char input);
+
 /******************* main *********************
 parses args, uses networkServer to start server, initializes Game, start networkServer(MessageLoop)
-If no seed is provided it is set to -1 to signify full randomness
 Caller Provides:
 	Two arguments a file that stores a map and a seed that is randomness
 We Do:
@@ -57,8 +61,12 @@ int main(const int argc, char *argv[]){
 	} else {
 		srand(getpid());
 	}
-	gameInfo_t* gameInfo = initializeGame(mapFilePath);
+	//Create game info
+	gameInfo_t* gameInfo = mem_assert(initializeGame(mapFilePath), "Server Main: initializeGame mem");
+	//Start the network server
 	startNetworkServer(gameInfo);
+	//Deletes the gameinfo
+	gameInfo_delete(gameInfo);
 }
 
 /******************* parseArgs - helper for main *********************
@@ -108,16 +116,27 @@ Caller Provides:
 	A string that is a path that leads to a valid map file
 We Return:
 	A game info with initialized map, array of players and gold info
+	Null on an error
 Caller is Responsible For:
 	Later calling gameInfo_delete
 */
-gameInfo_t* initializeGame(char* mapFile){
+static gameInfo_t* initializeGame(char* mapFile){
+	//Check Args
+	if(mapFile == NULL){
+		fprintf(stderr, "initializeGame: Invalid Args passed");
+		return NULL;
+	}
 	//Generate Random gold pile numbers
 	int piles = goldMinNumPiles + (rand() / (goldMaxNumPiles - goldMinNumPiles));
 	printf("PILES: %d\n", piles);
+	//Create a gameInfo
 	gameInfo_t* gameInfo = mem_assert(gameInfo_newGameInfo(piles, goldTotal, mapFile),"Server Main: mem gameInfo");
-	//ADD GOLD
-	return NULL;
+	//Add gold piles to the map
+	map_t* map = gameInfo_getMap(gameInfo);
+	for(int i = 0 ; i < piles; i++){
+		map_putOneGold(map);
+	}
+	return gameInfo;
 }
 
 /******************* movePlayer *********************
@@ -131,6 +150,26 @@ We Return:
 	False if there is still gold after this move
 */
 bool movePlayer(gameInfo_t* gameinfo, addr_t* player, char input){
+	//Check Args
+	if(gameinfo == NULL || player == NULL || input == NULL){
+		fprintf(stderr, "movePlayer: Invalid Args passed");
+		return NULL;
+	}
+	//Check if not sprint
+	if(!isupper(input)){
+		//Do one short move
+		shortMove(gameinfo, player, input);
+	} else {
+		//Loop short moves until you are unable to
+		while(shortMove(gameinfo, player, tolower(input)));
+	}
+	//Send new Game State
+	sendDisplays(gameinfo);
+	//Check for end
+	if(gameInfo_getGoldPiles(gameinfo) == 0){
+		endGame(gameinfo);
+		return true;
+	}
 	return false;
 }
 
@@ -142,12 +181,64 @@ Caller Provides:
 	A address for a player to move
 	A char that is an adjacent movement command/direction
 We Return:
-	True if the last pile of gold is collected by this move
-	False if there is still gold after this move
+	True if move was possible
+	False if move was impossible
+	Otherwise on error returns false
 */
-	bool shortMove(gameInfo_t* gameinfo, addr_t* player, char dir){
+static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir){
+	//Check args
+	if(gameinfo == NULL || addr == NULL || dir == NULL){
+		fprintf(stderr, "shortMove: Invalid Args passed");
 		return false;
 	}
+	//Find the pos we need to go to 
+	playerInfo_t* player = gameInfo_getPlayer(gameinfo, addr);
+	pos2D_t* toPos = dirToMovement(player->pos, dir);
+	map_t* map = gameInfo_getMap(gameinfo);
+	map_
+	pos2D_delete(toPos);
+}
+
+/******************* dirToMovement *********************
+Gets a position from a direction and start pos
+Caller Provides:
+	A dir to go in, lowercase adjacent
+	A starting pos
+We Return:
+	NULL on any error
+	Otherwise we return a pos that is the pos from the start pos in a certain direction
+Caller is Responsible For:
+	Later freeing the returned pos
+*/
+static pos2D_t* dirToMovement(pos2D_t* start, char dir){
+	//Change Args
+	if(start == NULL){
+		fprintf(stderr, "dirToMovement: Invalid Args passed");
+		return NULL;
+	}
+	//Get direction and return a new pos that is the appropriate spot to move
+	switch(dir) {
+		case 'k'  :
+			//UP
+			return mem_assert(pos2D_new(pos2D_getX(start), pos2D_getY(start) - 1), "dirToMovement: Pos Memory");
+      		break;
+		case 'l'  :
+			//RIGHT
+			return mem_assert(pos2D_new(pos2D_getX(start) + 1, pos2D_getY(start)), "dirToMovement: Pos Memory");
+      		break;
+		case 'j'  :
+			//DOWN
+			return mem_assert(pos2D_new(pos2D_getX(start), pos2D_getY(start) + 1), "dirToMovement: Pos Memory");
+      		break;
+		case 'h'  :
+			//LEFT
+			return mem_assert(pos2D_new(pos2D_getX(start) - 1, pos2D_getY(start)), "dirToMovement: Pos Memory");
+      		break;
+		default : 
+			fprintf(stderr, "shortMove: Invalid movement key");
+			return NULL;
+	}
+}
 
 /******************* joinUser *********************
 Adds a player and places them on the map or adds a spectator
