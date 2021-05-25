@@ -202,11 +202,14 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir){
 	if(current == '\0'){
 		return false;
 	}
-	//Check if floor or hall
-	if(current == '#' || current == '.'){
+	//Check if wall or empty space
+	if(current == '+' || current == ' '){
+		return false;
+	}
+	//Check if gold
+	if(current == '*'){
 		
 	}
-	//Check if 
 	pos2D_delete(toPos);
 }
 
