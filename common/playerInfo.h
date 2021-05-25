@@ -9,6 +9,7 @@
 
 #ifndef __PLAYERINFO_H
 #define __PLAYERINFO_H
+#include "message.h"
 
  /*********************** types **********************/
 typedef struct playerInfo {
