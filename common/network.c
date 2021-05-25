@@ -32,7 +32,7 @@
 
 /**************** startNetworkServer() ****************/
 /* see network.h for description */
-// handle message, they will enver get the same message.
+// handle message, they will never get the same message.
 void
 startNetworkServer(gameInfo_t* gameInfo);
 {
@@ -41,7 +41,7 @@ startNetworkServer(gameInfo_t* gameInfo);
 
 /**************** startNetworkClient() ****************/
 /* see network.h for description */
-// handle message, they will enver get the same message.
+// handle message, they will never get the same message.
 void
 startNetworkClient(char* serverHost, char* port)
 {
@@ -50,7 +50,7 @@ startNetworkClient(char* serverHost, char* port)
 
 /**************** tokenizeMessage() ****************/
 /* see network.h for description */
-// handle message, they will enver get the same message.
+// handle message, they will never get the same message.
 char**
 tokenizeMessage(const char* message)
 {
@@ -59,7 +59,7 @@ tokenizeMessage(const char* message)
 
 /**************** handleMessage() ****************/
 /* see network.h for description */
-// handle message, they will enver get the same message.
+// handle message, they will never get the same message.
 bool
 handleMessage(void* arg, const addr_t from, const char* message)
 {
@@ -68,7 +68,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
 
 /**************** handleTimeout() ****************/
 /* see network.h for description */
-// handle message, they will enver get the same message.
+// handle message, they will never get the same message.
 bool
 handleTimeout(void* arg)
 {
@@ -77,7 +77,7 @@ handleTimeout(void* arg)
 
 /**************** handleInput() ****************/
 /* see network.h for description */
-// handle message, they will enver get the same message.
+// handle message, they will never get the same message.
 bool
 handleInput(void* arg);
 {
