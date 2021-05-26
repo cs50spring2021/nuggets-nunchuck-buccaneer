@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ncurses.h>
 
 /**************** file-local global variables ****************/
 /* none */
@@ -27,6 +28,7 @@
 /* that is, visible outside this file */
 void display(const char* grid);
 void joinFail(pos2D_t* display_hW);
+void clientQuit(char* explanation);
 
 /**************** local functions ****************/
 /* not visible outside this file */
@@ -40,7 +42,7 @@ void joinFail(pos2D_t* display_hW);
 int
 main(const int argc, char *argv[])
 {
-
+    
 }
 
 /**************** display()  ****************/
@@ -58,7 +60,7 @@ display(const char* grid)
 
 }
 
-/**************** joinFail() ****************/
+/**************** ensureDimensions() ****************/
 /*
  * What it does: This function is called when a user fails to join. It sends 
  * a join message after resizing.
@@ -66,8 +68,50 @@ display(const char* grid)
  * Returns: Nothing
  */
 void
-joinFail(pos2D_t* display_hW)
+ensureDimensions(pos2D_t* display_hW)
 {
-
+    int NROWS;  // the number of rows on the client 
+    int NCOLS;  // the number of columns on the client
+    int displayW = pos2D_getX(display_hW);      // the number of columns on server
+    int displayH = pos2D_getY(display_hw);      // the number of rows on server
+    getmaxyx(stdscr, NROWS, NCOLS);
+    while (displayW < NCOLS || displayH < NROWS) {
+        char* printS;
+        sprintf(printS, "adjust screen width and height to fit requirements: \n"
+                "Current Width: %d, required %d\n"
+                "Current Height: %d, required %d\0", 
+                displayW, NROWS, displayH, NCOLS)
+        int i = 0;
+        // set the curser to the upper left corner
+        move(0,0);
+        int x;
+        int y;
+        // loop through the string to print, and print it in ncurses
+        while (printS[i] != '\0') {
+            getyx(y,x);
+            if (printS[i] == '\n'){
+                move(y + 1, 0);
+            } else {
+                addchar(printS[i]);
+                move(y, x +1);
+            }
+        }
+    }
+    return;
 }
 
+/***************** quitClient *****************/
+/*
+ * What it does: quits curses, prints a quit explanation string, exits 0
+ * Parameters: explanation - a string passed by server to be printed after quit
+ * return: nothing, this function exits the program.
+ */
+void
+quitClient(char* explanation)
+{
+    // exit Ncurses window
+    endwin();
+    printf("%s\n", explanation);
+    free(explanation);
+    exit(0);
+}
