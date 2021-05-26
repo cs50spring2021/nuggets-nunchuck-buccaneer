@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include "map.h"
 #include "grid.h"
+#include "mem.h"
 
 /* ******* helper_fucntion *****/
 
