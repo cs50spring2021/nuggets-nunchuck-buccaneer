@@ -16,6 +16,7 @@
 #include "pos2D.h"
 #include "message.h"
 #include "gameInfo.h"
+#include "playerInfo.h"
 #include <ctype.h>
 
 //CONSTANTS
@@ -151,19 +152,25 @@ We Return:
 	True if the last pile of gold is collected by this move
 	False if there is still gold after this move
 */
-bool movePlayer(gameInfo_t* gameinfo, addr_t* player, char input){
+bool movePlayer(gameInfo_t* gameinfo, addr_t* addr, char input){
 	//Check Args
-	if(gameinfo == NULL || player == NULL){
+	if(gameinfo == NULL || addr == NULL){
 		fprintf(stderr, "movePlayer: Invalid Args passed");
 		return NULL;
+	}
+	//Check that it is not a spectator
+	playerInfo_t* player = gameInfo_getPlayer(gameinfo, addr);
+	if(player->username == NULL){
+		//Exit without doing anything
+		return false;
 	}
 	//Check if not sprint
 	if(!isupper(input)){
 		//Do one short move
-		shortMove(gameinfo, player, input);
+		shortMove(gameinfo, addr, input);
 	} else {
 		//Loop short moves until you are unable to
-		while(shortMove(gameinfo, player, tolower(input)));
+		while(shortMove(gameinfo, addr, tolower(input)));
 	}
 	//Send new Game State
 	sendDisplays(gameinfo);
@@ -240,6 +247,22 @@ static pos2D_t* dirToMovement(pos2D_t* start, char dir){
 		case 'h'  :
 			//LEFT
 			return mem_assert(pos2D_new(pos2D_getX(start) - 1, pos2D_getY(start)), "dirToMovement: Pos Memory");
+      		break;
+		case 'u'  :
+			//UPRIGHT
+			return mem_assert(pos2D_new(pos2D_getX(start) + 1, pos2D_getY(start) - 1), "dirToMovement: Pos Memory");
+      		break;
+		case 'n'  :
+			//DOWNRIGHT
+			return mem_assert(pos2D_new(pos2D_getX(start) + 1, pos2D_getY(start) + 1), "dirToMovement: Pos Memory");
+      		break;
+		case 'y'  :
+			//UPLEFT
+			return mem_assert(pos2D_new(pos2D_getX(start) - 1, pos2D_getY(start) - 1), "dirToMovement: Pos Memory");
+      		break;
+		case 'b'  :
+			//DOWNLEFT
+			return mem_assert(pos2D_new(pos2D_getX(start) - 1, pos2D_getY(start) + 1), "dirToMovement: Pos Memory");
       		break;
 		default : 
 			fprintf(stderr, "shortMove: Invalid movement key");
