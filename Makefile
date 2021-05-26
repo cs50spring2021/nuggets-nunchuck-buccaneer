@@ -14,16 +14,18 @@ CC = gcc
 MAKE = make
 # for memory-leak tests
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all
+#Uncomment for server tests
+DEFINES = -DSERVERTEST
 all:
 	make -C support
 	make -C common
 	make server
 
 server: $(OBJS) $(LLIBS)
-	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+	$(CC) $(DEFINES) $(CFLAGS) $^ $(LIBS) -o $@
 
 servertest: $(OBJS) $(LLIBS)
-	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+	$(CC) $(DEFINES) $(CFLAGS) $^ $(LIBS) -o $@
 
 server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h
 

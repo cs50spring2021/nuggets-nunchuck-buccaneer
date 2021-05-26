@@ -40,6 +40,7 @@ static void endGame(gameInfo_t* gameinfo);
 
 bool movePlayer(gameInfo_t* gameinfo, addr_t* player, char input);
 
+#ifndef SERVERTEST
 /******************* main *********************
 parses args, uses networkServer to start server, initializes Game, start networkServer(MessageLoop)
 Caller Provides:
@@ -71,6 +72,7 @@ int main(const int argc, char *argv[]){
 	//Deletes the gameinfo
 	gameInfo_delete(gameInfo);
 }
+#endif
 
 /******************* parseArgs - helper for main *********************
 parses args and finds a seed and a mapFilePath, if no seed doesn't set it
@@ -165,7 +167,7 @@ bool movePlayer(gameInfo_t* gameinfo, addr_t* addr, char input){
 		return false;
 	}
 	//Check if not sprint
-	if(!isupper(input)){
+	if(isupper(input) == 0){
 		//Do one short move
 		shortMove(gameinfo, addr, input);
 	} else {
@@ -209,7 +211,32 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir){
 	if(current == '\0'){
 		return false;
 	}
-	//Check if 
+	//Check if wall or empty space
+	if(current == '+' || current == ' '){
+		return false;
+	}
+	//Check if gold
+	if(current == '*'){
+		gameInfo_pickupGold(gameinfo, addr);
+	}
+	int movedPlayer = -1;
+	playerInfo_t* displaced = NULL;
+	//Check for another Player, Capital letter
+	if(isupper(current) == 1){
+		//Find ID
+		movedPlayer = current - 65;
+		//Set player recorded pos
+		displaced = gameInfo_getPlayerFromID(gameinfo, movedPlayer);
+		pos2D_set(displaced->pos, pos2D_getX(player->pos), pos2D_getY(player->pos));
+	}
+	//Move player to spot on map
+	pos2D_set(player->pos, pos2D_getX(toPos), pos2D_getY(toPos));
+	map_setPlayerPos(map, player->pos, player);
+	if(movedPlayer != -1){
+		//Update displaced on the map
+		map_setPlayerPos(map, displaced->pos, displaced);
+	}
+	//Delete to Pos
 	pos2D_delete(toPos);
 }
 
