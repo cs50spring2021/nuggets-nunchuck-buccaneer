@@ -43,19 +43,33 @@ void startNetworkServer(gameInfo_t* gameInfo);
  */
 void startNetworkClient(char* serverHost, char* port);
 
+/* ***************** numWords() ********************** */
+/*
+ * numWords - This function counts the number of words in the message.
+ *
+ * Inputs:
+ *     * char* string - a message sent either from client to server or server
+ *                      to client.
+ * 
+ * Outputs: 
+ *     * int numWords - the number of words that were in the message
+ */
+ 
 /********************* tokenizeMessage() *********************/
 /*
- * tokenizeMessage - handles tokenizing the message passed from
- * client to server.
+ * tokenizeMessage - parses the message sent from server to client or from
+ * client to server. It breaks each individual word of the message a part and
+ * inserts it into an array.
  * 
  * Inputs:
  *     * message - char* containing the keystrokes sent from the
  *       client to the server.
+ *     * numWords - int the number of separate words found in a message.
  * Output:
  *     * char** tokens - char** pointing to tokens from the original
  *       message string passed to the server.
  */
-char** tokenizeMessage(const char* message);
+char** tokenizeMessage(const char* message, int numWords);
 
 /********************** handleMessage() **********************/
 /*
@@ -92,12 +106,12 @@ bool handleTimeout(void* arg);
 /*********************** handleInput() ************************/
 /*
  * handleInput - should read once from stdin and process it.
+ *               Also compares input to an array of valid key strokes to see if
+ *               it is an acceptable key stroke to send.
  *
  * Inputs:
- *     * void* arg - anything we want to pass through, i.e., gameInfo
- *       struct --> allows access to gameInfo for either side if needed.
- *       could also (more likely) be the server address, but void* arg 
- *       allows for flexibility in that regard.
+ *     * void* arg - anything we want to pass through, in this case we will
+ *                   be passing in the server address.
  * Output:
  *     * boolean:
  *          * true to terminate looping - game quit or game over.

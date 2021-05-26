@@ -102,6 +102,20 @@ void gameInfo_removePlayer(gameInfo_t* info, addr_t* address);
  */
 playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, addr_t* address);
 
+/******************* gameInfo_getPlayerFromID *******************/
+/*
+ * Gets player info from the players array using playerID
+ * Caller provides:
+ *     desired gameInfo struct,
+ *     playerID.
+ * We return:
+ *     playerInfo struct pointer,
+ *     NULL if any errors are encountered.
+ * Caller is responsible for:
+ *     nothing.
+ */
+playerInfo_t* gameInfo_getPlayerFromID(gameInfo_t* info, int playerID);
+
 /****************** gameInfo_pickupGold *******************/
 /*
  * Adds gold amount to the parameterized players address
