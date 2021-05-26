@@ -17,7 +17,7 @@ MAKE = make
 
 .PHONY: all clean test
 
-all: $(LIB) gridtest visibilitytest maptest
+all: $(LIB) gridtest visibilitytest maptest gameInfotest
 
 $(LIB): $(OBJS)
 	ar cr $(LIB) $(OBJS)
@@ -32,6 +32,9 @@ gameInfo: $(OBJS) $(LLIBS) gameInfo.o
 	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
 
 maptest: $(OBJS) $(LLIBS) maptest.o
+	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
+
+gameInfotest: $(OBJS) $(LLIBS) gameInfoTest.o
 	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
 
 grid.o: grid.h pos2D.h mem.h
@@ -54,6 +57,9 @@ test-visibility: visibilitytest
 
 test-map: maptest
 	valgrind --leak-check=full --show-leak-kinds=all ./maptest
+
+test-gameInfotest: gameInfotest
+	valgrind --leak-check=full --show-leak-kinds=all ./gameInfotest
 
 clean:
 	rm -rf *.dSYM
