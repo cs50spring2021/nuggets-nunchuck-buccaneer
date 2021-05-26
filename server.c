@@ -31,9 +31,9 @@ const int goldMaxNumPiles = 30; // maximum number of gold piles
 
 static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* seed);
 static gameInfo_t* initializeGame(char* mapFile);
-static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir);
+static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir, int* goldCollected);
 static pos2D_t* dirToMovement(pos2D_t* start, char dir);
-static void sendDisplays(gameInfo_t* gameinfo);
+void sendDisplays(gameInfo_t* gameinfo, addr_t* Player, int goldCollected);
 static void endGame(gameInfo_t* gameinfo);
 
 // FUNCTIONS
