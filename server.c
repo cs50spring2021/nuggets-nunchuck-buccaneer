@@ -298,19 +298,17 @@ static pos2D_t* dirToMovement(pos2D_t* start, char dir){
 }
 
 /******************* joinUser *********************
-Adds a player and places them on the map or adds a spectator
+adds a player, calls ensureDimensions on player, and places them on the map also
+can add a user as a spectator if name is NULL
 Caller Provides:
 	A gameInfo to update
 	A address for the player to create
-	A player name to assign to that player
-	and the terminal size for the player attempting to join
+	A player name to assign to that player, NULL for spectator
 We Do:
-	Check if the terminal size is big enough, if not sends a joinFail to the player with correct size
-	Otherwise add the player to GameInfo with relevant info and if they are not a spectator
-	places them into a random empty spot
-	on the map
+	Add a player to the game or a spectator, send the required dimensions to the player
+	and places the player on the map
 */
-void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName, pos2D_t* terminalSize){
+void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName){
 	return;
 }
 
