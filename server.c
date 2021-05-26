@@ -166,16 +166,18 @@ bool movePlayer(gameInfo_t* gameinfo, addr_t* addr, char input){
 		//Exit without doing anything
 		return false;
 	}
+	//Create var for goldCollected
+	int goldCollected = 0;
 	//Check if not sprint
 	if(isupper(input) == 0){
 		//Do one short move
-		shortMove(gameinfo, addr, input);
+		shortMove(gameinfo, addr, input, &goldCollected);
 	} else {
 		//Loop short moves until unable to
-		while(shortMove(gameinfo, player, tolower(input)));
+		while(shortMove(gameinfo, player, tolower(input), &goldCollected));
 	}
 	//Send new Game State
-	sendDisplays(gameinfo);
+	sendDisplays(gameinfo, addr, goldCollected);
 	//Check for end
 	if(gameInfo_getGoldPiles(gameinfo) == 0){
 		endGame(gameinfo);
@@ -196,7 +198,7 @@ We Return:
 	False if move was impossible
 	Otherwise on error returns false
 */
-static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir){
+static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir, int* goldCollected){
 	//Check args
 	if(gameinfo == NULL || addr == NULL){
 		fprintf(stderr, "shortMove: Invalid Args passed");
@@ -217,7 +219,7 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir){
 	}
 	//Check if gold
 	if(current == '*'){
-		gameInfo_pickupGold(gameinfo, addr);
+		*goldCollected += gameInfo_pickupGold(gameinfo, addr);
 	}
 	int movedPlayer = -1;
 	playerInfo_t* displaced = NULL;
@@ -335,7 +337,7 @@ We Do:
 	Send each player a line containing their current nuggets and the nuggets left to collect in the game with their visable map contained below 
 	it. To get the visible map we use the sightmaps from each playerinfo struct to combine into get VisibleMap
 */
-static void sendDisplays(gameInfo_t* gameinfo){
+void sendDisplays(gameInfo_t* gameinfo, addr_t* Player, int goldCollected){
 	return;
 }
 
