@@ -27,7 +27,7 @@
 /**************** global functions ****************/
 /* that is, visible outside this file */
 void display(const char* grid);
-void joinFail(pos2D_t* display_hW);
+void ensureDimensions(pos2D_t* display_hW);
 void clientQuit(char* explanation);
 
 /**************** local functions ****************/
