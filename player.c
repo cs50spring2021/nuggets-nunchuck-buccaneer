@@ -18,6 +18,7 @@
 #include <ncurses.h>
 #include "pos2D.h"
 #include "mem.h"
+#include "network.h"
 
 /**************** file-local global variables ****************/
 /* none */
@@ -26,7 +27,7 @@
 
 /**************** global types ****************/
 
-/**************** global functions ****************/
+/**************** global function prototypes ****************/
 /* that is, visible outside this file */
 void displayGrid(const char* grid);
 void displayerHeader(int n, int p, int r);
@@ -34,13 +35,38 @@ void displayAction(const char* message);
 void ensureDimensions(pos2D_t* display_hW);
 void clientQuit(char* explanation);
 
-/**************** local functions ****************/
+/**************** local function prototypes ****************/
 /* not visible outside this file */
+void clearHeader(void);
 
 /**************** global integer ****************/
 static int isSpectator;     // -1 if player, 1 if spectator
 static char playerID;       // initialized on recieving OK message for join
                             // Note: playerID not initailized for spectator
+
+/*****************************************************************************/
+/************************** Local functions ********************************/
+
+/* *********** clearHeader *********** */
+/* sets the whole header of the window to blank spaces in ncurses
+ * does not 'refresh()'
+ */
+void 
+clearHeader(void)
+{
+    int maxX = getmaxx(stdscr);
+    int x = 0;
+    // NOTE: may need to be '<='?
+    while (x < maxX) {
+        move(0,x);
+        addch(' ');
+        x++;
+    }
+    return;
+}
+
+/******************************************************************************/
+/************************ Global functions *************************/
 
 /* ***************** main ********************** */
 /*
@@ -50,7 +76,38 @@ static char playerID;       // initialized on recieving OK message for join
 int
 main(const int argc, char *argv[])
 {
+  if (argc != 3 || argc != 4) {
+    fprintf(stderr, "main(): inccoret number of args passed; %d\n", argc);
+    exit(1);
+  }
+
+  // NOTE: Do we need to check that hostname and port are valid?
+  char* hostname = argv[1]; 
+  char* port = argv[2];
+  char* playerName = NULL;
+  if (argc == 4) {
+    isSpectator = -1;
+    playerName = argv[3];
+  } else {
+    isSpectator = 1;
+  }
+
+  //initialize ncurses
+  initscr();
+  noecho();
+
+  // I believe that this initializes the background and writing colors
+  start_color();
+  init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+  attron(COLOR_PAIR(1));
     
+  //Start the network 
+  // We pass 'stderr' to errorFile because we will redirect log messages to 
+  // stderr when calling them, then redirect stderr to a file in the command line
+  startNetworkClient(hostname, port, stderr, playerName);
+    
+  // we shouldn't reach this point as we exit in the quitClient function
+  exit(0);
 }
 
 /*************** displayHeader() ****************/
@@ -82,6 +139,9 @@ void displayHeader(int n, int p, int r)
         displayAction(action);
         free(action);
     }
+    // clear the header line
+    clearHeader();
+
     // set the curser to the upper left corner
     move(0,0);
     int i = 0;
@@ -141,7 +201,7 @@ displayAction(const char* message)
 void
 setPlayerID(char* plID) 
 {
-    if (plID == '\0') {
+    if (plID == NULL) {
         fprintf(stderr, "setPlayerID(): NULL ('\\0') 'playerID' passed\n");
         return;
     }

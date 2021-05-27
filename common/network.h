@@ -8,6 +8,10 @@
  * Nunchuck Buccaneers, May 2021
  */
 
+#include "gameInfo.h"
+#include "message.h"
+
+
 /******************** function prototypes ********************/
 
 /********************* startNetworkServer ********************/
@@ -41,7 +45,8 @@ void startNetworkServer(gameInfo_t* gameInfo);
  *       address to server.
  *     * start message loop for the client
  */
-void startNetworkClient(char* serverHost, char* port);
+void startNetworkClient(char* serverHost, char* port, FILE* logFile,
+        char* playerName);
 
 /* ***************** numWords() ********************** */
 /*
