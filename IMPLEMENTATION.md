@@ -31,7 +31,7 @@ The Nuggets Game is implemented in two main files `server.c` and `player.c`. The
 ## Server
 ### main
 Psuedocode: 
-```c=
+```c
     * Check Num Args
     * Parse Args
     * Do Randomness initialization
@@ -57,7 +57,7 @@ Psuedocode:
 
 ### initializeGame
 Psuedocode: 
-```c=
+```c
     * Check Args
     * Generate random number of gold piles
     * Create a gameInfo
@@ -67,7 +67,7 @@ Psuedocode:
 
 ### movePlayer
 Psuedocode: 
-```c=
+```c
     * Check Args
     * Check if specator
         * return false if is
@@ -85,7 +85,7 @@ Psuedocode:
 
 ### shortMove
 Psuedocode: 
-```c=
+```c
     * Check args
     * Find the pos we need to go to with dirToMovement
     * Check if the pos is out of bounds
@@ -105,7 +105,7 @@ Psuedocode:
 
 ### dirToMovement
 Psuedocode: 
-```c=
+```c
     * Check Args
     * Get a dir and create a new pos to move to
     * return that pos
@@ -113,7 +113,7 @@ Psuedocode:
 
 ### joinUser
 Psuedocode: 
-```c=
+```c
     * Check args
     * Call ensure Dimensions on user
     * Check if name is NULL for spectator
@@ -128,7 +128,7 @@ Psuedocode:
 
 ### leaveUser
 Psuedocode: 
-```c=
+```c
     * Check args
     * Get the map from gameinfo
     * Call Map clear Spot
@@ -141,7 +141,7 @@ Psuedocode:
 
 ### SendDisplays
 Psuedocode: 
-```c=
+```c
     * Check args
     * Get gold score remaining
     * For each player
@@ -157,7 +157,7 @@ Psuedocode:
 
 ### EndGame
 Psuedocode: 
-```c=
+```c
     * Check args
     * use gameInfo to get a scoreboard string
     * for each player
@@ -167,7 +167,7 @@ Psuedocode:
 ## Client
 ### main
 Psuedocode: 
-```c=
+```c
     * Check number of args
     * parse args
     * call initscr(), initalizing ncurses screen
@@ -175,7 +175,7 @@ Psuedocode:
 ```
 ### display
 Psuedocode: 
-```c=
+```c
     * Check args
     * reset cursor to top left corner of screen 
     * create x and y int to represent cursor pos
@@ -195,7 +195,7 @@ Psuedocode:
 
 ### displayHeader
 Psuedocode: 
-```c=
+```c
     * Check args
     * Check if p == -1 for a spectator
         * Construct a header message "Player A has p nuggets (r nuggets unclaimed)."
@@ -212,7 +212,7 @@ Psuedocode:
 
 ### displayAction
 Psuedocode: 
-```c=
+```c
     * Check args
     * Get string length of the message, subtract 1 from it, and store it in a variable named charsLeft
     * initalize a char variable to store the current char
@@ -226,7 +226,7 @@ Psuedocode:
 ```
 
 ### ensureDimensions
-```c=
+```c
     * initalize 2 pairs of nrows and ncols variables (one for game window size, one for client window size)
     * extract the pos2D struct passed to the function into the server nrows and ncols pair
     * call getmaxyx, providing stdscr as the first parameter and the nrowsClient and nrowsCols variables.
@@ -630,6 +630,7 @@ Detailed descriptions of each function's interface is provided as a paragraph co
 int main(const int argc, char* argv[]);
 void display(const char* grid);
 void displayHeader(int goldCollected, int goldInPurse, int goldRemaining);
+void displayAction(char* action);
 void ensureDimensions(pos2D_t* display_hW);
 void quitClient(char* message);
 ```
@@ -713,7 +714,7 @@ playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, addr_t* player);
 playerInfo_t* gameInfo_getPlayerFromID(gameInfo_t* info, int ID);
 int gameInfo_pickupGold(gameInfo_t* info, addr_t* player);
 char* gameInfo_createScoreBoard(gameInfo_t* info);
-char* gameInfo_getScoreRemaining(gameInfo_t* info);
+int gameInfo_getScoreRemaining(gameInfo_t* info);
 void gameInfo_updateSightGrid(gameInfo_t* info, addr_t* player);
 map_t* gameInfo_getMap(gameInfo_t* info);
 int gameInfo_getGoldPiles(gameInfo_t* info);

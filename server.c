@@ -337,8 +337,16 @@ We Do:
 	Send each player a line containing their current nuggets and the nuggets left to collect in the game with their visable map contained below 
 	it. To get the visible map we use the sightmaps from each playerinfo struct to combine into get VisibleMap
 */
-static void sendDisplays(gameInfo_t* gameinfo){
-	return;
+static void sendDisplays(gameInfo_t* gameinfo, addr_t* Player, int goldCollected){
+	// Check Args
+	if(gameinfo == NULL){
+		fprintf(stderr, "sendDisplays: Provided gameInfo is NULL");
+		return; 
+	}
+	// Get Gold Score Remaining
+	if(){
+		
+	}
 }
 
 /******************* endGame *********************
