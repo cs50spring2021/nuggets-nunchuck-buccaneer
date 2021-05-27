@@ -22,11 +22,11 @@ main(int argc, char* argv[])
     // initialize player/spectator addresses
     addr_t address1 = message_noAddr();
     message_setAddr("localhost", "4242", &address1);
-    pos2D_t* pos1 = pos2D_new(50, 50);
+    pos2D_t* pos1 = map_randomEmptySquare(gameInfo_getMap(info));
 
     addr_t address2 = message_noAddr();
     message_setAddr("localhost", "4242", &address2);
-    pos2D_t* pos2 = pos2D_new(60, 60);
+    pos2D_t* pos2 = map_randomEmptySquare(gameInfo_getMap(info));
 
     addr_t address3 = message_noAddr();
     message_setAddr("localhost", "4242", &address3);
@@ -44,24 +44,17 @@ main(int argc, char* argv[])
     printf("%s added!\n", spectator->username);
 
     while (player1->score + player2->score < 500) {
-        char* topBar;
         int prevAmt;
         int i = rand() % 2;
         if (i == 0) {
             prevAmt = player1->score;
             gameInfo_pickupGold(info, &address1);
-            char message[40];
-            sprintf(message, "GOLD recieved testplayer1: %d\n", player1->score - prevAmt);
-            topBar = gameInfo_topBar(info, &address1, message);
+            printf("GOLD recieved testplayer1: %d\n", player1->score - prevAmt);
         } else {
             prevAmt = player2->score;
             gameInfo_pickupGold(info, &address2);
-            char message[40];
-            sprintf(message, "GOLD recieved testplayer1: %d\n", player2->score - prevAmt);
-            topBar = gameInfo_topBar(info, &address2, message);
+            printf("GOLD recieved testplayer1: %d\n", player2->score - prevAmt);
         }
-        printf("%s", topBar);
-        mem_free(topBar);
     }
 
     char* scoreboard = gameInfo_createScoreBoard(info);

@@ -101,10 +101,33 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos, char* userna
     
     // create the empty sightGrid
     player->sightGrid = grid_new(sightGridString_init);
-    gameInfo_updateSightGrid(info, player->address);
+    
+    // update the player's sightGrid based on position
+    char* gridString = grid_toString(player->sightGrid);
+
+    // loop to set all non '\n' chars to 0, 1, or 2
+    int height = 1;
+    int i = 0;
+    while (i < strlen(gridString)) {
+        // grab the currSpot char as well as x and y (height)
+        currSpot = gridString[i];
+        pos2D_t* otherPos = pos2D_new((i / height) + (i % height), height);
+
+        // increment height if encounters '\n'
+        if (currSpot == '\n') {
+            height++;
+        }
+        else {
+            // check visibility: if visible, switch value from 0 to 2
+            if (visibility_getVisibility(player->pos, otherPos, player->sightGrid)) {
+                grid_setPos(player->sightGrid, otherPos, '2');
+            }
+        }
+        i++;
+    }
 
     // update gameInfo struct
-    info->players[info->numPlayers] = player;
+    info->players[player->playerID] = player;
     info->numPlayers++;
 
     // player created!
@@ -125,7 +148,7 @@ gameInfo_addSpectator(gameInfo_t* info, addr_t* address)
     // insert a new player with null information into the players array
     playerInfo_t* spectator = mem_malloc_assert(sizeof(playerInfo_t), "memory allocation error\n");
     spectator->pos = NULL;
-    spectator->score = 0;
+    spectator->score = -1;
     spectator->playerID = 25;
     spectator->address = address;
     spectator->username = "spectator";
@@ -229,13 +252,13 @@ gameInfo_getPlayerFromID(gameInfo_t* info, int playerID)
 
 /****************** gameInfo_pickupGold *******************/
 /* see gameInfo.h for description */
-bool 
+int
 gameInfo_pickupGold(gameInfo_t* info, addr_t* address)
 {
     // arg checking
     if (info == NULL || address == NULL) {
         fprintf(stderr, "gameInfo_pickupGold: NULL gameInfo pointer or address pointer\n");
-        return false;
+        return -1;
     }
 
     /* 
@@ -253,7 +276,7 @@ gameInfo_pickupGold(gameInfo_t* info, addr_t* address)
     info->goldScore -= goldAmt;
 
     // gold added!
-    return true;
+    return goldAmt;
 }
 
 /******************* scoreboardCmpFunc ********************/
@@ -301,27 +324,18 @@ gameInfo_createScoreBoard(gameInfo_t* info)
     return scoreboardLine;
 }
 
-/******************** gameInfo_topBar *********************/
+/******************** gameInfo_getScoreRemaining *********************/
 /* see gameInfo.h for description */
-char* 
-gameInfo_topBar(gameInfo_t* info, addr_t* address, char* message)
+int 
+gameInfo_getScoreRemaining(gameInfo_t* info)
 {
     // arg checking
-    if (info == NULL || address == NULL) {
-        fprintf(stderr, "gameInfo_topBar: NULL gameInfo or address pointer\n");
-        return NULL;
+    if (info == NULL) {
+        fprintf(stderr, "gameInfo_getScoreRemaining: NULL gameInfo pointer\n");
+        return -1;
     }
 
-    // set message to an empty string 
-    if (message == NULL) {
-        message = " ";
-    }
-    // grab the top bar for the player and print out to a char*
-    playerInfo_t* player = gameInfo_getPlayer(info, address);
-    char* playerTopLine = mem_malloc_assert(100, "memory allocation error\n");
-    sprintf(playerTopLine, "Player %c has %d nuggets (%d nuggets unclaimed). %s", (player->playerID)+65, player->score, info->goldScore, message); // need to update to handle messages
-    
-    return playerTopLine;
+    return info->goldScore;
 }
 
 /******************** gameInfo_getMap *********************/
@@ -359,11 +373,15 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
 
     // mapString
     playerInfo_t* player = gameInfo_getPlayer(info, address);
+    if (player == NULL) {
+        fprintf(stderr, "gameInfo_updateSightGrid: player does not exist!\n");
+        return false;
+    }
     char* gridString = grid_toString(player->sightGrid);
 
     // loop to set all non '\n' chars to 0, 1, or 2
     char currSpot;
-    int height = 0;
+    int height = 1;
     int i = 0;
     while (i < strlen(gridString)) {
         // grab the currSpot char as well as x and y (height)
@@ -383,10 +401,10 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
              */
             if (visibility_getVisibility(player->pos, otherPos, player->sightGrid) && currSpot != '2') {
                 grid_setPos(player->sightGrid, otherPos, '2');
-            }
+            }/*
             else if (!visibility_getVisibility(player->pos, otherPos, player->sightGrid) && (currSpot == '1' || currSpot == '0')) {
-                continue;
-            } else if (!visibility_getVisibility(player->pos, otherPos, player->sightGrid) && currSpot == '2') {
+              continue;
+              } */else if (!visibility_getVisibility(player->pos, otherPos, player->sightGrid) && currSpot == '2') {
                 grid_setPos(player->sightGrid, otherPos, '1');
             }
         }

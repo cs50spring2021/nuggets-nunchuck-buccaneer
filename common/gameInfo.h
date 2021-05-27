@@ -123,12 +123,12 @@ playerInfo_t* gameInfo_getPlayerFromID(gameInfo_t* info, int playerID);
  *     desired gameInfo struct,
  *     player address.
  * We return:
- *     true if added,
- *     false if any errors.
+ *     amount of gold collected
+ *     -1 if any errors
  * Caller is responsible for:
  *     nothing.
  */
-bool gameInfo_pickupGold(gameInfo_t* info, addr_t* address);
+int gameInfo_pickupGold(gameInfo_t* info, addr_t* address);
 
 /*************** gameInfo_createScoreBoard ****************/
 /*
@@ -143,20 +143,18 @@ bool gameInfo_pickupGold(gameInfo_t* info, addr_t* address);
  */
 char* gameInfo_createScoreBoard(gameInfo_t* info);
 
-/******************** gameInfo_topBar *********************/
+/******************** gameInfo_getScoreRemaining *********************/
 /*
- * grabs the topBar for a player from the players array
- * upon any changes to their playerInfo/gamestate
+ * grabs the score remaining
  * Caller provides:
  *     desired gameInfo struct,
- *     player address.
  * We return:
- *     char* representing player topbar,
+ *     int score remaining
  *     NULL if errors encountered.
  * Caller is responsible for:
  *     nothing.
  */
-char* gameInfo_topBar(gameInfo_t* info, addr_t* address, char* message);
+int gameInfo_getScoreRemaining(gameInfo_t* info);
 
 /******************** gameInfo_getMap *********************/
 /*
