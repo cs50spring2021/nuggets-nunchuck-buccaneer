@@ -141,7 +141,7 @@ displayAction(const char* message)
 void
 setPlayerID(char* plID) 
 {
-    if (playerID == '\0') {
+    if (plID == '\0') {
         fprintf(stderr, "setPlayerID(): NULL ('\\0') 'playerID' passed\n");
         return;
     }
