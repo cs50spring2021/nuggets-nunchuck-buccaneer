@@ -46,6 +46,7 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
                        "server\n");
     exit(1);
   }
+  printf("PORT: %d", port);
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
   if (!message_loop(gameInfo, timeout, handleTimeout, handleInput, 
