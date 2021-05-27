@@ -16,6 +16,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ncurses.h>
+#include "pos2D.h"
+#include "mem.h"
 
 /**************** file-local global variables ****************/
 /* none */
@@ -26,7 +28,9 @@
 
 /**************** global functions ****************/
 /* that is, visible outside this file */
-void display(const char* grid);
+void displayGrid(const char* grid);
+void displayerHeader(int n, int p, int r);
+void displayAction(const char* message);
 void ensureDimensions(pos2D_t* display_hW);
 void clientQuit(char* explanation);
 
@@ -59,12 +63,11 @@ main(const int argc, char *argv[])
  * Returns: Nothing
  */
 void displayHeader(int n, int p, int r)
-{
-    if (header == NULL) {
-        fprintf(stderr, "displayHeader(): NULL 'header' passed\n");
-        return;
-    }
-    char* header;
+{   
+    // NOTE: buffer may need to be changed if the message is changed
+    //       n, p, r should not exeed 9999
+    char* header= mem_malloc_assert((88 * sizeof(char)) , 
+            "displayerHeader: out of memory");
     if (isSpectator == -1) {
         sprintf(header, "Spectator: %d nuggets unclaimed.", r);
     } else {
@@ -72,9 +75,12 @@ void displayHeader(int n, int p, int r)
                 playerID, p, r);
     }
     if (n != 0) {
-        char* action;
+        // buffer may need to change if the message is changed
+        char* action = mem_malloc_assert((20 * sizeof(char)), 
+                "displayerHeader: out of memeory");
         sprintf(action, "Gold received: %d", n);
         displayAction(action);
+        free(action);
     }
     // set the curser to the upper left corner
     move(0,0);
@@ -83,12 +89,13 @@ void displayHeader(int n, int p, int r)
     int y;
     // loop through the header char* and print it to the screen
     while (header[i] != '\0') {
-        get(y,x);
-        addchar[i];
+        getyx(stdscr, y, x);
+        addch(header[i]);
         move(y,x+1);
         i++;
     }
     refresh();
+    free(header);
     return;
 }
 
@@ -99,7 +106,7 @@ void displayHeader(int n, int p, int r)
  * Returns: nothing
  */
 void
-displayAction(char* message)
+displayAction(const char* message)
 {
     if (message == NULL){
         fprintf(stderr, "displayAction(): NULL 'message' passed\n");
@@ -107,17 +114,17 @@ displayAction(char* message)
     }
     int x;
     int y;
-    int NROWS;
     int NCOLS;
     int i = 0;
-    getmaxyx(stdscr, NROWS, NCOLS);
+    // We only need the number of columns here
+    NCOLS = getmaxx(stdscr);
     // set the curser to somwhere in the middle of the header
     // such that the message will reach the corner
     move(0, NCOLS - strlen(message) - 1);
     // loop through the message char* and print it to the screen
     while (message[i] != '\0') {
-        get(y,x);
-        addchar[i];
+        getyx(stdscr, y, x);
+        addch(message[i]);
         move(y,x+1);
         i++;
     }
@@ -134,8 +141,8 @@ displayAction(char* message)
 void
 setPlayerID(char* plID) 
 {
-    if (playerID == NULL) {
-        fprintf(stderr, "setPlayerID(): NULL 'playerID' passed\n");
+    if (playerID == '\0') {
+        fprintf(stderr, "setPlayerID(): NULL ('\\0') 'playerID' passed\n");
         return;
     }
     playerID = plID[0];
@@ -163,11 +170,11 @@ display(const char* grid)
     int x;
     int y;
     while (grid[i] != '\0') {
-        getyx(y,x);
-        if (printS[i] == '\n'){
+        getyx(stdscr, y, x);
+        if (grid[i] == '\n'){
             move(y + 1, 0);
         } else {
-            addchar(printS[i]);
+            addch(grid[i]);
             move(y, x +1);
         }
         i++;
@@ -189,14 +196,15 @@ ensureDimensions(pos2D_t* display_hW)
     int NROWS;  // the number of rows on the client 
     int NCOLS;  // the number of columns on the client
     int displayW = pos2D_getX(display_hW);      // the number of columns on server
-    int displayH = pos2D_getY(display_hw);      // the number of rows on server
+    int displayH = pos2D_getY(display_hW);      // the number of rows on server
     getmaxyx(stdscr, NROWS, NCOLS);
     while (displayW > NCOLS || displayH + 1 > NROWS) {
-        char* printS;
+        char* printS = mem_malloc_assert((130 * sizeof(char)), 
+                "ensureDimensions: out of memory");
         sprintf(printS, "adjust screen width and height to fit requirements: \n"
                 "Current Width: %d, required: %d\n"
-                "Current Height: %d, required: %d\0", 
-                displayW, NROWS, displayH, NCOLS)
+                "Current Height: %d, required: %d", 
+                displayW, NROWS, displayH, NCOLS);
         int i = 0;
         // set the curser to the upper left corner
         move(0,0);
@@ -204,16 +212,17 @@ ensureDimensions(pos2D_t* display_hW)
         int y;
         // loop through the string to print, and print it in ncurses
         while (printS[i] != '\0') {
-            getyx(y,x);
+            getyx(stdscr, y, x);
             if (printS[i] == '\n'){
                 move(y + 1, 0);
             } else {
-                addchar(printS[i]);
+                addch(printS[i]);
                 move(y, x +1);
             }
             i++;
         }
         refresh();
+        free(printS);
     }
     return;
 }
@@ -221,6 +230,7 @@ ensureDimensions(pos2D_t* display_hW)
 /***************** quitClient *****************/
 /*
  * What it does: quits curses, prints a quit explanation string, exits 0
+ *               all free the passed explanation, since we exit here
  * Parameters: explanation - a string passed by server to be printed after quit
  * return: nothing, this function exits the program.
  */
