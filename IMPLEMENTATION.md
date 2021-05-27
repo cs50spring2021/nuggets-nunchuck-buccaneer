@@ -115,7 +115,11 @@ Psuedocode:
 Psuedocode: 
 ```c
     * Check args
-    * Call ensure Dimensions on user
+    * initalize variables nrows and ncols (int)
+    * Allocate memory to create a message (char*)
+    * extract the terminalSize from the ints stored in the pos2D struct and extract them into the nrows and ncols variables
+    * construct a "GRID" message
+    * send it to the client
     * Check if name is NULL for spectator
         * Call gameInfo add spectator
     * Else
@@ -605,6 +609,7 @@ handleInput:
             * return false
     * call displayAction on client with "Unknown Keystroke"
     * return false
+```
 
 ## Function prototypes
 
