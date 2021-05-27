@@ -337,8 +337,51 @@ We Do:
 	Send each player a line containing their current nuggets and the nuggets left to collect in the game with their visable map contained below 
 	it. To get the visible map we use the sightmaps from each playerinfo struct to combine into get VisibleMap
 */
-void sendDisplays(gameInfo_t* gameinfo, addr_t* Player, int goldCollected){
-	return;
+
+static void sendDisplays(gameInfo_t* gameinfo, addr_t* addr, int goldCollected){
+	// Check Args
+	if(gameinfo == NULL){
+		fprintf(stderr, "sendDisplays: Provided gameInfo is NULL");
+		return; 
+	}
+	// Get Gold Score Remaining
+	int scoreLeft = gameInfo_getScoreRemaining(gameinfo);
+	//Loop through IDs for players
+	for(int i = 0; i < maxPlayers; i++){
+		playerInfo_t* player = NULL; 
+		if((player = gameInfo_getPlayerFromID(gameinfo, i)) != NULL){
+			//Make space for the message
+			char msgBuffer[41];
+			//Check if Spectator
+			if((player->username) == NULL){
+				//Create the header message for spectator
+				sprintf(msgBuffer, "GOLD 0 -1 %d", scoreLeft);
+			} else {
+				//Check if it was this player that collected gold
+				if(message_eqAddr(*addr, *(player->address))){
+					// Create the header message for collecting player
+					sprintf(msgBuffer, "GOLD %d %d %d", goldCollected, (player->score), scoreLeft);
+				} else {
+					// Create the header message for non-collecting player
+					sprintf(msgBuffer, "GOLD 0 %d %d", (player->score), scoreLeft);
+				}
+				if(!gameInfo_updateSightGrid(gameinfo, (player->address))){
+					fprintf(stderr, "sendDisplays: SightGrid update failed");
+				}
+			}
+			//Send the displayHeader message
+			message_send(*(player->address), msgBuffer);
+			// Get visible map from player
+			grid_t* seen = map_getVisibleMap(gameInfo_getMap(gameinfo), player->sightGrid);
+			// Create Display message
+			char* stringOfSeen = grid_toString(seen);
+			char* displayMsg = mem_malloc_assert(sizeof(char) * (strlen(stringOfSeen) + strlen("DISPLAY\n") + 1), "sendDisplays: mem for display msg failed");
+			sprintf(displayMsg, "DISPLAY\n%s", stringOfSeen);
+			//Clean up
+			mem_free(displayMsg);
+			grid_delete(seen);
+		}
+	}
 }
 
 /******************* endGame *********************
