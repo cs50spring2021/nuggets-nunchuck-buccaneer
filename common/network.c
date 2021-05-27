@@ -262,6 +262,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
 
   if ((strcmp(tokens[0], "OK")) == 0) {
     // the server was successfully added to the game, do nothing
+    setPlayerID(tokens[1]); 
     return true;
   }
 
