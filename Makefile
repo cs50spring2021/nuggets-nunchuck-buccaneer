@@ -6,7 +6,7 @@
 C = ./common
 S = ./support
 OBJS = server.o servertest.o network.o
-OBJS2 = client.o clienttest.o network.o
+OBJS2 = client.o clienttest.o network.o clientCmds.o
 LIBS = -lm -lncurses
 LLIBS = $C/common.a $S/support.a
 
@@ -39,11 +39,12 @@ clienttest: $(OBJS2) $(LLIBS)
 
 server.o: server.h $C/pos2D.h $S/message.h $C/gameInfo.h network.h $C/map.h
 client.o: client.h $C/pos2D.h 
-network.o: network.h $C/mem.h $C/pos2D.h $C/file.h $S/message.h server.h client.h
+network.o: network.h $C/mem.h $C/pos2D.h $C/file.h $S/message.h server.h clientCmds.h
+clientCmds.o: clientCmds.h $C/pos2D.h
 
 servertest.o: servertest.c
 
-clienttest.o: clienttest.c $C/file.h $C/grid.h
+clienttest.o: clienttest.c $C/file.h $C/grid.h clientCmds.h
 
 .PHONY: test valgrind clean
 

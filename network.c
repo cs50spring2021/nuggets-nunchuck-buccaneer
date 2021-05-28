@@ -17,7 +17,7 @@
 #include "file.h"
 #include "message.h"
 #include "server.h"
-#include "client.h"
+#include "clientCmds.h"
 
 /**************** file-local global variables ****************/
 /* none */
