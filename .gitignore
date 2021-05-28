@@ -37,5 +37,6 @@ Icon?
 ###########################################################################
 # custom additions below here; see also .gitignore files in subdirectories.
 server
+client
 maps/unreadable.txt
 *.swp
