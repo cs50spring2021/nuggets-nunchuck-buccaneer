@@ -305,6 +305,22 @@ ensureDimensions(pos2D_t* display_hW)
         refresh();
         free(printS);
     }
+    
+    // clear the ensureDimensions message
+    move(0,0);
+    int i = 0;
+    int y;
+    int x;
+    while (printS[i] != '\0') {
+        getyx(stdscr, y, x);
+        if (printS[i] == '\n'){
+            move(y + 1, 0);
+        } else {
+            addch(' ');
+            move(y, x +1);
+        }
+        i++;
+    }
     return;
 }
 
