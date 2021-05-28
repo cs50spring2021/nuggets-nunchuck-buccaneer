@@ -14,6 +14,7 @@
 #include "network.h"
 #include "mem.h"
 #include "pos2D.h"
+#include "ncurses.h"
 
 /**************** file-local global variables ****************/
 /* none */
@@ -30,7 +31,7 @@
 
 /**************** local functions ****************/
 /* not visible outside this file */
-
+bool str2int(const char string[], int* number);
 
 /**************** startNetworkServer() ****************/
 /* see network.h for description */
@@ -75,7 +76,7 @@ startNetworkClient(char* serverHost, char* port, FILE* errorFile, char* name)
     exit(1);
   }
 
-  message = mem_malloc_assert(sizeof(char*) * strlen(name) + 1);
+  message = mem_malloc_assert((sizeof(char) * (5 + strlen(name))) + 1);
   if (message == NULL) {
     fprintf(stderr, "error: issue encountered while allocating memory for"
     " the message that's sent to the server.\n");
@@ -132,15 +133,11 @@ numWords(char* message) {
         continue;
       }
     }
-    // if the character is a letter (first letter of the word)
-    if (isalpha(message[i])) {
-      numWords++;
-      /* scans through the word until it encounters a space, which signifies 
-      the end of the word. Also makes sure it doesn't read a null character */
-      while (!isspace(message[i]) && message[i] != '\0') {
-        i++;
-      }
-    } else {
+
+    numWords++;
+    /* scans through the word until it encounters a space, which signifies 
+    the end of the word. Also makes sure it doesn't read a null character */
+    while (!isspace(message[i]) && message[i] != '\0') {
       i++;
     }
   }
@@ -167,33 +164,30 @@ tokenizeMessage(const char* message, int numWords)
   To separate the words from one another, it inserts null characters at the
   end of a word. Borrowed this from Alan Moss' Querier */
   while (i < numWords) {
-    // steps through the characters in the string until it finds a letter
-    if (isalpha(*word)) {
-      // brings rest to the same spot as word
-      rest = word;
-      while (!isspace(*rest) && *rest != '\0') {
-        if (*(rest+1) != '\0') {
-          if (*rest == '\\' && *(rest+1) == 'n') {
-            // this conditional is specifically for DISPLAY messages.
-            rest += 2;
-            word = rest;
-            tokens[i] = word;
-            return tokens;
-          }
+    // brings rest to the same spot as word
+    rest = word;
+    while (!isspace(*rest) && *rest != '\0') {
+      if (*(rest+1) != '\0') {
+        if (*rest == '\\' && *(rest+1) == 'n') {
+          // this conditional is specifically for DISPLAY messages.
+          rest += 2;
+          word = rest;
+          tokens[i] = word;
+          return tokens;
         }
-        rest++;
       }
-      /* sets char to a null character, distinguishing the series of characters 
-      before the null char as its own word */
-      *rest = '\0';
-      // stores the word into the array
-      tokens[i] = word;
-      word = rest;
-      i++;
+      rest++;
     }
+    /* sets char to a null character, distinguishing the series of characters 
+    before the null char as its own word */
+    *rest = '\0';
+    // stores the word into the array
+    tokens[i] = word;
+    word = rest;
+    i++;
     // go forward a character
     word++;
-
+    
     /* stops parsing the string after we parse the first word. The rest of the
     string just goes into the 2nd slot in the array (1st). */
     if ((strcmp(tokens[0], "QUIT")) == 0) {
@@ -230,13 +224,13 @@ handleMessage(void* arg, const addr_t from, const char* message)
   if ((strcmp(tokens[0], "PLAY")) == 0) {
     // if the command is "PLAY", send a message to server with username
     joinUser(gameinfo, from, tokens[1]);
-    return true;
+    return false;
   }
 
   if ((strcmp(tokens[0], "SPECTATE")) == 0) {
     // if the command is "SPECTATE", send a join spectate message to the server
     joinUser(gameinfo, from, NULL);
-    return true;
+    return false;
   }
 
   if ((strcmp(tokens[0], "GRID")) == 0) {
@@ -251,30 +245,35 @@ handleMessage(void* arg, const addr_t from, const char* message)
 
     pos2D = pos2D_new(nrows, ncols);
     ensureDimensions(pos2D);
-    return true;
+    return false;
   }
 
   if ((strcmp(tokens[0], "QUIT")) == 0) {
     // the server disconnects the client from the game.
     quitClient(tokens[1]);
-    return true;
+    return false;
   }
 
   if ((strcmp(tokens[0], "OK")) == 0) {
     // the server was successfully added to the game, do nothing
-    return true;
+    return false;
   }
 
   if ((strcmp(tokens[0], "KEY")) == 0) {
-    // sends a single-character keystroke typed by the user to the server.
-    movePlayer(gameinfo, from, tokens[1]);
+    if ((strcmp(tokens[1], "Q")) == 0) {
+     return leaveUser(gameinfo, from);
+    } else {
+      // sends a single-character keystroke typed by the user to the server.
+      movePlayer(gameinfo, from, tokens[1]);
+      return false;
+    }
   }
 
   if ((strcmp(tokens[0], "DISPLAY")) == 0) {
     /* server sends the display of the textual representation of the grid to
     the clients */
     display(tokens[1]);
-    return true;
+    return false;
   }
 
   if ((strcmp(tokens[0], "GOLD")) == 0) {
@@ -287,7 +286,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     str2int(tokens[3], &r);
 
     displayHeader(n, p, r);
-    return true;
+    return false;
   }
 
   // the message received was malformatted
@@ -314,32 +313,34 @@ handleTimeout(void* arg)
 bool
 handleInput(void* arg);
 {
-  // character array for valid keystroke input.
-  char array[] = {'h', 'l', 'k', 'j', 'y', 'u', 'b', 'n', 'q', 'H', 'L', 'K',
-                  'J', 'Y', 'U', 'B', 'N', 'Q'};
-  int arrayItems = 18;              // number of items in the above array
-  char* message;
-  addr_t* address = arg;
+  if (arg != NULL) {
 
-  message = mem_malloc_assert(sizeof(char*) * strlen(name) + 1);
-  if (message == NULL) {
-    fprintf(stderr, "error: issue encountered while allocating memory for"
-    " the message that's sent to the server.\n");
-    return true;
-  }
+    // character array for valid keystroke input.
+    char array[] = {'h', 'l', 'k', 'j', 'y', 'u', 'b', 'n', 'H', 'L', 'K',
+                    'J', 'Y', 'U', 'B', 'N', 'Q'};
+    int arrayItems = 17;              // number of items in the above array
+    char* message;
+    addr_t* address = arg;
 
-  char key = '\0';
-  scanf("%c", key);
+    message = mem_malloc_assert((sizeof(char) * 6) + 1);
+    if (message == NULL) {
+      fprintf(stderr, "error: issue encountered while allocating memory for"
+      " the message that's sent to the server.\n");
+      return true;
+    }
 
-  // loops over all of the valid keystrokes that can be inputted
-  for (int i = 0; i < arrayItems; i++) {
-    if (key == array[i]) {
-      sprintf(message, "KEY %c", name);
-      message_send(address, message);
-      return false;
+    char key = '\0';
+    getch(key);
+
+    // loops over all of the valid keystrokes that can be inputted
+    for (int i = 0; i < arrayItems; i++) {
+      if (key == array[i]) {
+        sprintf(message, "KEY %c", key);
+        message_send(address, message);
+        return false;
+      }
     }
   }
-
   // if a message wasn't sent, the key inputted was not a valid keystroke
   return false;
 }
@@ -352,7 +353,8 @@ handleInput(void* arg);
  * Assumes number is a valid pointer.
  * Borrowed from CS 50 Lecture Notes.
  */
-bool str2int(const char string[], int* number)
+bool
+str2int(const char string[], int* number)
 {
   char nextchar;
   return (sscanf(string, "%d%c", number, &nextchar) == 1);
