@@ -22,6 +22,10 @@
 
 /**************** local types ****************/
 
+struct loopArgs {
+    gameInfo_t* gameinfo;
+    char* playerID;
+} loopArgs_t;
 
 /**************** global types ****************/
 
@@ -49,15 +53,19 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
     exit(1);
   }
   printf("PORT: %d", port);
+  //Create args struct for loop
+  loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "startNetworkServer(): Mem Error for args");
+  args->gameinfo = gameInfo;
+  args->playerID = '@';
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
-  if (!message_loop(gameInfo, timeout, handleTimeout, handleInput, 
+  if (!message_loop(args, timeout, handleTimeout, handleInput, 
                     handleMessage)) {
     // message_loop is false: a fatal error stopped it from continuing to loop.
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
     exit(2);
   }
-
+  free(args);
   message_done();
 }
 
@@ -214,9 +222,15 @@ bool
 handleMessage(void* arg, const addr_t from, const char* message)
 {
   gameInfo_t* gameinfo;
+<<<<<<< HEAD
+=======
+  char* playerID;
+  int numWords = 0;
+>>>>>>> main
   char** tokens;
-
-  gameinfo = arg;
+  loopArgs_t* argumentStruct = arg;
+  gameinfo = argumentStruct->gameinfo;
+  playerID = argumentStruct->playerID;
 
   // breaks a part the message into its individual parts
   tokens = tokenizeMessage(message);
@@ -257,7 +271,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
 
   if ((strcmp(tokens[0], "OK")) == 0) {
     // the server was successfully added to the game, do nothing
-    setPlayerID(tokens[1]); 
+    *playerID = tokens[1];
     return false;
   }
 
@@ -287,7 +301,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     str2int(tokens[2], &p);
     str2int(tokens[3], &r);
 
-    displayHeader(n, p, r);
+    displayHeader(n, p, r, *playerID);
     return false;
   }
 
