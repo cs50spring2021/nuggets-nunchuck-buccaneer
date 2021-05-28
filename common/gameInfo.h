@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h>
 #include "mem.h"
 #include "pos2D.h"
 #include "grid.h"
@@ -88,6 +87,19 @@ void gameInfo_addSpectator(gameInfo_t* info, addr_t* address);
  */
 void gameInfo_removePlayer(gameInfo_t* info, addr_t* address);
 
+/****************** gameInfo_removeSpectator *****************/
+/*
+ * Removes a spectator from the gameInfo player array
+ * Caller provides:
+ *     desired gameInfo struct,
+ * We return:
+ *     nothing,
+ *     exit non-zero if any errors are encountered.
+ * Caller is responsible for:
+ *     nothing.
+ */
+ void gameInfo_removeSpectator(gameInfo_t* info);
+
 /******************* gameInfo_getPlayer *******************/
 /*
  * Gets player info from the players array
@@ -101,6 +113,19 @@ void gameInfo_removePlayer(gameInfo_t* info, addr_t* address);
  *     nothing.
  */
 playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, addr_t* address);
+
+/******************* gameInfo_getSpectator *******************/
+/*
+ * Gets spectator from the players array == check to see if there is one
+ * Caller provides:
+ *     desired gameInfo struct,
+ * We return:
+ *     playerInfo pointer to the spectator slot in players,
+ *     NULL if any errors are encountered.
+ * Caller is responsible for:
+ *     nothing.
+ */
+playerInfo_t* gameInfo_getSpectator(gameInfo_t* info);
 
 /******************* gameInfo_getPlayerFromID *******************/
 /*
@@ -123,12 +148,12 @@ playerInfo_t* gameInfo_getPlayerFromID(gameInfo_t* info, int playerID);
  *     desired gameInfo struct,
  *     player address.
  * We return:
- *     true if added,
- *     false if any errors.
+ *     amount of gold collected
+ *     -1 if any errors
  * Caller is responsible for:
  *     nothing.
  */
-bool gameInfo_pickupGold(gameInfo_t* info, addr_t* address);
+int gameInfo_pickupGold(gameInfo_t* info, addr_t* address);
 
 /*************** gameInfo_createScoreBoard ****************/
 /*
@@ -143,20 +168,18 @@ bool gameInfo_pickupGold(gameInfo_t* info, addr_t* address);
  */
 char* gameInfo_createScoreBoard(gameInfo_t* info);
 
-/******************** gameInfo_topBar *********************/
+/******************** gameInfo_getScoreRemaining *********************/
 /*
- * grabs the topBar for a player from the players array
- * upon any changes to their playerInfo/gamestate
+ * grabs the score remaining
  * Caller provides:
  *     desired gameInfo struct,
- *     player address.
  * We return:
- *     char* representing player topbar,
+ *     int score remaining
  *     NULL if errors encountered.
  * Caller is responsible for:
  *     nothing.
  */
-char* gameInfo_topBar(gameInfo_t* info, addr_t* address, char* message);
+int gameInfo_getScoreRemaining(gameInfo_t* info);
 
 /******************** gameInfo_getMap *********************/
 /*
