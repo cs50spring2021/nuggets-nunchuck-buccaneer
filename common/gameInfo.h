@@ -88,6 +88,19 @@ void gameInfo_addSpectator(gameInfo_t* info, addr_t* address);
  */
 void gameInfo_removePlayer(gameInfo_t* info, addr_t* address);
 
+/****************** gameInfo_removeSpectator *****************/
+/*
+ * Removes a spectator from the gameInfo player array
+ * Caller provides:
+ *     desired gameInfo struct,
+ * We return:
+ *     nothing,
+ *     exit non-zero if any errors are encountered.
+ * Caller is responsible for:
+ *     nothing.
+ */
+ void gameInfo_removeSpectator(gameInfo_t* info);
+
 /******************* gameInfo_getPlayer *******************/
 /*
  * Gets player info from the players array
@@ -101,6 +114,19 @@ void gameInfo_removePlayer(gameInfo_t* info, addr_t* address);
  *     nothing.
  */
 playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, addr_t* address);
+
+/******************* gameInfo_getSpectator *******************/
+/*
+ * Gets spectator from the players array == check to see if there is one
+ * Caller provides:
+ *     desired gameInfo struct,
+ * We return:
+ *     playerInfo pointer to the spectator slot in players,
+ *     NULL if any errors are encountered.
+ * Caller is responsible for:
+ *     nothing.
+ */
+playerInfo_t* gameInfo_getSpectator(gameInfo_t* info);
 
 /******************* gameInfo_getPlayerFromID *******************/
 /*
