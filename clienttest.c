@@ -12,6 +12,10 @@
 #include <ncurses.h>
 #include <stdbool.h>
 #include "client.h"
+#include "file.h"
+#include "grid.h"
+
+
 
 int main(){
     fprintf(stderr, "CLIENT TEST\n");
@@ -23,31 +27,42 @@ int main(){
     init_pair(1, COLOR_RED, COLOR_BLACK);
     attron(COLOR_PAIR(1));
     printw("CLIENT TEST");
+    FILE* gridFile = fopen("./maps/hole.txt", "r");
+    char* readMap = file_readUntil(gridFile, NULL);
+    grid_t* grid = grid_new(readMap);
+    char* gridDisplay = grid_toString(grid);
+    free(readMap);
+    fclose(gridFile);
     testSetPlayerID('B');
     int c;
     int stage = 0;
-    bool end = false;
-    while((c = getch()) != 'x' && !end){
-        if(c = 'c'){
-            switch(stage){
-                case (0):
-                    ensureDimensions(pos2D_new(30,15));
-                    displayHeader(0, 0, 0);
-                    displayAction("Unknown Keystroke");
-                    break;
-                case (1):
-                    displayHeader(5, 10, 15);
-                    break;
-                case (2):
-                    display("|.......|\n|.......|");
-                    break;
-                default:
-                    end = true;
+    while((c = getch()) != 'x'){
+        if(c == 'c'){
+            if(stage == 0){
+                pos2D_t* dim = pos2D_new(30,15);
+                ensureDimensions(dim);
+                pos2D_delete(dim);
+                displayHeader(0, 0, 0);
+                displayAction("Unknown Keystroke");
+            }
+            if(stage == 1){
+                pos2D_t* hw = grid_getWidthheight(grid);
+                ensureDimensions(hw);
+                pos2D_delete(hw);
+                displayHeader(5, 10, 15);
+            }
+            if(stage == 2){
+                //display("|...|\n|...|");
+                display(gridDisplay);
+            }
+            if(stage == 3){
+                break;
             }
             stage++;
         }
         c = 'n';
     }
+    free(gridDisplay);
     quitClient("End of test");
     printf("ENDED");
 }

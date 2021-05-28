@@ -41,7 +41,7 @@ client.o: client.h $C/pos2D.h
 
 servertest.o: servertest.c
 
-clienttest.o: clienttest.c
+clienttest.o: clienttest.c $C/file.h $C/grid.h
 
 .PHONY: test valgrind clean
 
