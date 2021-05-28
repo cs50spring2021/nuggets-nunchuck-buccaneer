@@ -16,13 +16,15 @@
 #include "pos2D.h"
 #include "file.h"
 #include "message.h"
+#include "server.h"
+#include "client.h"
 
 /**************** file-local global variables ****************/
 /* none */
 
 /**************** local types ****************/
 
-struct loopArgs {
+typedef struct loopArgs {
     gameInfo_t* gameinfo;
     char* playerID;
 } loopArgs_t;
@@ -56,7 +58,7 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
   //Create args struct for loop
   loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "startNetworkServer(): Mem Error for args");
   args->gameinfo = gameInfo;
-  args->playerID = '@';
+  *(args->playerID) = '@';
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
   if (!message_loop(args, timeout, handleTimeout, handleInput, 
@@ -222,29 +224,29 @@ bool
 handleMessage(void* arg, const addr_t from, const char* message)
 {
   gameInfo_t* gameinfo;
-<<<<<<< HEAD
-=======
   char* playerID;
-  int numWords = 0;
->>>>>>> main
   char** tokens;
   loopArgs_t* argumentStruct = arg;
   gameinfo = argumentStruct->gameinfo;
   playerID = argumentStruct->playerID;
 
   // breaks a part the message into its individual parts
-  tokens = tokenizeMessage(message);
+  char* copiedMessage = mem_malloc_assert(sizeof(char) * (strlen(message) + 1), "handleMessage(): Mem message Copy");
+  strcpy(copiedMessage, message);
+  tokens = tokenizeMessage(copiedMessage);
 
   // look at the first (0th) slot in each array to see what the command is
   if ((strcmp(tokens[0], "PLAY")) == 0) {
     // if the command is "PLAY", send a message to server with username
     joinUser(gameinfo, from, tokens[1]);
+    mem_free(copiedMessage);
     return false;
   }
 
   if ((strcmp(tokens[0], "SPECTATE")) == 0) {
     // if the command is "SPECTATE", send a join spectate message to the server
     joinUser(gameinfo, from, NULL);
+    mem_free(copiedMessage);
     return false;
   }
 
@@ -260,18 +262,21 @@ handleMessage(void* arg, const addr_t from, const char* message)
 
     pos2D = pos2D_new(nrows, ncols);
     ensureDimensions(pos2D);
+    mem_free(copiedMessage);
     return false;
   }
 
   if ((strcmp(tokens[0], "QUIT")) == 0) {
     // the server disconnects the client from the game.
     quitClient(tokens[1]);
+    mem_free(copiedMessage);
     return false;
   }
 
   if ((strcmp(tokens[0], "OK")) == 0) {
     // the server was successfully added to the game, do nothing
-    *playerID = tokens[1];
+    playerID = tokens[1];
+    mem_free(copiedMessage);
     return false;
   }
 
@@ -280,7 +285,8 @@ handleMessage(void* arg, const addr_t from, const char* message)
      return leaveUser(gameinfo, from);
     } else {
       // sends a single-character keystroke typed by the user to the server.
-      movePlayer(gameinfo, from, tokens[1]);
+      movePlayer(gameinfo, from, *(tokens[1]));
+      mem_free(copiedMessage);
       return false;
     }
   }
@@ -289,6 +295,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     /* server sends the display of the textual representation of the grid to
     the clients */
     display(tokens[1]);
+    mem_free(copiedMessage);
     return false;
   }
 
@@ -302,11 +309,12 @@ handleMessage(void* arg, const addr_t from, const char* message)
     str2int(tokens[3], &r);
 
     displayHeader(n, p, r, *playerID);
+    mem_free(copiedMessage);
     return false;
   }
-
   // the message received was malformatted
-  fprintf(stderr, "error: msg received was malformatted, ignoring the msg.")
+  fprintf(stderr, "error: msg received was malformatted, ignoring the msg.");
+  mem_free(copiedMessage);
   return false;
 }
 
@@ -327,8 +335,7 @@ handleTimeout(void* arg)
 /**************** handleInput() ****************/
 /* see network.h for description */
 bool
-handleInput(void* arg);
-{
+handleInput(void* arg) {
   if (arg != NULL) {
 
     // character array for valid keystroke input.
@@ -338,7 +345,7 @@ handleInput(void* arg);
     char* message;
     addr_t* address = arg;
 
-    message = mem_malloc_assert((sizeof(char) * 6) + 1);
+    message = mem_malloc_assert((sizeof(char) * 6) + 1, "handleInput(): mem message");
     if (message == NULL) {
       fprintf(stderr, "error: issue encountered while allocating memory for"
       " the message that's sent to the server.\n");
@@ -346,13 +353,13 @@ handleInput(void* arg);
     }
 
     char key = '\0';
-    getch(key);
+    key = getch();
 
     // loops over all of the valid keystrokes that can be inputted
     for (int i = 0; i < arrayItems; i++) {
       if (key == array[i]) {
         sprintf(message, "KEY %c", key);
-        message_send(address, message);
+        message_send(*address, message);
         return false;
       }
     }

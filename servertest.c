@@ -11,11 +11,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "network.h"
-#include "server.h"
+#include "../server.h"
 
 int main(){
     srand(getpid());
 	gameInfo_t* gameInfo = mem_assert(initializeGame("../maps/hole.txt"), "Server Main: initializeGame mem");
-	startNetworkServer(gameInfo);
+	startNetworkServer(gameInfo, stderr);
 	gameInfo_delete(gameInfo);    
 }

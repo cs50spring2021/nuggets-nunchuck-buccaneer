@@ -15,6 +15,7 @@
 #include "message.h"
 #include "gameInfo.h"
 #include "playerInfo.h"
+#include "map.h"
 #include <ctype.h>
 
 //CONSTANTS
@@ -29,14 +30,12 @@ const int goldMaxNumPiles = 30; // maximum number of gold piles
 
 static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* seed);
 gameInfo_t* initializeGame(char* mapFile);
-static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir, int* goldCollected);
+static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldCollected);
 static pos2D_t* dirToMovement(pos2D_t* start, char dir);
-void sendDisplays(gameInfo_t* gameinfo, addr_t* Player, int goldCollected);
+static void sendDisplays(gameInfo_t* gameinfo, addr_t Player, int goldCollected);
 static void endGame(gameInfo_t* gameinfo);
 
 // FUNCTIONS
-
-bool movePlayer(gameInfo_t*  gameinfo, addr_t* player, char input);
 
 #ifndef TESTING
 /******************* main *********************
@@ -152,9 +151,9 @@ We Return:
 	True if the last pile of gold is collected by this move
 	False if there is still gold after this move
 */
-bool movePlayer(gameInfo_t* gameinfo, addr_t* addr, char input){
+bool movePlayer(gameInfo_t* gameinfo, addr_t addr, char input){
 	//Check Args
-	if(gameinfo == NULL || addr == NULL){
+	if(gameinfo == NULL){
 		fprintf(stderr, "movePlayer: Invalid Args passed");
 		return NULL;
 	}
@@ -172,7 +171,7 @@ bool movePlayer(gameInfo_t* gameinfo, addr_t* addr, char input){
 		shortMove(gameinfo, addr, input, &goldCollected);
 	} else {
 		//Loop short moves until unable to
-		while(shortMove(gameinfo, player, tolower(input), &goldCollected));
+		while(shortMove(gameinfo, addr, tolower(input), &goldCollected));
 	}
 	//Send new Game State
 	sendDisplays(gameinfo, addr, goldCollected);
@@ -196,9 +195,9 @@ We Return:
 	False if move was impossible
 	Otherwise on error returns false
 */
-static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir, int* goldCollected){
+static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldCollected){
 	//Check args
-	if(gameinfo == NULL || addr == NULL){
+	if(gameinfo == NULL){
 		fprintf(stderr, "shortMove: Invalid Args passed");
 		return false;
 	}
@@ -238,6 +237,7 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir, int* goldCol
 	}
 	//Delete to Pos
 	pos2D_delete(toPos);
+	return true;
 }
 
 /******************* dirToMovement *********************
@@ -308,25 +308,25 @@ We Do:
 	Add a player to the game or a spectator, send the required dimensions to the player
 	and places the player on the map
 */
-void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName, pos2D_t* terminalSize) 
+void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName) 
 {
   // Check args
-  if (gameinfo == NULL || addr == NULL || termianlSize == NULL) {
+  if (gameinfo == NULL || playerName == NULL) {
     fprintf(stderr, "joinUser: Invalid Args passed");
     return;
   }
   char* message;
   int nrows = 0; 
   int ncols = 0;
-  int messageLength;
-  map_t* map;
   pos2D_t* pos;
 
   // gets the rows by columns from the pos2D struct
+  map_t* map = gameInfo_getMap(gameinfo);
+  pos2D_t* terminalSize = map_getWidthheight(map);
   nrows = pos2D_getX(terminalSize);
   ncols = pos2D_getY(terminalSize);
 
-  message = mem_malloc_assert((sizeof(char) * 20) + 1);
+  message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
   if (message == NULL) {
     fprintf(stderr, "error: issue encountered while allocating memory for"
     " the message that's sent to the server.\n");
@@ -337,7 +337,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName, pos2D_t* t
   of their window */
   sprintf(message, "GRID %d %d", nrows, ncols);
   // sends the GRID message to the client
-  message_send(*player, message);
+  message_send(player, message);
 
   // if player name is not provided, add the user as a spectator
   if (playerName == NULL) {
@@ -356,12 +356,12 @@ void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName, pos2D_t* t
 	  exit(3);
     } 
 	// add the new user to the game info
-	gameInfo_addPlayer(gameinfo, player, pos);
+	gameInfo_addPlayer(gameinfo, player, pos, playerName);
 
 	free(pos);
   }
   // send the updated gameinfo to all clients.
-  sendDisplays(gameinfo, NULL, 0);
+  sendDisplays(gameinfo, message_noAddr(), 0);
   free(message);
 }
 
@@ -376,10 +376,10 @@ We return:
 	True if the last player has left
 	False if their are still players in the game
 */
-bool leaveUser(gameInfo_t* gameinfo, addr_t* player)
+bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 {
   // Check args
-  if (gameinfo == NULL || player == NULL) {
+  if (gameinfo == NULL) {
 	fprintf(stderr, "leaveUser: Invalid Args passed.\n");
 	return false;
   }
@@ -405,10 +405,10 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t* player)
   // player is removed from gameinfo
   gameInfo_removePlayer(gameinfo, player);
   // send the updated display to all players
-  sendDisplays(gameinfo, NULL, 0);
+  sendDisplays(gameinfo, message_noAddr(), 0);
 
   // checks to see if the last player has left the server
-  if (gameinfo->numPlayers == 0) {
+  if (gameInfo_getNumPlayers(gameinfo) == 0) {
     return true;
   }
   return false;
@@ -423,7 +423,7 @@ We Do:
 	it. To get the visible map we use the sightmaps from each playerinfo struct to combine into get VisibleMap
 */
 
-static void sendDisplays(gameInfo_t* gameinfo, addr_t* addr, int goldCollected){
+static void sendDisplays(gameInfo_t* gameinfo, addr_t addr, int goldCollected){
 	// Check Args
 	if(gameinfo == NULL){
 		fprintf(stderr, "sendDisplays: Provided gameInfo is NULL");
@@ -443,7 +443,7 @@ static void sendDisplays(gameInfo_t* gameinfo, addr_t* addr, int goldCollected){
 				sprintf(msgBuffer, "GOLD 0 -1 %d", scoreLeft);
 			} else {
 				//Check if it was this player that collected gold
-				if(message_eqAddr(*addr, *(player->address))){
+				if(message_eqAddr(addr, player->address)){
 					// Create the header message for collecting player
 					sprintf(msgBuffer, "GOLD %d %d %d", goldCollected, (player->score), scoreLeft);
 				} else {
@@ -455,7 +455,7 @@ static void sendDisplays(gameInfo_t* gameinfo, addr_t* addr, int goldCollected){
 				}
 			}
 			//Send the displayHeader message
-			message_send(*(player->address), msgBuffer);
+			message_send(player->address, msgBuffer);
 			// Get visible map from player
 			grid_t* seen = map_getVisibleMap(gameInfo_getMap(gameinfo), player->sightGrid);
 			// Create Display message
@@ -482,12 +482,12 @@ static void endGame(gameInfo_t* gameinfo)
   // Check args
   if (gameinfo == NULL) {
 	fprintf(stderr, "endGame: Invalid gameinfo struct passed.\n");
-	return false;
+	return;
   }
   char* scoreboard;
   char* message;
   playerInfo_t* player;
-  addr_t* playerAddress;
+  addr_t playerAddress;
 
   // gets the scoreboard to send to all the players when they are disconnected
   if ((scoreboard = gameInfo_createScoreBoard(gameinfo)) == NULL) {
@@ -496,7 +496,7 @@ static void endGame(gameInfo_t* gameinfo)
   }
 
   // allocates memory for the message that'll be sent to the user
-  message = mem_malloc_assert((sizeof(char*) * (5 + strlen(scoreboard))) + 1);
+  message = mem_malloc_assert((sizeof(char*) * (5 + strlen(scoreboard))) + 1, "endGame(): Mem message");
   if (message == NULL) {
     fprintf(stderr, "error: issue encountered while allocating memory for"
     " the message.\n");
@@ -512,7 +512,7 @@ static void endGame(gameInfo_t* gameinfo)
       continue;
     }
     // grab the player address
-    playerAddress = player->address
+    playerAddress = player->address;
     // send the quit message to the specific player
     message_send(playerAddress, message);
   }	

@@ -5,8 +5,8 @@
 # Made to create and test the crawler module
 C = ./common
 S = ./support
-OBJS = server.o servertest.o
-OBJS2 = client.o clienttest.o
+OBJS = server.o servertest.o network.o
+OBJS2 = client.o clienttest.o network.o
 LIBS = -lm -lncurses
 LLIBS = $C/common.a $S/support.a
 
@@ -21,6 +21,7 @@ VALGRIND = valgrind --leak-check=full --show-leak-kinds=all
 all:
 	make -C support
 	make -C common
+	make server
 	make client
 
 server: $(OBJS) $(LLIBS)
@@ -36,8 +37,9 @@ clienttest: $(OBJS2) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 
-server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h $S/network.h
+server.o: server.h $C/pos2D.h $S/message.h $C/gameInfo.h network.h $C/map.h
 client.o: client.h $C/pos2D.h 
+network.o: network.h $C/mem.h $C/pos2D.h $C/file.h $S/message.h server.h client.h
 
 servertest.o: servertest.c
 

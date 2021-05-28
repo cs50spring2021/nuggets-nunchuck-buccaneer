@@ -22,5 +22,5 @@ void display(const char* grid);
 void displayHeader(int goldCollected, int goldInPurse, int goldRemaining, char ID);
 void displayAction(char* action);
 void ensureDimensions(pos2D_t* display_hW);
-void clientQuit(char* explanation);
+void quitClient(char* explanation);
 void clearHeader(void);

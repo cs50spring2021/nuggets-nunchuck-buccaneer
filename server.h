@@ -23,8 +23,8 @@
 /* ********** prototypes for functions in server.c *********** */
 /* for function descriptions see paragraph comments in server.c */
 
-void sendDisplays(gameInfo_t* gameinfo, addr_t* Player, int goldCollected);
-bool movePlayer(gameInfo_t* gameinfo, addr_t* addr, char input);
-void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName, pos2D_t* terminalSize);
-bool leaveUser(gameInfo_t* gameinfo, addr_t* player);
+void sendDisplays(gameInfo_t* gameinfo, addr_t Player, int goldCollected);
+bool movePlayer(gameInfo_t* gameinfo, addr_t addr, char input);
+void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName);
+bool leaveUser(gameInfo_t* gameinfo, addr_t player);
 gameInfo_t* initializeGame(char* mapFile);
