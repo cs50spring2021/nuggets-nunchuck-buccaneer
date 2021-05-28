@@ -39,6 +39,7 @@ void clientQuit(char* explanation);
 /******************************************************************************/
 /************************ Global functions *************************/
 #ifndef TESTING
+static bool str2int(const char string[], int* number);
 /* ***************** main ********************** */
 /*
  * What it does: parses args, connects to the server, Send Join message, 
@@ -54,9 +55,10 @@ main(const int argc, char *argv[])
 
   // NOTE: Do we need to check that hostname and port are valid?
   char* hostname = argv[1]; 
-  //char* port = argv[2];
+  char* port = argv[2];
   char* playerName = NULL;
-
+  int portNum = 0;
+  str2int(port, &portNum);
   //initialize ncurses
   initscr();
   noecho();
@@ -65,13 +67,26 @@ main(const int argc, char *argv[])
   start_color();
   init_pair(1, COLOR_RED, COLOR_BLACK);
   attron(COLOR_PAIR(1));
-  int this = 5;
   //Start the network 
   // We pass 'stderr' to errorFile because we will redirect log messages to 
   // stderr when calling them, then redirect stderr to a file in the command line
-  startNetworkClient(hostname, &this, stderr, playerName);
+  startNetworkClient(hostname, &portNum, stderr, playerName);
     
   // startNetworkClient exits after it recieves a 'QUIT' message
   exit(0);
 }
 #endif
+
+/* ***************** str2int ********************** */
+/*
+ * Convert a string to an integer, returning that integer.
+ * Returns true if successful, or false if any error. 
+ * It is an error if there is any additional character beyond the integer.
+ * Assumes number is a valid pointer.
+ * Borrowed from CS 50 Lecture Notes.
+ */
+static bool str2int(const char string[], int* number)
+{
+  char nextchar;
+  return (sscanf(string, "%d%c", number, &nextchar) == 1);
+}

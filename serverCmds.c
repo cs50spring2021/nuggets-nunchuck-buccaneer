@@ -316,11 +316,9 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
   sendDisplays(gameinfo, message_noAddr(), 0);
 
   // checks to see if the last player has left the server
-  /*
   if (gameInfo_getNumPlayers(gameinfo) == 0) {
     return true;
   }
-  */
   return false;
 }
 
