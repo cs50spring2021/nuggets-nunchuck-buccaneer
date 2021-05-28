@@ -14,7 +14,6 @@
 #include "network.h"
 #include "mem.h"
 #include "pos2D.h"
-#include "ncurses.h"
 
 /**************** file-local global variables ****************/
 /* none */
