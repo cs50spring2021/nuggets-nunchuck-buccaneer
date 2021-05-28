@@ -43,7 +43,6 @@ void testSetPlayerID(char id);
 void clearHeader(void);
 
 /**************** global integer ****************/
-static int isSpectator;     // -1 if player, 1 if spectator
 static char playerID;       // initialized on recieving OK message for join
 static const int headerLen = 52;
 static const int actionLen = 19;
@@ -77,7 +76,6 @@ clearAction(void)
     int y;
     int x;
     int maxX;
-    int test;
     maxX = getmaxx(stdscr); // the width of the screen
     maxX -= 2;
     move(0, maxX - actionLen);
@@ -109,12 +107,6 @@ main(const int argc, char *argv[])
   char* hostname = argv[1]; 
   char* port = argv[2];
   char* playerName = NULL;
-  if (argc == 4) {
-    isSpectator = -1;
-    playerName = argv[3];
-  } else {
-    isSpectator = 1;
-  }
 
   //initialize ncurses
   initscr();
@@ -149,7 +141,7 @@ void displayHeader(int n, int p, int r)
     //       n, p, r should not exeed 999
     char* header= mem_malloc_assert((headerLen * sizeof(char)) , 
             "displayerHeader: out of memory");
-    if (isSpectator == -1) {
+    if (p == -1) {
         sprintf(header, "Spectator: %d nuggets unclaimed.", r);
     } else {
         sprintf(header, "Player %c has %d nuggets (%d nuggets unclaimed).", 
@@ -251,8 +243,18 @@ display(const char* grid)
         fprintf(stderr, "displayGrid(): NULL 'grid' passed\n");
         return;
     }
+    int NROWS;  // the number of rows on the client 
+    int NCOLS;  // the number of columns on the client
+    getmaxyx(stdscr, NROWS, NCOLS);
+    // clear the old Display message
+    for(int y = 1; y < NROWS; y++){
+        for(int x = 0; x < NCOLS; x++){
+            move(y, x);
+            addch(' ');
+        }
+    }
     move(1,0);
-    int i;
+    int i = 0;
     int x;
     int y;
     while (grid[i] != '\0') {
@@ -290,9 +292,9 @@ ensureDimensions(pos2D_t* display_hW)
     if (displayW < minTotalTopWidth) {
         displayW = minTotalTopWidth;
     }
-
+    displayH++;
     getmaxyx(stdscr, NROWS, NCOLS);
-    while (displayW > NCOLS || displayH + 1 > NROWS) {
+    while (displayW > NCOLS || displayH > NROWS) {
         char* printS = mem_malloc_assert((130 * sizeof(char)), 
                 "ensureDimensions: out of memory");
         sprintf(printS, "adjust screen width and height to fit requirements: \n"
@@ -317,26 +319,16 @@ ensureDimensions(pos2D_t* display_hW)
         }
         refresh();
         free(printS);
-        sleep(1);
         getmaxyx(stdscr, NROWS, NCOLS);
     }
-    
     // clear the ensureDimensions message
-    move(0,0);
     int i = 0;
-    int y;
-    int x;
-    while (printS[i] != '\0') {
-        getyx(stdscr, y, x);
-        if (printS[i] == '\n'){
-            move(y + 1, 0);
-        } else {
+    for(int y = 0; y < NROWS; y++){
+        for(int x = 0; x < NCOLS; x++){
+            move(y, x);
             addch(' ');
-            move(y, x +1);
         }
-        i++;
     }
-    return;
 }
 
 /***************** quitClient *****************/
