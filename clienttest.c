@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
+#include <stdbool.h>
 #include "client.h"
 
 int main(){
@@ -23,12 +24,29 @@ int main(){
     attron(COLOR_PAIR(1));
     printw("CLIENT TEST");
     testSetPlayerID('B');
-    ensureDimensions(pos2D_new(30,20));
-    displayHeader(0, 0, 0);
-    //display("|.......|\n|.......|");
     int c;
-    while((c = getch()) != 'x'){
-
+    int stage = 0;
+    bool end = false;
+    while((c = getch()) != 'x' && !end){
+        if(c = 'c'){
+            switch(stage){
+                case (0):
+                    ensureDimensions(pos2D_new(30,15));
+                    displayHeader(0, 0, 0);
+                    displayAction("Unknown Keystroke");
+                    break;
+                case (1):
+                    displayHeader(5, 10, 15);
+                    break;
+                case (2):
+                    display("|.......|\n|.......|");
+                    break;
+                default:
+                    end = true;
+            }
+            stage++;
+        }
+        c = 'n';
     }
     quitClient("End of test");
     printf("ENDED");

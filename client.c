@@ -76,7 +76,10 @@ clearAction(void)
 {   
     int y;
     int x;
-    int maxX = getmaxx(stdscr); // the width of the screen
+    int maxX;
+    int test;
+    maxX = getmaxx(stdscr); // the width of the screen
+    maxX -= 2;
     move(0, maxX - actionLen);
     x = maxX - actionLen;
     while (x <= maxX) {
