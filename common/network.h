@@ -8,12 +8,16 @@
  * Nunchuck Buccaneers, May 2021
  */
 
+#include "gameInfo.h"
+#include "message.h"
+
+
 /******************** function prototypes ********************/
 
 /********************* startNetworkServer ********************/
 /*
- * startNetworkServer - handles starting the network on the
- * server side.
+ * startNetworkServer - starts the network on the server side, initalizing the
+ * message module, running the message loop, and terminating the msg module.
  * 
  * Inputs:
  *     * gameInfo_t* gameInfo - gameInfo from the server
@@ -28,8 +32,9 @@ void startNetworkServer(gameInfo_t* gameInfo);
 
 /********************** startNetworkClient *******************/
 /*
- * startNetworkClient - handles starting the network on the
- * client side.
+ * startNetworkClient - starts the network on the client side, initalizing the
+ * message module, setting the server address, sending an initial join message,
+ * running the message loop, and terminating the msg module.
  * 
  * Inputs:
  *     * serverHost - IP address to connect client to server
@@ -41,7 +46,8 @@ void startNetworkServer(gameInfo_t* gameInfo);
  *       address to server.
  *     * start message loop for the client
  */
-void startNetworkClient(char* serverHost, char* port);
+void startNetworkClient(char* serverHost, char* port, FILE* logFile,
+        char* playerName);
 
 /* ***************** numWords() ********************** */
 /*
@@ -54,6 +60,7 @@ void startNetworkClient(char* serverHost, char* port);
  * Outputs: 
  *     * int numWords - the number of words that were in the message
  */
+ int numWords(char* message);
  
 /********************* tokenizeMessage() *********************/
 /*
@@ -74,7 +81,8 @@ char** tokenizeMessage(const char* message, int numWords);
 /********************** handleMessage() **********************/
 /*
  * handleMessage - handles the message passed from client to server
- * or server to client.
+ * or server to client. This function checks the first word of every message to
+ * determine what steps to take next (typically calls other functions).
  * 
  * Inputs:
  *     * void* arg - anything we want to pass through, i.e., gameInfo

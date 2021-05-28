@@ -44,7 +44,7 @@ gridtest.o: mem.o pos2D.o grid.o grid.h pos2D.h
 visibilitytest.o: pos2D.o grid.o grid.h pos2D.h file.h mem.h
 maptest.o: mem.o map.h grid.h
 gameInfo.o: gameInfo.h mem.h pos2D.h grid.h $S/message.h visibility.h map.h
-playerInfo.o:
+playerInfo.o: $S/message.h
 
 test-grid: gridtest
 	valgrind --leak-check=full --show-leak-kinds=all ./gridtest
@@ -64,6 +64,7 @@ clean:
 	rm -rf gridtest
 	rm -rf visibilitytest
 	rm -rf maptest
-	rm -rf gameInfoTest
 	rm -rf pos2Dtest
 	rm -rf common.a
+	rm -rf gameInfotest
+	rm -rf vgcore.*

@@ -6,39 +6,57 @@
 C = ./common
 S = ./support
 OBJS = server.o servertest.o
-LIBS = -lm
+OBJS2 = client.o clienttest.o
+LIBS = -lm -lncurses
 LLIBS = $C/common.a $S/support.a
 
-CFLAGS = -Wall -pedantic -std=c11 -ggdb $(TESTING) -I$S -I$C
+#Uncomment for server tests
+DEFINES = -DTESTING
+CFLAGS = -Wall -pedantic -std=c11 -ggdb $(DEFINES) -I$S -I$C
 CC = gcc
 MAKE = make
 # for memory-leak tests
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all
+
 all:
 	make -C support
 	make -C common
-	make server
+	make client
 
 server: $(OBJS) $(LLIBS)
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+
+client: $(OBJS2) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 servertest: $(OBJS) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
+clienttest: $(OBJS2) $(LLIBS)
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+
+
 server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h
+client.o: client.h $C/pos2D.h 
 
 servertest.o: servertest.c
+
+clienttest.o: clienttest.c
 
 .PHONY: test valgrind clean
 
 #  Tests
-test: server servertest
+testserver: server servertest
 	bash -v testing.sh
+
+testclient: client clienttest
+	./clienttest
 	
 clean:
 	rm -rf *.dSYM  # MacOS debugger info
 	rm -f *~ *.o
 	rm -f server
 	rm -f client
+	rm -rf client
 	make -C common clean
 	make -C support clean
