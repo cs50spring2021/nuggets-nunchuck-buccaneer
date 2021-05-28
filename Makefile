@@ -5,8 +5,8 @@
 # Made to create and test the crawler module
 C = ./common
 S = ./support
-OBJS = server.o
-LIBS = 
+OBJS = server.o servertest.o
+LIBS = -lm
 LLIBS = $C/common.a $S/support.a
 
 CFLAGS = -Wall -pedantic -std=c11 -ggdb $(TESTING) -I$S -I$C
@@ -22,12 +22,17 @@ all:
 server: $(OBJS) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
+servertest: $(OBJS) $(LLIBS)
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+
 server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h
+
+servertest.o: servertest.c
 
 .PHONY: test valgrind clean
 
 #  Tests
-test: server
+test: server servertest
 	bash -v testing.sh
 	
 clean:
