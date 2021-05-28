@@ -28,9 +28,6 @@ gridtest: $(OBJS) $(LLIBS) gridtest.o
 visibilitytest: $(OBJS) $(LLIBS) visibilitytest.o
 	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
 
-gameInfo: $(OBJS) $(LLIBS) gameInfo.o
-	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
-
 maptest: $(OBJS) $(LLIBS) maptest.o
 	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
 
@@ -41,13 +38,13 @@ grid.o: grid.h pos2D.h mem.h
 visibility.o: visibility.h pos2D.h grid.h mem.h
 pos2D.o: pos2D.h
 mem.o: mem.h
-map.o: map.h file.h pos2D.h grid.h mem.h gameInfo.h
+map.o: map.h file.h pos2D.h grid.h mem.h gameInfo.h playerInfo.h
 file.o: file.h
 gridtest.o: mem.o pos2D.o grid.o grid.h pos2D.h
 visibilitytest.o: pos2D.o grid.o grid.h pos2D.h file.h mem.h
 maptest.o: mem.o map.h grid.h
 gameInfo.o: gameInfo.h mem.h pos2D.h grid.h $S/message.h visibility.h map.h
-
+playerInfo.o: $S/message.h
 
 test-grid: gridtest
 	valgrind --leak-check=full --show-leak-kinds=all ./gridtest
@@ -67,6 +64,7 @@ clean:
 	rm -rf gridtest
 	rm -rf visibilitytest
 	rm -rf maptest
+	rm -rf pos2Dtest
 	rm -rf common.a
 	rm -rf gameInfotest
 	rm -rf vgcore.*
