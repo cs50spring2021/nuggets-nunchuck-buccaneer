@@ -34,55 +34,7 @@ void displayGrid(const char* grid);
 void displayerHeader(int n, int p, int r, char ID);
 void displayAction(const char* message);
 void ensureDimensions(pos2D_t* display_hW);
-void clientQuit(char* explanation);
-
-/**************** local function prototypes ****************/
-/* not visible outside this file */
-void clearHeader(void);
-
-/**************** global integer ****************/
-static const int headerLen = 52;
-static const int actionLen = 19;
-                           
-/*****************************************************************************/
-/************************** Local functions ********************************/
-
-/* *********** clearHeader *********** */
-/* sets the header part of the top line to blank spaces in ncurses
- * does not 'refresh()'
- */
-void 
-clearHeader(void)
-{
-    int x = 0;
-    // NOTE: may need to be '<='?
-    while (x <= headerLen) {
-        move(0,x);
-        addch(' ');
-        x++;
-    }
-    return;
-}
-/* ********** clearAction ********** */
-/* sets the action part of the top line to blank spaces in ncurses
- * does not 'refresh()'
- */
-void
-clearAction(void)
-{   
-    int y;
-    int x;
-    int maxX;
-    maxX = getmaxx(stdscr); // the width of the screen
-    maxX -= 2;
-    move(0, maxX - actionLen);
-    x = maxX - actionLen;
-    while (x <= maxX) {
-        addch(' ');
-        move(y,x+1);
-        getyx(stdscr, y, x);
-    }
-}
+void clientQuit(char* explanation);  
 
 /******************************************************************************/
 /************************ Global functions *************************/
@@ -102,7 +54,7 @@ main(const int argc, char *argv[])
 
   // NOTE: Do we need to check that hostname and port are valid?
   char* hostname = argv[1]; 
-  char* port = argv[2];
+  //char* port = argv[2];
   char* playerName = NULL;
 
   //initialize ncurses
@@ -113,11 +65,11 @@ main(const int argc, char *argv[])
   start_color();
   init_pair(1, COLOR_RED, COLOR_BLACK);
   attron(COLOR_PAIR(1));
-    
+  int this = 5;
   //Start the network 
   // We pass 'stderr' to errorFile because we will redirect log messages to 
   // stderr when calling them, then redirect stderr to a file in the command line
-  startNetworkClient(hostname, port, stderr, playerName);
+  startNetworkClient(hostname, &this, stderr, playerName);
     
   // startNetworkClient exits after it recieves a 'QUIT' message
   exit(0);

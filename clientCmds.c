@@ -3,6 +3,61 @@
  *
  * nunchuck-buccaneers, May 2021
  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <ncurses.h>
+#include "pos2D.h"
+#include "mem.h"
+#include "network.h"
+#include <unistd.h>
+#include "clientCmds.h"
+
+
+/**************** global integer ****************/
+static const int headerLen = 52;
+static const int actionLen = 19;
+
+/*****************************************************************************/
+/************************** Local functions ********************************/
+
+/* *********** clearHeader *********** */
+/* sets the header part of the top line to blank spaces in ncurses
+ * does not 'refresh()'
+ */
+void 
+clearHeader(void)
+{
+    int x = 0;
+    // NOTE: may need to be '<='?
+    while (x <= headerLen) {
+        move(0,x);
+        addch(' ');
+        x++;
+    }
+    return;
+}
+/* ********** clearAction ********** */
+/* sets the action part of the top line to blank spaces in ncurses
+ * does not 'refresh()'
+ */
+void
+clearAction(void)
+{   
+    int y;
+    int x;
+    int maxX;
+    maxX = getmaxx(stdscr); // the width of the screen
+    maxX -= 2;
+    move(0, maxX - actionLen);
+    x = maxX - actionLen;
+    while (x <= maxX) {
+        addch(' ');
+        move(y,x+1);
+        getyx(stdscr, y, x);
+    }
+}
 
 /*************** displayHeader() ****************/
 /*

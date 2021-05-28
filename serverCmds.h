@@ -1,6 +1,6 @@
 /* 
- * server.h - header files for server.c, holds prototypes for the functions in
- *            server.c so they can be called in network
+ * serverCmds.h - header files for serverCmds.c, holds prototypes for the functions in
+ *            serverCmds.c so they can be called in network
  * 
  * Nunchuck Buccaneers
  * cs50 - Spring 2021
@@ -20,10 +20,9 @@
 
 
 
-/* ********** prototypes for functions in server.c *********** */
-/* for function descriptions see paragraph comments in server.c */
+/* ********** prototypes for functions in serverCmds.c *********** */
+/* for function descriptions see paragraph comments in serverCmds.c */
 
-void sendDisplays(gameInfo_t* gameinfo, addr_t Player, int goldCollected);
 bool movePlayer(gameInfo_t* gameinfo, addr_t addr, char input);
 void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName);
 bool leaveUser(gameInfo_t* gameinfo, addr_t player);

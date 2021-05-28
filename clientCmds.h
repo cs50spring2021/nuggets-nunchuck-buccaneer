@@ -20,7 +20,7 @@
 /* for function descriptions see paragraph comments in clientCmds.c */
 void display(const char* grid);
 void displayHeader(int goldCollected, int goldInPurse, int goldRemaining, char ID);
-void displayAction(char* action);
+void displayAction(const char* message);
 void ensureDimensions(pos2D_t* display_hW);
 void quitClient(char* explanation);
 void clearHeader(void);

@@ -5,13 +5,13 @@
 # Made to create and test the crawler module
 C = ./common
 S = ./support
-OBJS = server.o servertest.o network.o
-OBJS2 = client.o clienttest.o network.o clientCmds.o
+OBJS = server.o network.o serverCmds.o clientCmds.o
+OBJS2 = client.o network.o clientCmds.o serverCmds.o
 LIBS = -lm -lncurses
 LLIBS = $C/common.a $S/support.a
 
 #Uncomment for server tests
-DEFINES = -DTESTING
+#DEFINES = -DTESTING
 CFLAGS = -Wall -pedantic -std=c11 -ggdb $(DEFINES) -I$S -I$C
 CC = gcc
 MAKE = make
@@ -37,10 +37,11 @@ clienttest: $(OBJS2) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 
-server.o: server.h $C/pos2D.h $S/message.h $C/gameInfo.h network.h $C/map.h
-client.o: client.h $C/pos2D.h 
-network.o: network.h $C/mem.h $C/pos2D.h $C/file.h $S/message.h server.h clientCmds.h
-clientCmds.o: clientCmds.h $C/pos2D.h
+server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h network.h $C/map.h
+client.o: client.c $C/pos2D.h network.h
+network.o: network.h $C/mem.h $C/pos2D.h $C/file.h $S/message.h clientCmds.h serverCmds.h
+clientCmds.o: clientCmds.h $C/pos2D.h $C/mem.h $C/pos2D.h
+serverCmds.o: serverCmds.h server.c $C/pos2D.h $S/message.h $C/gameInfo.h $C/map.h
 
 servertest.o: servertest.c
 
