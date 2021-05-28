@@ -278,6 +278,14 @@ ensureDimensions(pos2D_t* display_hW)
     int NCOLS;  // the number of columns on the client
     int displayW = pos2D_getX(display_hW);      // the number of columns on server
     int displayH = pos2D_getY(display_hW);      // the number of rows on server
+
+    // if displayW is less than the width required to print header + action
+    // set displayW to the width of header + action + 1
+    int minTotalTopWidth = headerLen + actionLen + 1;
+    if (displayW < minTotalTopWidth) {
+        displayW = minTotalTopWidth;
+    }
+
     getmaxyx(stdscr, NROWS, NCOLS);
     while (displayW > NCOLS || displayH + 1 > NROWS) {
         char* printS = mem_malloc_assert((130 * sizeof(char)), 
