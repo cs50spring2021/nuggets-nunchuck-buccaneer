@@ -6,7 +6,7 @@
 C = ./common
 S = ./support
 OBJS = server.o servertest.o
-OBJS2 = player.o 
+OBJS2 = client.o 
 LIBS = -lm -lncurses
 LLIBS = $C/common.a $S/support.a
 
@@ -21,12 +21,12 @@ all:
 	make -C support
 	make -C common
 	make server
-	make player
+	make client
 
 server: $(OBJS) $(LLIBS)
 	$(CC) $(DEFINES) $(CFLAGS) $^ $(LIBS) -o $@
 
-player: $(OBJS2) $(LLIBS)
+client: $(OBJS2) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 servertest: $(OBJS) $(LLIBS)
@@ -34,7 +34,7 @@ servertest: $(OBJS) $(LLIBS)
 
 
 server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h
-player.o: player.c $C/pos2D.h 
+client.o: client.c $C/pos2D.h 
 
 servertest.o: servertest.c
 
@@ -49,6 +49,6 @@ clean:
 	rm -f *~ *.o
 	rm -f server
 	rm -f client
-	rm -rf player
+	rm -rf client
 	make -C common clean
 	make -C support clean
