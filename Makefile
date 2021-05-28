@@ -38,7 +38,7 @@ clienttest: $(OBJS2) $(LLIBS)
 
 
 server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h
-client.o: client.c $C/pos2D.h 
+client.o: client.h $C/pos2D.h 
 
 servertest.o: servertest.c
 
@@ -47,8 +47,11 @@ clienttest.o: clienttest.c
 .PHONY: test valgrind clean
 
 #  Tests
-test: server servertest
+testserver: server servertest
 	bash -v testing.sh
+
+testclient: client clienttest
+	./clienttest
 	
 clean:
 	rm -rf *.dSYM  # MacOS debugger info
