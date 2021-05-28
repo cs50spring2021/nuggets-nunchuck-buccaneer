@@ -40,7 +40,7 @@ static void endGame(gameInfo_t* gameinfo);
 
 bool movePlayer(gameInfo_t* gameinfo, addr_t* player, char input);
 
-#ifndef SERVERTEST
+#ifndef TESTING
 /******************* main *********************
 parses args, uses networkServer to start server, initializes Game, start networkServer(MessageLoop)
 Caller Provides:

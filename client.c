@@ -19,6 +19,7 @@
 #include "pos2D.h"
 #include "mem.h"
 #include "network.h"
+#include <unistd.h>
 
 /**************** file-local global variables ****************/
 /* none */
@@ -34,6 +35,8 @@ void displayerHeader(int n, int p, int r);
 void displayAction(const char* message);
 void ensureDimensions(pos2D_t* display_hW);
 void clientQuit(char* explanation);
+
+void testSetPlayerID(char id);
 
 /**************** local function prototypes ****************/
 /* not visible outside this file */
@@ -73,20 +76,19 @@ clearAction(void)
 {   
     int y;
     int x;
-    int maxX = getmaxX(stdscr); // the width of the screen
+    int maxX = getmaxx(stdscr); // the width of the screen
     move(0, maxX - actionLen);
     x = maxX - actionLen;
     while (x <= maxX) {
-        getyx(stdscr, y, x);
-        addch(message[i]);
+        addch(' ');
         move(y,x+1);
-        i++;
-    {
+        getyx(stdscr, y, x);
+    }
 }
 
 /******************************************************************************/
 /************************ Global functions *************************/
-
+#ifndef TESTING
 /* ***************** main ********************** */
 /*
  * What it does: parses args, connects to the server, Send Join message, 
@@ -128,7 +130,7 @@ main(const int argc, char *argv[])
   // startNetworkClient exits after it recieves a 'QUIT' message
   exit(0);
 }
-
+#endif
 /*************** displayHeader() ****************/
 /*
  * What it does: Display just the top line header that the serve sends to the client
@@ -293,7 +295,7 @@ ensureDimensions(pos2D_t* display_hW)
         sprintf(printS, "adjust screen width and height to fit requirements: \n"
                 "Current Width: %d, required: %d\n"
                 "Current Height: %d, required: %d", 
-                displayW, NROWS, displayH, NCOLS);
+                NCOLS, displayW, NROWS, displayH);
         int i = 0;
         // set the curser to the upper left corner
         move(0,0);
@@ -312,6 +314,8 @@ ensureDimensions(pos2D_t* display_hW)
         }
         refresh();
         free(printS);
+        sleep(1);
+        getmaxyx(stdscr, NROWS, NCOLS);
     }
     return;
 }
@@ -330,4 +334,9 @@ quitClient(char* explanation)
     endwin();
     printf("%s\n", explanation);
     free(explanation);
+}
+
+
+void testSetPlayerID(char id){
+    playerID = id;
 }
