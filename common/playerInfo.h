@@ -9,10 +9,7 @@
 
 #ifndef __PLAYERINFO_H
 #define __PLAYERINFO_H
-<<<<<<< HEAD
 #include "message.h"
-=======
->>>>>>> main
 
  /*********************** types **********************/
 typedef struct playerInfo {
@@ -24,8 +21,4 @@ typedef struct playerInfo {
     char* username;
 } playerInfo_t;
 
-<<<<<<< HEAD
 #endif // __PLAYERINFO_H
-=======
-#endif // __PLAYERINFO_H
->>>>>>> main

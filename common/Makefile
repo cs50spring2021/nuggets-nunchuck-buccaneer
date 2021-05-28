@@ -9,7 +9,7 @@ S = ../support
 OBJS = grid.o pos2D.o mem.o visibility.o file.o gameInfo.o map.o
 
 LIB = common.a
-LLIBS = ../support.a
+LLIBS = $S/support.a
 
 CFLAGS = -Wall -pedantic -std=c11 -ggdb $(FLAGS) -I$S
 CC = gcc
@@ -46,13 +46,8 @@ file.o: file.h
 gridtest.o: mem.o pos2D.o grid.o grid.h pos2D.h
 visibilitytest.o: pos2D.o grid.o grid.h pos2D.h file.h mem.h
 maptest.o: mem.o map.h grid.h
-<<<<<<< HEAD
 gameInfo.o: gameInfo.h mem.h pos2D.h grid.h $S/message.h visibility.h map.h
-=======
-playerInfo.o:
-gameInfo.o: mem.h pos2D.h grid.h visibility.h playerInfo.h map.o
-gameInfoTest.o: pos2D.h grid.h playerInfo.h gameInfo.o map.o
->>>>>>> main
+playerInfo.o: $S/message.h
 
 
 test-grid: gridtest
@@ -64,13 +59,8 @@ test-visibility: visibilitytest
 test-map: maptest
 	valgrind --leak-check=full --show-leak-kinds=all ./maptest
 
-<<<<<<< HEAD
 test-gameInfotest: gameInfotest
 	valgrind --leak-check=full --show-leak-kinds=all ./gameInfotest
-=======
-test-gameInfo: gameInfoTest
-	valgrind --leak-check=full --show-leak-kinds=all ./gameInfoTest
->>>>>>> main
 
 clean:
 	rm -rf *.dSYM
