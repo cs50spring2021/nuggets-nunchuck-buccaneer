@@ -20,7 +20,10 @@
 #include "visibility.h"
 #include "playerInfo.h"
 #include "string.h"
+<<<<<<< HEAD
 #include "gameInfo.h"
+=======
+>>>>>>> main
 
 /********************** global types **********************/
 typedef struct gameInfo {
@@ -73,6 +76,7 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos, char* userna
     player->username = username;
 
     // handle for number of players
+<<<<<<< HEAD
     if (info->numPlayers < 25) {
         // find first empty spot and set playerID to that
         int i = 0;
@@ -86,6 +90,10 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos, char* userna
         pos2D_delete(pos);
         return false;
     }
+=======
+    if (info->numPlayers < 25) player->playerID = info->numPlayers + 1;
+    else return false;
+>>>>>>> main
 
     // create the players initial sightGrid
     char* mapString = grid_toString(map_getBaseGrid(gameInfo_getMap(info)));
@@ -96,6 +104,7 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos, char* userna
     for (int i = 0; i < strlen(mapString); i++) {
         currSpot = mapString[i];
         if (currSpot == '\n') sightGridString_init[i] = '\n'; // new line
+<<<<<<< HEAD
         // else if (currSpot == '\0') sightGridString_init[i] = '\0'; // end of the string
         else sightGridString_init[i] = '0'; // empty spot
     }
@@ -135,6 +144,19 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos, char* userna
 
     // update gameInfo struct
     info->players[player->playerID] = player;
+=======
+        else if (currSpot == '\0') sightGridString_init[i] = '\0'; // end of the string
+        else sightGridString_init[i] = '2'; // empty spot
+    }
+    
+    // create the empty sightGrid
+    grid_t* sightGridNew = grid_new(sightGridString_init);
+    player->sightGrid = sightGridNew;
+    gameInfo_updateSightGrid(info, player->address);
+
+    // update gameInfo struct
+    info->players[info->numPlayers] = player;
+>>>>>>> main
     info->numPlayers++;
 
     // player created!
@@ -156,7 +178,11 @@ gameInfo_addSpectator(gameInfo_t* info, addr_t* address)
     // insert a new player with null information into the players array
     playerInfo_t* spectator = mem_malloc_assert(sizeof(playerInfo_t), "memory allocation error\n");
     spectator->pos = NULL;
+<<<<<<< HEAD
     spectator->score = -1;
+=======
+    spectator->score = 0;
+>>>>>>> main
     spectator->playerID = 25;
     spectator->address = address;
     spectator->username = "spectator";
@@ -171,19 +197,30 @@ gameInfo_addSpectator(gameInfo_t* info, addr_t* address)
     for (int i = 0; i < strlen(mapString); i++) {
         currSpot = mapString[i];
         if (currSpot == '\n') sightGridString_init[i] = '\n'; // new line
+<<<<<<< HEAD
         // else if (currSpot == '\0') sightGridString_init[i] = '\0'; // end of the string
         else sightGridString_init[i] = '2'; // empty spot
+=======
+        else if (currSpot == '\0') sightGridString_init[i] = '\0'; // end of the string
+        else sightGridString_init[i] = '0'; // empty spot
+>>>>>>> main
     }
     
     // create the empty sightGrid
     grid_t* sightGridNew = grid_new(sightGridString_init);
     spectator->sightGrid = sightGridNew;
+<<<<<<< HEAD
     mem_free(mapString);
     mem_free(sightGridString_init);
 
     // check to see if there is already a spectator
     gameInfo_removeSpectator(info);
     (info->players)[25] = spectator;
+=======
+
+
+    info->players[25] = spectator;
+>>>>>>> main
 }
 
 /****************** gameInfo_removePlayer *****************/
@@ -201,7 +238,12 @@ gameInfo_removePlayer(gameInfo_t* info, addr_t* address)
     playerInfo_t* player = gameInfo_getPlayer(info, address);
 
     // remove player from list and change gameInfo
+<<<<<<< HEAD
     int playerID = player->playerID;
+=======
+    info->players[player->playerID] = NULL;
+    info->numPlayers--;
+>>>>>>> main
 
     // free from memory
     grid_delete(player->sightGrid);
@@ -244,10 +286,16 @@ gameInfo_getPlayer(gameInfo_t* info, addr_t* address)
 
     // return player info for given address
     int i = 0;
+<<<<<<< HEAD
     while (i < info->numPlayers) {
         if (message_eqAddr(*address, *((info->players)[i]->address))) {
             playerInfo_t* player = (info->players)[i];
             return player;
+=======
+    while (player == NULL && i < info->numPlayers) {
+        if (message_eqAddr(*address, *(info->players[i]->address))) {
+            player = info->players[i];
+>>>>>>> main
         }
         i++;
     }
@@ -312,6 +360,7 @@ gameInfo_pickupGold(gameInfo_t* info, addr_t* address)
      *     decrement goldPiles and goldScore
      */
     // seed & goldAmt
+<<<<<<< HEAD
     int goldAmt;
     if (info->goldScore > 25 && info->goldPiles > 1) {
         int avgGoldScore = info->goldScore % info->goldPiles;
@@ -320,6 +369,9 @@ gameInfo_pickupGold(gameInfo_t* info, addr_t* address)
     else {
         goldAmt = info->goldScore;
     }
+=======
+    int goldAmt = rand() % info->goldScore;
+>>>>>>> main
 
     // make changes
     playerInfo_t* player = gameInfo_getPlayer(info, address);
@@ -355,6 +407,17 @@ sortFunc(playerInfo_t** players, int length)
     }
 }
 
+/******************* scoreboardCmpFunc ********************/
+/* comparator for scoreboard qsort */
+int
+scoreboardCmpFunc(const void* player1, const void* player2)
+{
+    playerInfo_t* player1P = (playerInfo_t*) player1;
+    playerInfo_t* player2P = (playerInfo_t*) player2;
+
+    return player1P->score - player2P->score;
+}
+
 /*************** gameInfo_createScoreBoard ****************/
 /* see gameInfo.h for description */
 char* 
@@ -377,21 +440,33 @@ gameInfo_createScoreBoard(gameInfo_t* info)
     }
 
     // sort and create a string
+<<<<<<< HEAD
     sortFunc(scoreboard, info->numPlayers);
+=======
+    qsort(scoreboard, info->numPlayers, sizeof(playerInfo_t), scoreboardCmpFunc);
+>>>>>>> main
     char* scoreboardLine = mem_calloc_assert(info->numPlayers, 50, "memory allocation error\n"); // 50 chars for each line
 
     // print out players in decreasing order to a string
     sprintf(scoreboardLine, "GAME OVER: \n");
     for (int i = 0; i < info->numPlayers; i++) {
+<<<<<<< HEAD
         char* playerLine = mem_malloc_assert(50, "memory allocation error\n");
         sprintf(playerLine, "%c \t%d \t%s\n", i+65, scoreboard[i]->score, scoreboard[i]->username);
         strcat(scoreboardLine, playerLine);
+=======
+        sprintf(scoreboardLine, "%c \t%d \t%s\n", i+65, scoreboard[i]->score, scoreboard[i]->username);
+>>>>>>> main
     }
 
     return scoreboardLine;
 }
 
+<<<<<<< HEAD
 /******************** gameInfo_getScoreRemaining *********************/
+=======
+/******************** gameInfo_topBar *********************/
+>>>>>>> main
 /* see gameInfo.h for description */
 int 
 gameInfo_getScoreRemaining(gameInfo_t* info)
@@ -402,7 +477,20 @@ gameInfo_getScoreRemaining(gameInfo_t* info)
         return -1;
     }
 
+<<<<<<< HEAD
     return info->goldScore;
+=======
+    // set message to an empty string 
+    if (message == NULL) {
+        message = " ";
+    }
+    // grab the top bar for the player and print out to a char*
+    playerInfo_t* player = gameInfo_getPlayer(info, address);
+    char* playerTopLine = mem_malloc_assert(100, "memory allocation error\n");
+    sprintf(playerTopLine, "Player %c has %d nuggets (%d nuggets unclaimed). %s", (player->playerID)+65, player->score, info->goldScore, message); // need to update to handle messages
+    
+    return playerTopLine;
+>>>>>>> main
 }
 
 /******************** gameInfo_getMap *********************/
@@ -440,10 +528,13 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
 
     // mapString
     playerInfo_t* player = gameInfo_getPlayer(info, address);
+<<<<<<< HEAD
     if (player == NULL) {
         fprintf(stderr, "gameInfo_updateSightGrid: player does not exist!\n");
         return false;
     }
+=======
+>>>>>>> main
     char* gridString = grid_toString(player->sightGrid);
 
     // loop to set all non '\n' chars to 0, 1, or 2
@@ -454,7 +545,11 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
     while (i < strlen(gridString)) {
         // grab the currSpot char as well as x and y (height)
         currSpot = gridString[i];
+<<<<<<< HEAD
         pos2D_t* otherPos = pos2D_new(x, height);
+=======
+        pos2D_t* otherPos = pos2D_new((i / height) + (i % height), height);
+>>>>>>> main
 
         // increment height if encounters '\n'
         if (currSpot == '\n') {
@@ -468,10 +563,19 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
              *     if '2' and not visible, switch to '1'
              *     if visible, switch to '2'
              */
+<<<<<<< HEAD
             if (visibility_getVisibility(player->pos, otherPos, map_getBaseGrid(info->map)) && currSpot != '2') {
                 grid_setPos(player->sightGrid, otherPos, '2');
             }
             else if (!visibility_getVisibility(player->pos, otherPos, map_getBaseGrid(info->map)) && currSpot == '2') {
+=======
+            if (visibility_getVisibility(player->pos, otherPos, player->sightGrid) && currSpot != '2') {
+                grid_setPos(player->sightGrid, otherPos, '2');
+            }
+            else if (!visibility_getVisibility(player->pos, otherPos, player->sightGrid) && (currSpot == '1' || currSpot == '0')) {
+                continue;
+            } else if (!visibility_getVisibility(player->pos, otherPos, player->sightGrid) && currSpot == '2') {
+>>>>>>> main
                 grid_setPos(player->sightGrid, otherPos, '1');
             }
             x++;
@@ -519,6 +623,7 @@ gameInfo_delete(gameInfo_t* info)
      *  map_t* map;
      */
 
+<<<<<<< HEAD
     // free memory for all players and singular spectator
     for (int i = 0; i < info->numPlayers; i++) {
         gameInfo_removePlayer(info, info->players[i]->address);
@@ -526,6 +631,12 @@ gameInfo_delete(gameInfo_t* info)
     gameInfo_removeSpectator(info);
 
     // free the players array
+=======
+    // free memory for all players and players array
+    for (int i = 0; i < info->numPlayers; i++) {
+        gameInfo_removePlayer(info, info->players[i]->address);
+    }
+>>>>>>> main
     mem_free(info->players);
 
     // free map memory and gameInfo memory

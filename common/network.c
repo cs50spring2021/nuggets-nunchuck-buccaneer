@@ -34,6 +34,10 @@
 
 /**************** startNetworkServer() ****************/
 /* see network.h for description */
+<<<<<<< HEAD
+=======
+// handle message, they will never get the same message.
+>>>>>>> main
 void
 startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
 {
@@ -60,6 +64,10 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
 
 /**************** startNetworkClient() ****************/
 /* see network.h for description */
+<<<<<<< HEAD
+=======
+// handle message, they will never get the same message.
+>>>>>>> main
 void
 startNetworkClient(char* serverHost, char* port, FILE* errorFile, char* name)
 {
@@ -149,6 +157,10 @@ numWords(char* message) {
 
 /**************** tokenizeMessage() ****************/
 /* see network.h for description */
+<<<<<<< HEAD
+=======
+// handle message, they will never get the same message.
+>>>>>>> main
 char**
 tokenizeMessage(const char* message, int numWords)
 {
@@ -213,6 +225,10 @@ tokenizeMessage(const char* message, int numWords)
 
 /**************** handleMessage() ****************/
 /* see network.h for description */
+<<<<<<< HEAD
+=======
+// handle message, they will never get the same message.
+>>>>>>> main
 bool
 handleMessage(void* arg, const addr_t from, const char* message)
 {
@@ -297,6 +313,10 @@ handleMessage(void* arg, const addr_t from, const char* message)
 
 /**************** handleTimeout() ****************/
 /* see network.h for description */
+<<<<<<< HEAD
+=======
+// handle message, they will never get the same message.
+>>>>>>> main
 bool
 handleTimeout(void* arg)
 {
@@ -311,6 +331,10 @@ handleTimeout(void* arg)
 
 /**************** handleInput() ****************/
 /* see network.h for description */
+<<<<<<< HEAD
+=======
+// handle message, they will never get the same message.
+>>>>>>> main
 bool
 handleInput(void* arg);
 {

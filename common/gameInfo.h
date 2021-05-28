@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h>
 #include "mem.h"
 #include "pos2D.h"
 #include "grid.h"
