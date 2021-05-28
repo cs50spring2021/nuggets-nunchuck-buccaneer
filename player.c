@@ -67,7 +67,7 @@ clearHeader(void)
 
 /******************************************************************************/
 /************************ Global functions *************************/
-
+#ifndef TESTING
 /* ***************** main ********************** */
 /*
  * What it does: parses args, connects to the server, Send Join message, 
@@ -109,7 +109,7 @@ main(const int argc, char *argv[])
   // we shouldn't reach this point as we exit in the quitClient function
   exit(0);
 }
-
+#endif
 /*************** displayHeader() ****************/
 /*
  * What it does: Display just the top line header that the serve sends to the client
