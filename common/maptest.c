@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include "map.h"
 #include "grid.h"
+#include "mem.h"
 
 /* ******* helper_fucntion *****/
 
@@ -126,9 +127,21 @@ int main()
     map_setPlayerPos(map1, pos3, player);
     printf("Player A at 5,2. Player B at 5,3:\n");
     print_gameGrid(map1);
-    pos2D_delete(pos3);
     free(player);
 
+    printf("\n__________ map_clearSpot() __________\n");
+    printf("NULL map pointer passed:\n");
+    map_clearSpot(NULL, pos3);
+    printf("\nNULL pos pointer passed:\n");
+    map_clearSpot(map1, NULL);
+    printf("\npos out of bounds passed:\n");
+    pos2D_t* pos20 = pos2D_new(20,20);
+    map_clearSpot(map1, pos20);
+    pos2D_delete(pos20);
+    printf("\nProper function: Player A at 5,2. No player at 5,3\n");
+    map_clearSpot(map1, pos3);
+    print_gameGrid(map1);
+    pos2D_delete(pos3);
 
     printf("\n__________ map_randomEmptySquare() __________\n");
     printf("Null pointer passed:\n");

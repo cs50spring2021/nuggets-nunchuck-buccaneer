@@ -102,6 +102,20 @@ void gameInfo_removePlayer(gameInfo_t* info, addr_t* address);
  */
 playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, addr_t* address);
 
+/******************* gameInfo_getPlayerFromID *******************/
+/*
+ * Gets player info from the players array using playerID
+ * Caller provides:
+ *     desired gameInfo struct,
+ *     playerID.
+ * We return:
+ *     playerInfo struct pointer,
+ *     NULL if any errors are encountered.
+ * Caller is responsible for:
+ *     nothing.
+ */
+playerInfo_t* gameInfo_getPlayerFromID(gameInfo_t* info, int playerID);
+
 /****************** gameInfo_pickupGold *******************/
 /*
  * Adds gold amount to the parameterized players address
@@ -170,6 +184,18 @@ map_t* gameInfo_getMap(gameInfo_t* info);
  *     nothing.
  */
 bool gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address);
+
+/******************* gameInfo_getGoldPiles *******************/
+/*
+ * Getter for gold amount in gameInfo struct
+ * Caller provides:
+ *     desired gameInfo struct,
+ * We return:
+ *     gold piles left over
+ * Caller is responsible for:
+ *     nothing.
+ */
+int gameInfo_getGoldPiles(gameInfo_t* info);
 
 /********************* gameInfo_delete ********************/
 /*

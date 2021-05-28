@@ -14,6 +14,7 @@
 #include "pos2D.h"
 #include "message.h"
 #include "gameInfo.h"
+#include "playerInfo.h"
 #include <ctype.h>
 
 //CONSTANTS
@@ -28,15 +29,16 @@ const int goldMaxNumPiles = 30; // maximum number of gold piles
 
 static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* seed);
 static gameInfo_t* initializeGame(char* mapFile);
-static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir);
+static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir, int* goldCollected);
 static pos2D_t* dirToMovement(pos2D_t* start, char dir);
-static void sendDisplays(gameInfo_t* gameinfo);
+void sendDisplays(gameInfo_t* gameinfo, addr_t* Player, int goldCollected);
 static void endGame(gameInfo_t* gameinfo);
 
 // FUNCTIONS
 
 bool movePlayer(gameInfo_t*  gameinfo, addr_t* player, char input);
 
+#ifndef TESTING
 /******************* main *********************
 parses args, uses networkServer to start server, initializes Game, start networkServer(MessageLoop)
 Caller Provides:
@@ -68,6 +70,7 @@ int main(const int argc, char *argv[]){
 	//Deletes the gameinfo
 	gameInfo_delete(gameInfo);
 }
+#endif
 
 /******************* parseArgs - helper for main *********************
 parses args and finds a seed and a mapFilePath, if no seed doesn't set it
@@ -149,22 +152,30 @@ We Return:
 	True if the last pile of gold is collected by this move
 	False if there is still gold after this move
 */
-bool movePlayer(gameInfo_t* gameinfo, addr_t* player, char input){
+bool movePlayer(gameInfo_t* gameinfo, addr_t* addr, char input){
 	//Check Args
-	if(gameinfo == NULL || player == NULL){
+	if(gameinfo == NULL || addr == NULL){
 		fprintf(stderr, "movePlayer: Invalid Args passed");
 		return NULL;
 	}
+	//Check that it is not a spectator
+	playerInfo_t* player = gameInfo_getPlayer(gameinfo, addr);
+	if(player->username == NULL){
+		//Exit without doing anything
+		return false;
+	}
+	//Create var for goldCollected
+	int goldCollected = 0;
 	//Check if not sprint
-	if(!isupper(input)){
+	if(isupper(input) == 0){
 		//Do one short move
-		shortMove(gameinfo, player, input);
+		shortMove(gameinfo, addr, input, &goldCollected);
 	} else {
-		//Loop short moves until you are unable to
-		while(shortMove(gameinfo, player, tolower(input)));
+		//Loop short moves until unable to
+		while(shortMove(gameinfo, player, tolower(input), &goldCollected));
 	}
 	//Send new Game State
-	sendDisplays(gameinfo);
+	sendDisplays(gameinfo, addr, goldCollected);
 	//Check for end
 	if(gameInfo_getGoldPiles(gameinfo) == 0){
 		endGame(gameinfo);
@@ -185,7 +196,7 @@ We Return:
 	False if move was impossible
 	Otherwise on error returns false
 */
-static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir){
+static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir, int* goldCollected){
 	//Check args
 	if(gameinfo == NULL || addr == NULL){
 		fprintf(stderr, "shortMove: Invalid Args passed");
@@ -200,7 +211,32 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir){
 	if(current == '\0'){
 		return false;
 	}
-	//Check if 
+	//Check if wall or empty space
+	if(current == '+' || current == ' '){
+		return false;
+	}
+	//Check if gold
+	if(current == '*'){
+		*goldCollected += gameInfo_pickupGold(gameinfo, addr);
+	}
+	int movedPlayer = -1;
+	playerInfo_t* displaced = NULL;
+	//Check for another Player, Capital letter
+	if(isupper(current) == 1){
+		//Find ID
+		movedPlayer = current - 65;
+		//Set player recorded pos
+		displaced = gameInfo_getPlayerFromID(gameinfo, movedPlayer);
+		pos2D_set(displaced->pos, pos2D_getX(player->pos), pos2D_getY(player->pos));
+	}
+	//Move player to spot on map
+	pos2D_set(player->pos, pos2D_getX(toPos), pos2D_getY(toPos));
+	map_setPlayerPos(map, player->pos, player);
+	if(movedPlayer != -1){
+		//Update displaced on the map
+		map_setPlayerPos(map, displaced->pos, displaced);
+	}
+	//Delete to Pos
 	pos2D_delete(toPos);
 }
 
@@ -239,6 +275,22 @@ static pos2D_t* dirToMovement(pos2D_t* start, char dir){
 			//LEFT
 			return mem_assert(pos2D_new(pos2D_getX(start) - 1, pos2D_getY(start)), "dirToMovement: Pos Memory");
       		break;
+		case 'u'  :
+			//UPRIGHT
+			return mem_assert(pos2D_new(pos2D_getX(start) + 1, pos2D_getY(start) - 1), "dirToMovement: Pos Memory");
+      		break;
+		case 'n'  :
+			//DOWNRIGHT
+			return mem_assert(pos2D_new(pos2D_getX(start) + 1, pos2D_getY(start) + 1), "dirToMovement: Pos Memory");
+      		break;
+		case 'y'  :
+			//UPLEFT
+			return mem_assert(pos2D_new(pos2D_getX(start) - 1, pos2D_getY(start) - 1), "dirToMovement: Pos Memory");
+      		break;
+		case 'b'  :
+			//DOWNLEFT
+			return mem_assert(pos2D_new(pos2D_getX(start) - 1, pos2D_getY(start) + 1), "dirToMovement: Pos Memory");
+      		break;
 		default : 
 			fprintf(stderr, "shortMove: Invalid movement key");
 			return NULL;
@@ -246,17 +298,15 @@ static pos2D_t* dirToMovement(pos2D_t* start, char dir){
 }
 
 /******************* joinUser *********************
-Adds a player and places them on the map or adds a spectator
+adds a player, calls ensureDimensions on player, and places them on the map also
+can add a user as a spectator if name is NULL
 Caller Provides:
 	A gameInfo to update
 	A address for the player to create
-	A player name to assign to that player
-	and the terminal size for the player attempting to join
+	A player name to assign to that player, NULL for spectator
 We Do:
-	Check if the terminal size is big enough, if not sends a joinFail to the player with correct size
-	Otherwise add the player to GameInfo with relevant info and if they are not a spectator
-	places them into a random empty spot
-	on the map
+	Add a player to the game or a spectator, send the required dimensions to the player
+	and places the player on the map
 */
 void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName, pos2D_t* terminalSize) 
 {
@@ -372,8 +422,51 @@ We Do:
 	Send each player a line containing their current nuggets and the nuggets left to collect in the game with their visable map contained below 
 	it. To get the visible map we use the sightmaps from each playerinfo struct to combine into get VisibleMap
 */
-static void sendDisplays(gameInfo_t* gameinfo){
-	return;
+
+static void sendDisplays(gameInfo_t* gameinfo, addr_t* addr, int goldCollected){
+	// Check Args
+	if(gameinfo == NULL){
+		fprintf(stderr, "sendDisplays: Provided gameInfo is NULL");
+		return; 
+	}
+	// Get Gold Score Remaining
+	int scoreLeft = gameInfo_getScoreRemaining(gameinfo);
+	//Loop through IDs for players
+	for(int i = 0; i < maxPlayers; i++){
+		playerInfo_t* player = NULL; 
+		if((player = gameInfo_getPlayerFromID(gameinfo, i)) != NULL){
+			//Make space for the message
+			char msgBuffer[41];
+			//Check if Spectator
+			if((player->username) == NULL){
+				//Create the header message for spectator
+				sprintf(msgBuffer, "GOLD 0 -1 %d", scoreLeft);
+			} else {
+				//Check if it was this player that collected gold
+				if(message_eqAddr(*addr, *(player->address))){
+					// Create the header message for collecting player
+					sprintf(msgBuffer, "GOLD %d %d %d", goldCollected, (player->score), scoreLeft);
+				} else {
+					// Create the header message for non-collecting player
+					sprintf(msgBuffer, "GOLD 0 %d %d", (player->score), scoreLeft);
+				}
+				if(!gameInfo_updateSightGrid(gameinfo, (player->address))){
+					fprintf(stderr, "sendDisplays: SightGrid update failed");
+				}
+			}
+			//Send the displayHeader message
+			message_send(*(player->address), msgBuffer);
+			// Get visible map from player
+			grid_t* seen = map_getVisibleMap(gameInfo_getMap(gameinfo), player->sightGrid);
+			// Create Display message
+			char* stringOfSeen = grid_toString(seen);
+			char* displayMsg = mem_malloc_assert(sizeof(char) * (strlen(stringOfSeen) + strlen("DISPLAY\n") + 1), "sendDisplays: mem for display msg failed");
+			sprintf(displayMsg, "DISPLAY\n%s", stringOfSeen);
+			//Clean up
+			mem_free(displayMsg);
+			grid_delete(seen);
+		}
+	}
 }
 
 /******************* endGame *********************
