@@ -1,8 +1,8 @@
 /* 
- * player.c - Handles the client-side of the game. Detects keystrokes and join msg; Displays the visible map for
+ * client.c - Handles the client-side of the game. Detects keystrokes and join msg; Displays the visible map for
  *            players and the end game screen
  *
- * usage: ./player hostname port [playername]
+ * usage: ./client hostname port [playername]
  *   where hostname is the IP address that the server's running on
  *   where port is the number which the server listens for messages on
  *   where playername, if provided, the client joins as a player
@@ -106,7 +106,7 @@ main(const int argc, char *argv[])
   // stderr when calling them, then redirect stderr to a file in the command line
   startNetworkClient(hostname, port, stderr, playerName);
     
-  // we shouldn't reach this point as we exit in the quitClient function
+  // startNetworkClient exits after it recieves a 'QUIT' message
   exit(0);
 }
 #endif
@@ -301,5 +301,4 @@ quitClient(char* explanation)
     endwin();
     printf("%s\n", explanation);
     free(explanation);
-    exit(0);
 }
