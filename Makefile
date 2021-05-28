@@ -21,7 +21,6 @@ VALGRIND = valgrind --leak-check=full --show-leak-kinds=all
 all:
 	make -C support
 	make -C common
-	make server
 	make client
 
 server: $(OBJS) $(LLIBS)

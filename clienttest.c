@@ -16,14 +16,20 @@ int main(){
     fprintf(stderr, "CLIENT TEST\n");
     //initialize ncurses
     initscr();
-    //noecho();
+    noecho();
     // I believe that this initializes the background and writing colors
     start_color();
-    init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(1, COLOR_RED, COLOR_BLACK);
     attron(COLOR_PAIR(1));
     printw("CLIENT TEST");
-    attroff(COLOR_PAIR(1));
+    testSetPlayerID('B');
+    ensureDimensions(pos2D_new(30,20));
     displayHeader(0, 0, 0);
     //display("|.......|\n|.......|");
-    //quitClient("End of test");
+    int c;
+    while((c = getch()) != 'x'){
+
+    }
+    quitClient("End of test");
+    printf("ENDED");
 }
