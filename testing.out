@@ -1,4 +1,37 @@
-./clienttest
 CLIENT TEST
-[?1049h[22;0;0t[1;24r(B[m[4l[?7h[39;49m[39;49m[37m[40m[H[2J[31m[40mPlayer B has 0 nuggets (0 nuggets unclaimed). [7b[1;46H(B[m[39;49m[37m[40m[39;49m[24d[K[24;1H[?1049l[23;0;0t[?1l>Makefile:53: recipe for target 'testclient' failed
-make: *** [testclient] Error 1
+
+Basic Ensure Dimensions Test
+
+Negative Ensure Dimensions Test
+pos2D_set: invalid/NULL pos, x, or y input -- must be non-NULL or > 0
+
+NULL Ensure Dimensions Test
+ensureDimensions(): NULL 'pos' passed
+
+Basic Header Test
+
+Basic Action Test
+
+NULL Action Test
+displayAction(): NULL 'message' passed
+
+Second Basic Ensure Test
+
+Display Header Test 2
+
+Basic Display Test
+
+Basic Third Ensure Test
+
+Spectator Header Test 2
+
+Basic Change Display Test
+
+NULL Display Test
+displayGrid(): NULL 'grid' passed
+
+QuitClient NULL Test
+quitClient(): NULL explanation passed
+
+QuitClient Test
+make: *** [testclient] Segmentation fault (core dumped)

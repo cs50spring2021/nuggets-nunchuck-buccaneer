@@ -31,19 +31,16 @@
 /**************** global function prototypes ****************/
 /* that is, visible outside this file */
 void displayGrid(const char* grid);
-void displayerHeader(int n, int p, int r);
+void displayerHeader(int n, int p, int r, char ID);
 void displayAction(const char* message);
 void ensureDimensions(pos2D_t* display_hW);
 void clientQuit(char* explanation);
-
-void testSetPlayerID(char id);
 
 /**************** local function prototypes ****************/
 /* not visible outside this file */
 void clearHeader(void);
 
 /**************** global integer ****************/
-static char playerID;       // initialized on recieving OK message for join
 static const int headerLen = 52;
 static const int actionLen = 19;
                            
@@ -114,7 +111,7 @@ main(const int argc, char *argv[])
 
   // I believe that this initializes the background and writing colors
   start_color();
-  init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(1, COLOR_RED, COLOR_BLACK);
   attron(COLOR_PAIR(1));
     
   //Start the network 
@@ -132,10 +129,10 @@ main(const int argc, char *argv[])
  * Parameters: n - number of gold left remaining
  *             p - amount of gold that this player has in their purse
  *             r - amount of gold just collected by this player (if applicable)
- *
+ *             ID - character for the player ID
  * Returns: Nothing
  */
-void displayHeader(int n, int p, int r)
+void displayHeader(int n, int p, int r, char ID)
 {   
     // NOTE: buffer may need to be changed if the message is changed
     //       n, p, r should not exeed 999
@@ -145,7 +142,7 @@ void displayHeader(int n, int p, int r)
         sprintf(header, "Spectator: %d nuggets unclaimed.", r);
     } else {
         sprintf(header, "Player %c has %d nuggets (%d nuggets unclaimed).", 
-                playerID, p, r);
+                ID, p, r);
     }
     if (n != 0) {
         // buffer may need to change if the message is changed
@@ -210,23 +207,6 @@ displayAction(const char* message)
     return;
 }
 
-/**************** setPlayerID *****************/
-/* 
- * What it does: sets the player's PlayerID from a server OK message
- * Parameters: playerID - the players playerID character
- * Returns: Nothing
- */
-void
-setPlayerID(char* plID) 
-{
-    if (plID == NULL) {
-        fprintf(stderr, "setPlayerID(): NULL ('\\0') 'playerID' passed\n");
-        return;
-    }
-    playerID = plID[0];
-    return;
-}
-
 /**************** displayGrid()  ****************/
 /*
  * What it does: Display the grid (the map) that the server sends to the client
@@ -281,6 +261,14 @@ display(const char* grid)
 void
 ensureDimensions(pos2D_t* display_hW)
 {
+    if(display_hW == NULL){
+        fprintf(stderr, "ensureDimensions(): NULL 'pos' passed\n");
+        return;
+    }
+    if(pos2D_getX(display_hW) <= 0 || pos2D_getY(display_hW) <= 0){
+        fprintf(stderr, "ensureDimensions(): Negative HW passed\n");
+        return;
+    }
     int NROWS;  // the number of rows on the client 
     int NCOLS;  // the number of columns on the client
     int displayW = pos2D_getX(display_hW);      // the number of columns on server
@@ -322,7 +310,6 @@ ensureDimensions(pos2D_t* display_hW)
         getmaxyx(stdscr, NROWS, NCOLS);
     }
     // clear the ensureDimensions message
-    int i = 0;
     for(int y = 0; y < NROWS; y++){
         for(int x = 0; x < NCOLS; x++){
             move(y, x);
@@ -341,13 +328,13 @@ ensureDimensions(pos2D_t* display_hW)
 void
 quitClient(char* explanation)
 {
+    if(explanation == NULL){
+        fprintf(stderr, "quitClient(): NULL explanation passed\n");
+        return;
+    }
     // exit Ncurses window
     endwin();
     printf("%s\n", explanation);
     free(explanation);
 }
 
-
-void testSetPlayerID(char id){
-    playerID = id;
-}

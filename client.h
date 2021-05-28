@@ -6,9 +6,9 @@
 #include "pos2D.h"
 #include "mem.h"
 #include "network.h"
-void display(const char* grid);
-void displayHeader(int goldCollected, int goldInPurse, int goldRemaining);
-void displayAction(char* action);
+void displayGrid(const char* grid);
+void displayHeader(int n, int p, int r, char ID);
+void displayAction(const char* message);
 void ensureDimensions(pos2D_t* display_hW);
-void quitClient(char* message);
-void testSetPlayerID(int id);
+void clientQuit(char* explanation);
+void clearHeader(void);
