@@ -14,6 +14,8 @@
 #include "network.h"
 #include "mem.h"
 #include "pos2D.h"
+#include "file.h"
+#include "message.h"
 
 /**************** file-local global variables ****************/
 /* none */
@@ -40,7 +42,7 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
   int port = 0;
   int timeout = 10;
   // initalizes the message server
-  if ((port = message_init(FILE* errorFile)) == 0) {
+  if ((port = message_init(errorFile)) == 0) {
     // error occurred while initalizing the server
     fprintf(stderr, "error: issue encountered while initializing the "
                        "server\n");
@@ -62,21 +64,21 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
 /**************** startNetworkClient() ****************/
 /* see network.h for description */
 void
-startNetworkClient(char* serverHost, char* port, FILE* errorFile, char* name)
+startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
 {
-  addr_t serverAddress;
+  addr_t* serverAddress;
   int timeout = 10;
   char* message;            // the initial join message sent to the server
 
   // allocating memory for the two variables
-  serverAddress = mem_malloc_assert(sizeof(adrr_t));
+  serverAddress = mem_malloc_assert(sizeof(addr_t), "startNetworkClient(): Mem Server Address");
   if (serverAddress == NULL) {
     fprintf(stderr, "error: issue encountered while allocating memory for the"
                     " server address.\n");
     exit(1);
   }
 
-  message = mem_malloc_assert((sizeof(char) * (5 + strlen(name))) + 1);
+  message = mem_malloc_assert((sizeof(char) * (5 + strlen(name))) + 1, "startNetworkClient(): Mem Message");
   if (message == NULL) {
     fprintf(stderr, "error: issue encountered while allocating memory for"
     " the message that's sent to the server.\n");
@@ -86,20 +88,23 @@ startNetworkClient(char* serverHost, char* port, FILE* errorFile, char* name)
   sprintf(message, "PLAY %s", name);
 
   // initalizes the message server
-  if ((port = message_init(FILE* errorFile)) == 0) {
+  if ((*port = message_init(errorFile)) == 0) {
     // error occurred while initalizing the client's connection
     fprintf(stderr, "error: issue encountered while initializing the"
                        " client's connection\n");
     exit(3);
   }
-  if (!message_setAddr(serverHost, serverPort, &serverAddress)) {
+  //Convert port to string
+  char portStr[10];
+  sprintf(portStr, "%d", *port);
+  if (!message_setAddr(serverHost, portStr, serverAddress)) {
     fprintf(stderr, "error: issue encountered likely due to a bad hostname or"
                     " port number\n");
     exit(4);
   }
 
   // user joins the server
-  message_send(serverAddress, message);
+  message_send(*serverAddress, message);
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
   if (!message_loop(NULL, timeout, handleTimeout, handleInput, 
@@ -147,7 +152,7 @@ numWords(char* message) {
 /**************** tokenizeMessage() ****************/
 /* see network.h for description */
 char**
-tokenizeMessage(const char* message, int numWords)
+tokenizeMessage(char* message)
 {
   char** tokens = NULL;      // the array that stores the words
   char* word = message;       // used to split up words (stays at front of word)
@@ -155,7 +160,7 @@ tokenizeMessage(const char* message, int numWords)
   int i = 0;
 
   // allocates space in memory for the array
-  tokens = mem_malloc_assert(numWords * sizeof(char*), "error: issue "
+  tokens = mem_malloc_assert(2 * sizeof(char*), "error: issue "
               "encountered while allocating memory for the array.\n");
   
 
@@ -163,7 +168,6 @@ tokenizeMessage(const char* message, int numWords)
   words. It separates words by spaces and also looks out for null characters.
   To separate the words from one another, it inserts null characters at the
   end of a word. Borrowed this from Alan Moss' Querier */
-  while (i < numWords) {
     // brings rest to the same spot as word
     rest = word;
     while (!isspace(*rest) && *rest != '\0') {
@@ -197,11 +201,10 @@ tokenizeMessage(const char* message, int numWords)
 
     /* stops parsing the string after we parse the first word. The rest of the
     string just goes into the 2nd slot in the array (1st). */
-    if ((strcmp(tokens[0], "PLAY"))) == 0) {
+    if ((strcmp(tokens[0], "PLAY")) == 0) {
       tokens[1] = word;
       return tokens;
     }
-  }
   return tokens;
 }
 
@@ -211,14 +214,12 @@ bool
 handleMessage(void* arg, const addr_t from, const char* message)
 {
   gameInfo_t* gameinfo;
-  int numWords = 0;
   char** tokens;
 
   gameinfo = arg;
 
-  numWords = numWords(message);
   // breaks a part the message into its individual parts
-  tokens = tokenizeMessage(message, numWords);
+  tokens = tokenizeMessage(message);
 
   // look at the first (0th) slot in each array to see what the command is
   if ((strcmp(tokens[0], "PLAY")) == 0) {

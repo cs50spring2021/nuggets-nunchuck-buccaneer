@@ -36,7 +36,7 @@ clienttest: $(OBJS2) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 
-server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h
+server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h $S/network.h
 client.o: client.h $C/pos2D.h 
 
 servertest.o: servertest.c
@@ -47,7 +47,8 @@ clienttest.o: clienttest.c
 
 #  Tests
 testserver: server servertest
-	bash -v testing.sh
+	./servertest
+#bash -v testing.sh
 
 testclient: client clienttest
 	./clienttest

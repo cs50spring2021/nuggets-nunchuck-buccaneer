@@ -83,7 +83,7 @@ clean:
 #
 
 S = ../support
-OBJS = grid.o pos2D.o mem.o visibility.o file.o gameInfo.o map.o
+OBJS = grid.o pos2D.o mem.o visibility.o file.o gameInfo.o map.o network.o
 
 LIB = common.a
 LLIBS = $S/support.a
@@ -111,9 +111,6 @@ maptest: $(OBJS) $(LLIBS) maptest.o
 gameInfotest: $(OBJS) $(LLIBS) gameInfoTest.o
 	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
 
-networktest: $(OBJS) $(LLIBS) networktest.o
-	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
-
 grid.o: grid.h pos2D.h mem.h
 visibility.o: visibility.h pos2D.h grid.h mem.h
 pos2D.o: pos2D.h
@@ -125,8 +122,7 @@ visibilitytest.o: pos2D.o grid.o grid.h pos2D.h file.h mem.h
 maptest.o: mem.o map.h grid.h
 gameInfo.o: gameInfo.h mem.h pos2D.h grid.h $S/message.h visibility.h map.h
 playerInfo.o: $S/message.h
-network.o: network.h pos2D.h mem.h
-networkTest.o: network.h pos2D.h mem.h
+network.o: network.h pos2D.h mem.h file.h $S/message.h
 
 test-grid: gridtest
 	valgrind --leak-check=full --show-leak-kinds=all ./gridtest
@@ -140,9 +136,6 @@ test-map: maptest
 test-gameInfotest: gameInfotest
 	valgrind --leak-check=full --show-leak-kinds=all ./gameInfotest
 
-test-networkTest: networkTest
-	valgrind --leak-check=full --show-leak-kinds=all ./networkTest
-
 clean:
 	rm -rf *.dSYM
 	rm -rf  *.o
@@ -153,5 +146,4 @@ clean:
 	rm -rf common.a
 	rm -rf gameInfotest
 	rm -rf vgcore.*
-	rm -rf networkTest
 	rm -rf vgcore.*

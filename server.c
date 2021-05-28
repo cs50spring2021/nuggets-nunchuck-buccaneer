@@ -28,7 +28,7 @@ const int goldMaxNumPiles = 30; // maximum number of gold piles
 // LOCAL FUNCTIONS, PROTOTYPES
 
 static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* seed);
-static gameInfo_t* initializeGame(char* mapFile);
+gameInfo_t* initializeGame(char* mapFile);
 static bool shortMove(gameInfo_t* gameinfo, addr_t* addr, char dir, int* goldCollected);
 static pos2D_t* dirToMovement(pos2D_t* start, char dir);
 void sendDisplays(gameInfo_t* gameinfo, addr_t* Player, int goldCollected);
@@ -123,7 +123,7 @@ We Return:
 Caller is Responsible For:
 	Later calling gameInfo_delete
 */
-static gameInfo_t* initializeGame(char* mapFile){
+gameInfo_t* initializeGame(char* mapFile){
 	//Check Args
 	if(mapFile == NULL){
 		fprintf(stderr, "initializeGame: Invalid Args passed");
