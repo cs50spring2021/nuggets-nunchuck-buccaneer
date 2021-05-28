@@ -215,6 +215,27 @@ void map_setPlayerPos(map_t* map, pos2D_t* pos, playerInfo_t* player)
     return;
 }
 
+/* *********** map_clearSpot() ********** */
+/* see map.h for description */
+void map_clearSpot(map_t* map, pos2D_t* pos)
+{
+    if (map == NULL) {
+        fprintf(stderr, "map_clearSpot(): NULL 'map' passed\n");
+        return;
+    }
+    if (pos == NULL) {
+        fprintf(stderr, "map_clearSpot(): NULL 'pos' passed\n");
+        return;
+    }
+    char c = grid_getPos(map->baseGrid, pos);
+    if (c == '\0') {
+        fprintf(stderr, "map_clearSpot(): grid_getPos returned null\n");
+        return;
+    }
+    grid_setPos(map->gameGrid, pos, c);
+    return;
+}
+
 /* ********** map_randomEmptySquare() ********** */
 /* see map.h for description */
 pos2D_t* map_randomEmptySquare(map_t* map)

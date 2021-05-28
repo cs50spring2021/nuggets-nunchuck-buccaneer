@@ -27,7 +27,7 @@ gridtest: $(OBJS) $(LLIBS) gridtest.o
 
 visibilitytest: $(OBJS) $(LLIBS) visibilitytest.o
 	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
-	
+
 gameInfo: $(OBJS) $(LLIBS) gameInfo.o
 	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
 
@@ -70,3 +70,5 @@ clean:
 	rm -rf maptest
 	rm -rf gameInfoTest
 	rm -rf common.a
+	rm -rf gameInfotest
+	rm -rf vgcore.*

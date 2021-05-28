@@ -112,6 +112,22 @@ char map_getGamePos(map_t* map, pos2D_t* pos);
  */
 void map_setPlayerPos(map_t* map, pos2D_t* pos, playerInfo_t* player);
 
+
+/* ********** map_clearSpot() ********** */
+/* replaces a pos in gameGrid with the char in that pos from baseGrid
+ *
+ * Caller provides:
+ *      - a valid pointer to a mpa
+ *      - a valid pointer to a pos
+ * 
+ * We return:
+ *      - nothin
+ * 
+ * We do:
+ *      - set the gameGrid pos position to the char at that pos from baseGrid
+ */
+void map_clearSpot(map_t* map, pos2D_t* pos);
+
 /* ********** map_randomEmptySquare() ********** */
 /* return a random empty square from the map
  * note: an empty square means a square in the gameGrid that has a '.'
