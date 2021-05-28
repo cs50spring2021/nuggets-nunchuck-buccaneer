@@ -16,13 +16,11 @@
 #include "pos2D.h"
 #include "mem.h"
 #include "network.h"
-
-
 /* ********** prototypes for functions in client.c *********** */
 /* for function descriptions see paragraph comments in client.c */
 void display(const char* grid);
-void displayHeader(int goldCollected, int goldInPurse, int goldRemaining);
+void displayHeader(int goldCollected, int goldInPurse, int goldRemaining, char ID);
 void displayAction(char* action);
 void ensureDimensions(pos2D_t* display_hW);
-void quitClient(char* message);
-void testSetPlayerID(int id);
+void clientQuit(char* explanation);
+void clearHeader(void);
