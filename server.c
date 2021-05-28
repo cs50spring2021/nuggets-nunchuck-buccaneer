@@ -1,11 +1,9 @@
 /*
-
-    server.c
-    runs the server and parses and receives Messages from Clients, sends relevant visible maps for all players.
+	server.c - runs the server and parses and receives Messages from Clients, sends relevant visible maps for all players.
 	Handles all the GameLogic and initializes the map.
 
 	Nunchuck-Buccaneers
-    CS50, 5/12/2021
+	CS50, 5/12/2021
 
 */
 
@@ -38,7 +36,7 @@ static void endGame(gameInfo_t* gameinfo);
 
 // FUNCTIONS
 
-bool movePlayer(gameInfo_t* gameinfo, addr_t* player, char input);
+bool movePlayer(gameInfo_t*  gameinfo, addr_t* player, char input);
 
 #ifndef TESTING
 /******************* main *********************
@@ -310,8 +308,61 @@ We Do:
 	Add a player to the game or a spectator, send the required dimensions to the player
 	and places the player on the map
 */
-void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName){
-	return;
+void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName, pos2D_t* terminalSize) 
+{
+  // Check args
+  if (gameinfo == NULL || addr == NULL || termianlSize == NULL) {
+    fprintf(stderr, "joinUser: Invalid Args passed");
+    return;
+  }
+  char* message;
+  int nrows = 0; 
+  int ncols = 0;
+  int messageLength;
+  map_t* map;
+  pos2D_t* pos;
+
+  // gets the rows by columns from the pos2D struct
+  nrows = pos2D_getX(terminalSize);
+  ncols = pos2D_getY(terminalSize);
+
+  message = mem_malloc_assert((sizeof(char) * 20) + 1);
+  if (message == NULL) {
+    fprintf(stderr, "error: issue encountered while allocating memory for"
+    " the message that's sent to the server.\n");
+    exit(1);
+  }
+
+  /* writes a message that'll be sent to the client to check the dimensions 
+  of their window */
+  sprintf(message, "GRID %d %d", nrows, ncols);
+  // sends the GRID message to the client
+  message_send(*player, message);
+
+  // if player name is not provided, add the user as a spectator
+  if (playerName == NULL) {
+	gameInfo_addSpectator(gameinfo, player);
+  } else {
+	// get the map
+	if ((map = gameInfo_getMap(gameinfo)) == NULL) {
+	  fprintf(stderr, "error: gameinfo provided is NULL.\n");
+      free(message);
+	  exit(2);
+	}
+	// generate a random position to place the new user in the map
+	if ((pos = map_randomEmptySquare(map)) == NULL) {
+	  fprintf(stderr, "error: map provided is NULL.\n");
+      free(message);
+	  exit(3);
+    } 
+	// add the new user to the game info
+	gameInfo_addPlayer(gameinfo, player, pos);
+
+	free(pos);
+  }
+  // send the updated gameinfo to all clients.
+  sendDisplays(gameinfo, NULL, 0);
+  free(message);
 }
 
 /******************* leaveUser *********************
@@ -325,8 +376,42 @@ We return:
 	True if the last player has left
 	False if their are still players in the game
 */
-bool leaveUser(gameInfo_t* gameinfo, addr_t* Player){
+bool leaveUser(gameInfo_t* gameinfo, addr_t* player)
+{
+  // Check args
+  if (gameinfo == NULL || player == NULL) {
+	fprintf(stderr, "leaveUser: Invalid Args passed.\n");
 	return false;
+  }
+  map_t* map;
+  playerInfo_t* playerinfo;
+  pos2D_t* pos;
+
+  // get the map
+  if ((map = gameInfo_getMap(gameinfo)) == NULL) {
+    fprintf(stderr, "error: gameinfo provided is NULL.\n");
+	exit(1);
+  }	
+  // gets the playerinfo struct
+  if ((playerinfo = gameInfo_getPlayer(gameinfo, player)) == NULL) {
+    fprintf(stderr, "error: couldn't retrieve playerinfo struct.\n");
+    exit(2);
+  }
+  // gets the position of the player that will be cleared on the map
+  pos = playerinfo->pos;
+
+  // clears the spot on the map
+  map_clearSpot(map, pos);
+  // player is removed from gameinfo
+  gameInfo_removePlayer(gameinfo, player);
+  // send the updated display to all players
+  sendDisplays(gameinfo, NULL, 0);
+
+  // checks to see if the last player has left the server
+  if (gameinfo->numPlayers == 0) {
+    return true;
+  }
+  return false;
 }
 
 /******************* sendDisplays *********************
@@ -392,6 +477,43 @@ We Do:
 	Send a new display to each player that contains the endgame scoreboard constructed from gameinfo
 	Send a quit message to all players
 */
-static void endGame(gameInfo_t* gameinfo){
-	return;
+static void endGame(gameInfo_t* gameinfo)
+{
+  // Check args
+  if (gameinfo == NULL) {
+	fprintf(stderr, "endGame: Invalid gameinfo struct passed.\n");
+	return false;
+  }
+  char* scoreboard;
+  char* message;
+  playerInfo_t* player;
+  addr_t* playerAddress;
+
+  // gets the scoreboard to send to all the players when they are disconnected
+  if ((scoreboard = gameInfo_createScoreBoard(gameinfo)) == NULL) {
+    fprintf(stderr, "error: scoreboard returned is NULL.\n");
+    exit(1);
+  }
+
+  // allocates memory for the message that'll be sent to the user
+  message = mem_malloc_assert((sizeof(char*) * (5 + strlen(scoreboard))) + 1);
+  if (message == NULL) {
+    fprintf(stderr, "error: issue encountered while allocating memory for"
+    " the message.\n");
+    exit(2);
+  }
+  // constructs the quit message sent to the user
+  sprintf(message, "QUIT %s", scoreboard);
+
+  // loop over all the playerIDs and disconnect all of the players
+  for (int i = 0; i < 26; i++) {
+    if ((player = gameInfo_getPlayerFromID(gameinfo, i)) == NULL) {
+      // error occurred or a player does not exist at this index
+      continue;
+    }
+    // grab the player address
+    playerAddress = player->address
+    // send the quit message to the specific player
+    message_send(playerAddress, message);
+  }	
 }
