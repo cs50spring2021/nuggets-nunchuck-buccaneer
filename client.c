@@ -42,27 +42,46 @@ void clearHeader(void);
 /**************** global integer ****************/
 static int isSpectator;     // -1 if player, 1 if spectator
 static char playerID;       // initialized on recieving OK message for join
-                            // Note: playerID not initailized for spectator
-
+static const int headerLen = 52;
+static const int actionLen = 19;
+                           
 /*****************************************************************************/
 /************************** Local functions ********************************/
 
 /* *********** clearHeader *********** */
-/* sets the whole header of the window to blank spaces in ncurses
+/* sets the header part of the top line to blank spaces in ncurses
  * does not 'refresh()'
  */
 void 
 clearHeader(void)
 {
-    int maxX = getmaxx(stdscr);
     int x = 0;
     // NOTE: may need to be '<='?
-    while (x < maxX) {
+    while (x <= headerLen) {
         move(0,x);
         addch(' ');
         x++;
     }
     return;
+}
+/* ********** clearAction ********** */
+/* sets the action part of the top line to blank spaces in ncurses
+ * does not 'refresh()'
+ */
+void
+clearAction(void)
+{   
+    int y;
+    int x;
+    int maxX = getmaxX(stdscr); // the width of the screen
+    move(0, maxX - actionLen);
+    x = maxX - actionLen;
+    while (x <= maxX) {
+        getyx(stdscr, y, x);
+        addch(message[i]);
+        move(y,x+1);
+        i++;
+    {
 }
 
 /******************************************************************************/
@@ -122,8 +141,8 @@ main(const int argc, char *argv[])
 void displayHeader(int n, int p, int r)
 {   
     // NOTE: buffer may need to be changed if the message is changed
-    //       n, p, r should not exeed 9999
-    char* header= mem_malloc_assert((88 * sizeof(char)) , 
+    //       n, p, r should not exeed 999
+    char* header= mem_malloc_assert((headerLen * sizeof(char)) , 
             "displayerHeader: out of memory");
     if (isSpectator == -1) {
         sprintf(header, "Spectator: %d nuggets unclaimed.", r);
@@ -133,13 +152,13 @@ void displayHeader(int n, int p, int r)
     }
     if (n != 0) {
         // buffer may need to change if the message is changed
-        char* action = mem_malloc_assert((20 * sizeof(char)), 
+        char* action = mem_malloc_assert((actionLen * sizeof(char)), 
                 "displayerHeader: out of memeory");
         sprintf(action, "Gold received: %d", n);
         displayAction(action);
         free(action);
     }
-    // clear the header line
+    // clear the header part of the top line
     clearHeader();
 
     // set the curser to the upper left corner
@@ -172,6 +191,8 @@ displayAction(const char* message)
         fprintf(stderr, "displayAction(): NULL 'message' passed\n");
         return;
     }
+    // clear the action part of the top line
+    clearAction();
     int x;
     int y;
     int NCOLS;
@@ -257,6 +278,14 @@ ensureDimensions(pos2D_t* display_hW)
     int NCOLS;  // the number of columns on the client
     int displayW = pos2D_getX(display_hW);      // the number of columns on server
     int displayH = pos2D_getY(display_hW);      // the number of rows on server
+
+    // if displayW is less than the width required to print header + action
+    // set displayW to the width of header + action + 1
+    int minTotalTopWidth = headerLen + actionLen + 1;
+    if (displayW < minTotalTopWidth) {
+        displayW = minTotalTopWidth;
+    }
+
     getmaxyx(stdscr, NROWS, NCOLS);
     while (displayW > NCOLS || displayH + 1 > NROWS) {
         char* printS = mem_malloc_assert((130 * sizeof(char)), 
