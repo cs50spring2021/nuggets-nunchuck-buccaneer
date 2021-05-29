@@ -182,35 +182,37 @@ void map_setPlayerPos(map_t* map, pos2D_t* pos, playerInfo_t* player)
         fprintf(stderr, "map_setPlayerPos(): NULL pointer 'player'\n");
         return;
     }
-    
+    char ID = (player->playerID) + 65;
     // Check for NULL pointers in player->ID
-    if (player->playerID == '\0') {
+    if (ID == '\0') {
         fprintf(stderr, "map_setPlayerPos(): NULL pointer 'player->playerID'\n");
     return;
     }
     
     // add the player to the new position on the gameGrid
-    grid_setPos(map->gameGrid, pos, player->playerID);
-    // add the new position to the players struct (save the old position)
-    pos2D_t* old_pos = player->pos; 
-    player->pos = pos;
+    grid_setPos(map->gameGrid, pos, ID);
+    if(player->pos == pos){
+        // add the new position to the players struct (save the old position)
+        pos2D_t* old_pos = player->pos; 
+        player->pos = pos;
     
-    // UNLESS the player has only just entered the game
-    // UNLESS this player is being swapped with another player
-    // reset the old_pos char on gameGrid to the baseGrid char
-    if (old_pos != NULL) {
-        // the char from the spot the player came from
-        char old_char = grid_getPos(map->gameGrid, old_pos);
-        // if the old char is this player's ID
-        if (old_char == player->playerID) {
-            // reset the old spot on the grameGrid to the baseGrid char
-            char spot_baseGrid = grid_getPos(map->baseGrid, old_pos);
-            grid_setPos(map->gameGrid, old_pos, spot_baseGrid);
+        // UNLESS the player has only just entered the game
+        // UNLESS this player is being swapped with another player
+        // reset the old_pos char on gameGrid to the baseGrid char
+        if (old_pos != NULL) {
+            // the char from the spot the player came from
+            char old_char = grid_getPos(map->gameGrid, old_pos);
+            // if the old char is this player's ID
+            if (old_char == ID) {
+                // reset the old spot on the grameGrid to the baseGrid char
+                char spot_baseGrid = grid_getPos(map->baseGrid, old_pos);
+                grid_setPos(map->gameGrid, old_pos, spot_baseGrid);
+            }
+                // if it is not, then a player has taken their spot
+                // so we don't over write them
         }
-            // if it is not, then a player has taken their spot
-            // so we don't over write them
+        pos2D_delete(old_pos);
     }
-    pos2D_delete(old_pos);
     return;
 }
 

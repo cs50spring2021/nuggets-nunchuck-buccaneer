@@ -132,7 +132,6 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t address, pos2D_t* pos, char* usernam
         pos2D_delete(otherPos);
         i++;
     }
-
     // update gameInfo struct
     info->players[player->playerID] = player;
     info->numPlayers++;
