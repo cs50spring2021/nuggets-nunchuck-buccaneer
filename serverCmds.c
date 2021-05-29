@@ -40,7 +40,7 @@ gameInfo_t* initializeGame(char* mapFile){
 	int piles = goldMinNumPiles + (rand() % (goldMaxNumPiles - goldMinNumPiles));
 	printf("PILES: %d\n", piles);
 	//Create a gameInfo
-	gameInfo_t* gameInfo = mem_assert(gameInfo_newGameInfo(piles, goldTotal, mapFile),"Server Main: mem gameInfo");
+	gameInfo_t* gameInfo = mem_assert(gameInfo_newGameInfo(piles, goldTotal, mapFile, maxPlayers),"Server Main: mem gameInfo");
 	//Add gold piles to the map
 	map_t* map = gameInfo_getMap(gameInfo);
 	for(int i = 0 ; i < piles; i++){
@@ -309,7 +309,6 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
   }
   // gets the position of the player that will be cleared on the map
   pos = playerinfo->pos;
-
   // clears the spot on the map
   map_clearSpot(map, pos);
   // player is removed from gameinfo

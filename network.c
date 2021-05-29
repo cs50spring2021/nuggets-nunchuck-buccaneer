@@ -251,6 +251,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     // if the command is "PLAY", send a message to server with username
     joinUser(gameinfo, from, tokens[1]);
     mem_free(copiedMessage);
+    mem_free(tokens);
     return false;
   }
 
@@ -258,6 +259,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     // if the command is "SPECTATE", send a join spectate message to the server
     joinUser(gameinfo, from, NULL);
     mem_free(copiedMessage);
+    mem_free(tokens);
     return false;
   }
 
@@ -274,6 +276,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     pos2D = pos2D_new(nrows, ncols);
     ensureDimensions(pos2D);
     mem_free(copiedMessage);
+    mem_free(tokens);
     return false;
   }
 
@@ -281,6 +284,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     // the server disconnects the client from the game.
     quitClient(tokens[1]);
     mem_free(copiedMessage);
+    mem_free(tokens);
     return false;
   }
 
@@ -288,16 +292,20 @@ handleMessage(void* arg, const addr_t from, const char* message)
     // the server was successfully added to the game, do nothing
     playerID = tokens[1];
     mem_free(copiedMessage);
+    mem_free(tokens);
     return false;
   }
 
   if ((strcmp(tokens[0], "KEY")) == 0) {
     if ((strcmp(tokens[1], "Q")) == 0) {
+      mem_free(copiedMessage);
+      mem_free(tokens);
      return leaveUser(gameinfo, from);
     } else {
       // sends a single-character keystroke typed by the user to the server.
       movePlayer(gameinfo, from, *(tokens[1]));
       mem_free(copiedMessage);
+      mem_free(tokens);
       return false;
     }
   }
@@ -307,6 +315,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     the clients */
     display(tokens[1]);
     mem_free(copiedMessage);
+    mem_free(tokens);
     return false;
   }
 
@@ -321,11 +330,13 @@ handleMessage(void* arg, const addr_t from, const char* message)
 
     displayHeader(n, p, r, *playerID);
     mem_free(copiedMessage);
+    mem_free(tokens);
     return false;
   }
   // the message received was malformatted
   fprintf(stderr, "error: msg received was malformatted, ignoring the msg.\n");
   mem_free(copiedMessage);
+  mem_free(tokens);
   return false;
 }
 
