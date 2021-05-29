@@ -17,7 +17,7 @@ typedef struct playerInfo {
     pos2D_t* pos;
     int score;
     int playerID;
-    addr_t address;
+    addr_t* address;
     char* username;
 } playerInfo_t;
 
