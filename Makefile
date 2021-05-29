@@ -1,12 +1,13 @@
-# Makefile for 'crawler' module
+# Makefile for 'nuggets' module
 #
-# John "James" Utley
-# CS50, 4/26/2021
-# Made to create and test the crawler module
+# nunchuck-buccaneers
+# CS50, 5/29/2021
+# Made to create and test the nuggets module
 C = ./common
 S = ./support
 OBJS = server.o network.o serverCmds.o clientCmds.o
 OBJS2 = client.o network.o clientCmds.o serverCmds.o
+OBJS3 = network.o networktest.o clientCmds.o serverCmds.o
 LIBS = -lm -lncurses
 LLIBS = $C/common.a $S/support.a
 
@@ -36,6 +37,9 @@ servertest: servertest.o network.o serverCmds.o clientCmds.o $(LLIBS)
 clienttest: $(OBJS2) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
+networktest: $(OBJS3) $(LLIBS)
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+
 
 server.o: server.c $C/pos2D.h $S/message.h $C/gameInfo.h network.h $C/map.h
 client.o: client.c $C/pos2D.h network.h
@@ -46,6 +50,8 @@ serverCmds.o: serverCmds.h server.c $C/pos2D.h $S/message.h $C/gameInfo.h $C/map
 servertest.o: servertest.c
 
 clienttest.o: clienttest.c $C/file.h $C/grid.h clientCmds.h
+
+networktest.o: networktest.c network.h $C/mem.h $C/pos2D.h $C/file.h $S/message.h clientCmds.h serverCmds.h
 
 .PHONY: test valgrind clean
 
@@ -60,8 +66,12 @@ Vtestserver: servertest
 testclient: clienttest
 	$(VALGRIND) ./clienttest
 
+
+testnetwork: networktest
+	./networktest
 runserver: server
-	$(VALGRIND) ./server maps/hole.txt 4
+	./server maps/hole.txt 4
+
 	
 clean:
 	rm -rf *.dSYM  # MacOS debugger info
@@ -71,3 +81,4 @@ clean:
 	rm -rf client
 	make -C common clean
 	make -C support clean
+	rm -rf networktest

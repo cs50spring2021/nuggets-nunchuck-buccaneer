@@ -130,35 +130,33 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
   mem_free(serverAddress);
 }
 
-/**************** numWords() ****************/
-/* see network.h for description */
-  /* scans and reads the message until a null character is encountered. It
-  determines the number of words in the input line so that we can create 
-  an array of the appropriate size later. */
-int
-numWords(char* message) {
-  int numWords = 0;
-  int i = 0;
+// /**************** numWords() ****************/
+// /* see network.h for description */
+//   /* scans and reads the message until a null character is encountered. It
+//   determines the number of words in the input line so that we can create 
+//   an array of the appropriate size later. */
+// int
+// numWords(char* message) {
+//   int numWords = 0;
+//   int i = 0;
 
-  while (message[i] != '\0') {
-    if (message[i+1] != '\0') {
-      // detects a new line character
-      if (message[i] == '\\' && message[i+1] == 'n') {
-        i += 2;
-        numWords++;
-        continue;
-      }
-    }
+//   while (message[i] != '\0') {
+//     if (message[i] == '\n') {
+//         i++;
+//         numWords++;
+//         continue;
+//       }
+//     }
 
-    numWords++;
-    /* scans through the word until it encounters a space, which signifies 
-    the end of the word. Also makes sure it doesn't read a null character */
-    while (!isspace(message[i]) && message[i] != '\0') {
-      i++;
-    }
-  }
-  return numWords;
-}
+//     numWords++;
+//     /* scans through the word until it encounters a space, which signifies 
+//     the end of the word. Also makes sure it doesn't read a null character */
+//     while (!isspace(message[i]) && message[i] != '\0') {
+//       i++;
+//     }
+//   }
+//   return numWords;
+// }
 
 /**************** tokenizeMessage() ****************/
 /* see network.h for description */
@@ -171,25 +169,22 @@ tokenizeMessage(char* message)
   int i = 0;
 
   // allocates space in memory for the array
-  tokens = mem_malloc_assert(2 * sizeof(char*), "error: issue "
+  tokens = mem_malloc_assert(4 * sizeof(char*), "error: issue "
               "encountered while allocating memory for the array.\n");
   
-
+while (word[0] != '\0' ) {
   /* this loop is used to read the string and break it into its individual
   words. It separates words by spaces and also looks out for null characters.
   To separate the words from one another, it inserts null characters at the
   end of a word. Borrowed this from Alan Moss' Querier */
     // brings rest to the same spot as word
-    rest = word;
     while (!isspace(*rest) && *rest != '\0') {
-      if (*(rest+1) != '\0') {
-        if (*rest == '\\' && *(rest+1) == 'n') {
-          // this conditional is specifically for DISPLAY messages.
-          rest += 2;
-          word = rest;
-          tokens[i] = word;
-          return tokens;
-        }
+      if (*(rest) == '\n') {
+        // this conditional is specifically for DISPLAY messages.
+        rest++;
+        word = rest;
+        tokens[i] = word;
+        return tokens;
       }
       rest++;
     }
@@ -216,7 +211,8 @@ tokenizeMessage(char* message)
       tokens[1] = word;
       return tokens;
     }
-  return tokens;
+  }
+return tokens;
 }
 
 /**************** handleMessage() ****************/
