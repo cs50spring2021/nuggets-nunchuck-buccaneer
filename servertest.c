@@ -27,14 +27,35 @@ int main(){
   	args->gameinfo = gameInfo;
   	*(args->playerID) = '@';
 	addr_t player1 = message_noAddr();
+	message_setAddr("26346", "122345", &player1);
+
 	fprintf(stderr, "\nINVALID MESSAGE\n");
 	handleMessage(args, player1, "Message");
 
 	fprintf(stderr, "\nJOIN MESSAGE\n");
 	handleMessage(args, player1, "PLAY Doodle");
 
-	fprintf(stderr, "Reached End\n");
-	gameInfo_delete(gameInfo);   
-	fprintf(stderr, "Reached End\n");
- 
+	map_t* map = gameInfo_getMap(gameInfo);
+	pos2D_t* mapWH = map_getWidthheight(map);
+	for(int y = 0 ; y < pos2D_getY(mapWH); y++){
+		for(int x = 0 ; x < pos2D_getX(mapWH); x++){
+			pos2D_t* pos = pos2D_new(x,y);
+			fprintf(stderr, "%c", map_getGamePos(map, pos));
+			pos2D_delete(pos);
+		}
+		fprintf(stderr, "\n");
+	}
+
+	// fprintf(stderr, "\MOVE MESSAGE\n");
+	// handleMessage(args, player1, "KEY l");
+
+	// fprintf(stderr, "\nLEAVE MESSAGE\n");
+	// handleMessage(args, player1, "KEY Q");
+
+	//fprintf(stderr, "\nJOIN SPECTATOR\n");
+	//handleMessage(args, player1, "PLAY");
+
+	mem_free(args->playerID);
+	mem_free(args);
+	gameInfo_delete(gameInfo);    
 }

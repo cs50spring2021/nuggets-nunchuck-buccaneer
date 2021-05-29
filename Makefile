@@ -54,8 +54,11 @@ testserver: servertest
 	./servertest
 #bash -v testing.sh
 
+Vtestserver: servertest
+	$(VALGRIND) ./servertest
+
 testclient: clienttest
-	./clienttest
+	$(VALGRIND) ./clienttest
 
 runserver: server
 	$(VALGRIND) ./server maps/hole.txt 4

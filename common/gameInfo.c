@@ -201,7 +201,6 @@ gameInfo_removePlayer(gameInfo_t* info, addr_t address)
     playerInfo_t* player = gameInfo_getPlayer(info, address);
     // remove player from list and change gameInfo
     int playerID = player->playerID;
-    fprintf(stderr, "X: %d Y: %d\n", pos2D_getX(player->pos), pos2D_getY(player->pos));
     // free from memory
     grid_delete(player->sightGrid);
     pos2D_delete(player->pos);
@@ -477,7 +476,7 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t address)
         i++;
     }
 
-    // mem_free(gridString);
+    mem_free(gridString);
     // successfully updated!
     return true;
 }
