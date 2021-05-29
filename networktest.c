@@ -14,7 +14,7 @@
 
 int main(){
   printf("Parse Test\n");
-  char* message = mem_malloc_assert(30 * sizeof(char), "error: issue "
+  char* message = mem_malloc_assert(100 * sizeof(char), "error: issue "
               "encountered while allocating memory for the message.\n");
   strcpy(message, "GRID 15 23 18");
   char** array = tokenizeMessage(message);
@@ -25,6 +25,7 @@ int main(){
     printf("%s", array[i]);
     printf("\n");
   }
+  free(array);
 
   printf("Parse Test 2\n");
   strcpy(message, "PLAY Alan and Friends");
@@ -37,6 +38,7 @@ int main(){
     printf("\n");
   }
   printf("\n");
+  free(array);
 
   printf("Parse Test 3\n");
   strcpy(message, "QUIT Game is full: no more players can join.");
@@ -49,6 +51,7 @@ int main(){
     printf("\n");
   }
   printf("\n");
+  free(array);
 
   printf("Parse Test 4\n");
   strcpy(message, "DISPLAY\nthisisthefirst line of the grid\nthis would be the second line");
@@ -61,8 +64,8 @@ int main(){
     printf("\n");
   }
   printf("\n");
-
-
+  free(array);
+  free(message);
 }
 
 
