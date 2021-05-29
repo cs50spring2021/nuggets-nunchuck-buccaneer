@@ -1,8 +1,9 @@
 /*
- * servertest.c - test program for server.c
+ * testing file for the network.c module
  *
- * Nunchuck-Buccaneers
- * 05/24/21
+ * Nunchuck Buccaneers
+ * CS50 - Spring 2021
+ * 05/28/21
  *
  */
 
@@ -26,5 +27,5 @@ main() {
 
     gameInfo_delete(game);
     
-    return 0; // succecssful run!
+    return 0; // successful run!
 }
