@@ -245,7 +245,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 	pos2D_t* terminalSize = map_getWidthheight(map);
 	nrows = pos2D_getX(terminalSize);
 	ncols = pos2D_getY(terminalSize);
-
+	mem_free(terminalSize);
 	message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
 	if (message == NULL) {
 		fprintf(stderr, "error: issue encountered while allocating memory for"
@@ -332,9 +332,9 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 	sendDisplays(gameinfo, message_noAddr(), 0);
 
 	// checks to see if the last player has left the server
-	//if (gameInfo_getNumPlayers(gameinfo) == 0) {
-		//return true;
-	//}
+	if (gameInfo_getPlayerCount(gameinfo) == 0) {
+		return true;
+	}
 	return false;
 }
 
@@ -387,6 +387,7 @@ static void sendDisplays(gameInfo_t* gameinfo, addr_t addr, int goldCollected){
 			char* stringOfSeen = grid_toString(seen);
 			char* displayMsg = mem_malloc_assert(sizeof(char) * (strlen(stringOfSeen) + strlen("DISPLAY\n") + 1), "sendDisplays: mem for display msg failed");
 			sprintf(displayMsg, "DISPLAY\n%s", stringOfSeen);
+			mem_free(stringOfSeen);
 			//Clean up
 			mem_free(displayMsg);
 			grid_delete(seen);
