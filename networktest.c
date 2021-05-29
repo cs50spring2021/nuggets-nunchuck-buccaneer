@@ -13,16 +13,57 @@
 
 
 int main(){
-  printf("Network Test\n");
-  char** array = tokenizeMessage("GRID 15 23 18");
+  printf("Parse Test\n");
+  char* message = mem_malloc_assert(30 * sizeof(char), "error: issue "
+              "encountered while allocating memory for the message.\n");
+  strcpy(message, "GRID 15 23 18");
+  char** array = tokenizeMessage(message);
 
-  printf("\n Words in the array: ");
+  printf("\nWords in the array:\n");
   // i is 4 because in this particular case we are testing a "GRID" message
   for (int i = 0; i < 4; i++) {
-    printf("%s ", array[i]);
+    printf("%s", array[i]);
+    printf("\n");
+  }
+
+  printf("Parse Test 2\n");
+  strcpy(message, "PLAY Alan and Friends");
+  array = tokenizeMessage(message);
+
+  printf("\nWords in the array:\n");
+  // i is 4 because in this particular case we are testing a "GRID" message
+  for (int i = 0; i < 2; i++) {
+    printf("%s", array[i]);
+    printf("\n");
   }
   printf("\n");
 
+  printf("Parse Test 3\n");
+  strcpy(message, "QUIT Game is full: no more players can join.");
+  array = tokenizeMessage(message);
+
+  printf("\nWords in the array:\n");
+  // i is 4 because in this particular case we are testing a "GRID" message
+  for (int i = 0; i < 2; i++) {
+    printf("%s", array[i]);
+    printf("\n");
+  }
+  printf("\n");
+
+  printf("Parse Test 4\n");
+  strcpy(message, "DISPLAY\nthisisthefirst line of the grid\nthis would be the second line");
+  array = tokenizeMessage(message);
+
+  printf("\nWords in the array:\n");
+  // i is 4 because in this particular case we are testing a "GRID" message
+  for (int i = 0; i < 2; i++) {
+    printf("%s", array[i]);
+    printf("\n");
+  }
+  printf("\n");
+
+
 }
+
 
 

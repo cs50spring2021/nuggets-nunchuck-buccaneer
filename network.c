@@ -173,20 +173,28 @@ tokenizeMessage(char* message)
               "encountered while allocating memory for the array.\n");
   
 while (word[0] != '\0' ) {
+  rest = word;
   /* this loop is used to read the string and break it into its individual
   words. It separates words by spaces and also looks out for null characters.
   To separate the words from one another, it inserts null characters at the
   end of a word. Borrowed this from Alan Moss' Querier */
     // brings rest to the same spot as word
     while (!isspace(*rest) && *rest != '\0') {
-      if (*(rest) == '\n') {
-        // this conditional is specifically for DISPLAY messages.
-        rest++;
-        word = rest;
-        tokens[i] = word;
-        return tokens;
-      }
       rest++;
+    }
+    if (*(rest) == '\n') {
+      // this conditional is specifically for DISPLAY messages.
+      *rest = '\0';
+      tokens[i] = word;
+      i++;
+      rest++;
+      word = rest;
+      tokens[i] = word;
+      return tokens;
+    }
+    if (*rest == '\0') {
+      tokens[i] = word;
+      break;
     }
     /* sets char to a null character, distinguishing the series of characters 
     before the null char as its own word */
@@ -198,16 +206,22 @@ while (word[0] != '\0' ) {
     // go forward a character
     word++;
     
-    /* stops parsing the string after we parse the first word. The rest of the
-    string just goes into the 2nd slot in the array (1st). */
+    
+    /* stops parsing the string if the first word parsed is "QUIT". The rest 
+    of the string just goes into the 2nd slot in the array (1st). */
     if ((strcmp(tokens[0], "QUIT")) == 0) {
       tokens[1] = word;
       return tokens;
     }
-
-    /* stops parsing the string after we parse the first word. The rest of the
-    string just goes into the 2nd slot in the array (1st). */
+    /* stops parsing the string if the first word parsed is "PLAY". The rest of 
+    the string just goes into the 2nd slot in the array (1st). */
     if ((strcmp(tokens[0], "PLAY")) == 0) {
+      tokens[1] = word;
+      return tokens;
+    }
+    /* stops parsing the string if the first word parsed is "ERROR". The rest of 
+    the string just goes into the 2nd slot in the array (1st). */
+    if ((strcmp(tokens[0], "ERROR")) == 0) {
       tokens[1] = word;
       return tokens;
     }
