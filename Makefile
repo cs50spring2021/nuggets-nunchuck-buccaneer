@@ -30,7 +30,7 @@ server: $(OBJS) $(LLIBS)
 client: $(OBJS2) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
-servertest: $(OBJS) $(LLIBS)
+servertest: servertest.o network.o serverCmds.o clientCmds.o $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 clienttest: $(OBJS2) $(LLIBS)
@@ -50,15 +50,15 @@ clienttest.o: clienttest.c $C/file.h $C/grid.h clientCmds.h
 .PHONY: test valgrind clean
 
 #  Tests
-testserver: server servertest
+testserver: servertest
 	./servertest
 #bash -v testing.sh
 
-testclient: client clienttest
+testclient: clienttest
 	./clienttest
 
 runserver: server
-	./server maps/hole.txt 4
+	$(VALGRIND) ./server maps/hole.txt 4
 	
 clean:
 	rm -rf *.dSYM  # MacOS debugger info

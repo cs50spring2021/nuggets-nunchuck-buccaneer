@@ -218,7 +218,8 @@ We Do:
 */
 void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName) 
 {
-  // Check args
+	fprintf(stderr,"JOIN USER: %s\n", playerName);
+  // Check arg
   if (gameinfo == NULL || playerName == NULL) {
     fprintf(stderr, "joinUser: Invalid Args passed");
     return;
@@ -240,7 +241,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
     " the message that's sent to the server.\n");
     exit(1);
   }
-
+  fprintf(stderr, "RAN");
   /* writes a message that'll be sent to the client to check the dimensions 
   of their window */
   sprintf(message, "GRID %d %d", nrows, ncols);
