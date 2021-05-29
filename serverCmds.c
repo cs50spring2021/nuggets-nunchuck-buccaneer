@@ -218,9 +218,8 @@ We Do:
 */
 void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName) 
 {
-	fprintf(stderr,"JOIN USER: %s\n", playerName);
   // Check arg
-  if (gameinfo == NULL || playerName == NULL) {
+  if (gameinfo == NULL) {
     fprintf(stderr, "joinUser: Invalid Args passed");
     return;
   }
@@ -234,25 +233,24 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   pos2D_t* terminalSize = map_getWidthheight(map);
   nrows = pos2D_getX(terminalSize);
   ncols = pos2D_getY(terminalSize);
-
+  mem_free(terminalSize);
   message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
   if (message == NULL) {
     fprintf(stderr, "error: issue encountered while allocating memory for"
     " the message that's sent to the server.\n");
     exit(1);
   }
-  fprintf(stderr, "RAN\n");
   /* writes a message that'll be sent to the client to check the dimensions 
   of their window */
   sprintf(message, "GRID %d %d", nrows, ncols);
   // sends the GRID message to the client
   message_send(player, message);
-  fprintf(stderr, "RAN2\n");
-
   // if player name is not provided, add the user as a spectator
   if (playerName == NULL) {
+	fprintf(stderr,"JOIN SPEC");
 	gameInfo_addSpectator(gameinfo, player);
   } else {
+	fprintf(stderr,"JOIN USER: %s\n", playerName);
 	// get the map
 	if ((map = gameInfo_getMap(gameinfo)) == NULL) {
 	  fprintf(stderr, "error: gameinfo provided is NULL.\n");
@@ -265,13 +263,12 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
       free(message);
 	  exit(3);
     } 
-	    fprintf(stderr, "X: %d Y: %d\n", pos2D_getX(pos), pos2D_getY(pos));
 	// add the new user to the game info
 	gameInfo_addPlayer(gameinfo, player, pos, playerName);
-
+	playerInfo_t* playerinfo = gameInfo_getPlayer(gameinfo, player);
+	map_setPlayerPos(map,pos,playerinfo);
 	free(pos);
   }
-    fprintf(stderr, "RAN4\n");
   // send the updated gameinfo to all clients.
   sendDisplays(gameinfo, message_noAddr(), 0);
   free(message);
@@ -290,6 +287,7 @@ We return:
 */
 bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 {
+  fprintf(stderr,"LEAVE USER:\n");
   // Check args
   if (gameinfo == NULL) {
 	fprintf(stderr, "leaveUser: Invalid Args passed.\n");
@@ -374,6 +372,7 @@ static void sendDisplays(gameInfo_t* gameinfo, addr_t addr, int goldCollected){
 			char* stringOfSeen = grid_toString(seen);
 			char* displayMsg = mem_malloc_assert(sizeof(char) * (strlen(stringOfSeen) + strlen("DISPLAY\n") + 1), "sendDisplays: mem for display msg failed");
 			sprintf(displayMsg, "DISPLAY\n%s", stringOfSeen);
+			mem_free(stringOfSeen);
 			//Clean up
 			mem_free(displayMsg);
 			grid_delete(seen);
