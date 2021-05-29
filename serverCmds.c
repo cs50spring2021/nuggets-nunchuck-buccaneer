@@ -241,12 +241,13 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
     " the message that's sent to the server.\n");
     exit(1);
   }
-  fprintf(stderr, "RAN");
+  fprintf(stderr, "RAN\n");
   /* writes a message that'll be sent to the client to check the dimensions 
   of their window */
   sprintf(message, "GRID %d %d", nrows, ncols);
   // sends the GRID message to the client
   message_send(player, message);
+  fprintf(stderr, "RAN2\n");
 
   // if player name is not provided, add the user as a spectator
   if (playerName == NULL) {
@@ -264,11 +265,13 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
       free(message);
 	  exit(3);
     } 
+	    fprintf(stderr, "X: %d Y: %d\n", pos2D_getX(pos), pos2D_getY(pos));
 	// add the new user to the game info
 	gameInfo_addPlayer(gameinfo, player, pos, playerName);
 
 	free(pos);
   }
+    fprintf(stderr, "RAN4\n");
   // send the updated gameinfo to all clients.
   sendDisplays(gameinfo, message_noAddr(), 0);
   free(message);

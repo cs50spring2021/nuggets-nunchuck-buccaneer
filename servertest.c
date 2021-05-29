@@ -33,5 +33,8 @@ int main(){
 	fprintf(stderr, "\nJOIN MESSAGE\n");
 	handleMessage(args, player1, "PLAY Doodle");
 
-	gameInfo_delete(gameInfo);    
+	fprintf(stderr, "Reached End\n");
+	gameInfo_delete(gameInfo);   
+	fprintf(stderr, "Reached End\n");
+ 
 }
