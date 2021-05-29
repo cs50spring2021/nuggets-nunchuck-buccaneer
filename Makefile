@@ -31,7 +31,7 @@ server: $(OBJS) $(LLIBS)
 client: $(OBJS2) $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
-servertest: $(OBJS) $(LLIBS)
+servertest: servertest.o network.o serverCmds.o clientCmds.o $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 clienttest: $(OBJS2) $(LLIBS)
@@ -56,11 +56,11 @@ networktest.o: networktest.c network.h $C/mem.h $C/pos2D.h $C/file.h $S/message.
 .PHONY: test valgrind clean
 
 #  Tests
-testserver: server servertest
+testserver: servertest
 	./servertest
 #bash -v testing.sh
 
-testclient: client clienttest
+testclient: clienttest
 	./clienttest
 
 

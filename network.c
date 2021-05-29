@@ -46,7 +46,7 @@ void
 startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
 {
   int port = 0;
-  int timeout = 10;
+  //int timeout = 10;
   // initalizes the message server
   if ((port = message_init(errorFile)) == 0) {
     // error occurred while initalizing the server
@@ -57,11 +57,12 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
   printf("PORT: %d", port);
   //Create args struct for loop
   loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "startNetworkServer(): Mem Error for args");
+  args->playerID = mem_malloc_assert(sizeof(char), "startNetworkServer(): Mem error id");
   args->gameinfo = gameInfo;
   *(args->playerID) = '@';
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
-  if (!message_loop(args, timeout, handleTimeout, handleInput, 
+  if (!message_loop(args, 0, NULL, handleInput, 
                     handleMessage)) {
     // message_loop is false: a fatal error stopped it from continuing to loop.
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
@@ -77,7 +78,7 @@ void
 startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
 {
   addr_t* serverAddress;
-  int timeout = 10;
+  //int timeout = 10;
   char* message;            // the initial join message sent to the server
 
   // allocating memory for the two variables
@@ -117,7 +118,7 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
   message_send(*serverAddress, message);
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
-  if (!message_loop(NULL, timeout, handleTimeout, handleInput, 
+  if (!message_loop(NULL, 0, NULL, handleInput, 
                     handleMessage)) {
     // message_loop is false: a fatal error stopped it from continuing to loop.
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
@@ -241,7 +242,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
   playerID = argumentStruct->playerID;
 
   // breaks a part the message into its individual parts
-  char* copiedMessage = mem_malloc_assert(sizeof(char) * (strlen(message) + 1), "handleMessage(): Mem message Copy");
+  char* copiedMessage = mem_malloc_assert(sizeof(char) * (strlen(message) + 1), "handleMessage(): Mem message Copy\n");
   strcpy(copiedMessage, message);
   tokens = tokenizeMessage(copiedMessage);
 
@@ -323,16 +324,17 @@ handleMessage(void* arg, const addr_t from, const char* message)
     return false;
   }
   // the message received was malformatted
-  fprintf(stderr, "error: msg received was malformatted, ignoring the msg.");
+  fprintf(stderr, "error: msg received was malformatted, ignoring the msg.\n");
   mem_free(copiedMessage);
   return false;
 }
 
 /**************** handleTimeout() ****************/
-/* see network.h for description */
+/* see network.h for description 
 bool
 handleTimeout(void* arg)
 {
+  fprintf(stderr, "AHH");
   if (arg != NULL) {
     quitClient("");
     return true;
@@ -341,6 +343,7 @@ handleTimeout(void* arg)
   // keep looping in message_loop
   return false;
 }
+*/
 
 /**************** handleInput() ****************/
 /* see network.h for description */

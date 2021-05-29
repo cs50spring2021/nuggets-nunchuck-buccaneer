@@ -55,7 +55,7 @@ grid_t* grid_new(char* readString)
             height++;
         }
         i++;
-    } 
+    }
 
     // assign the values to the grid
     grid_t* grid = mem_malloc_assert(sizeof(grid_t), "grid_new(): "
