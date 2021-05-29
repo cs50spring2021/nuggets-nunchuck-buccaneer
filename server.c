@@ -52,6 +52,7 @@ int main(const int argc, char *argv[]){
 	}
 	//Create game info
 	gameInfo_t* gameInfo = mem_assert(initializeGame(mapFilePath), "Server Main: initializeGame mem");
+	printf("Server Starting\n");
 	//Start the network server
 	startNetworkServer(gameInfo, stderr);
 	//Deletes the gameinfo
