@@ -41,3 +41,4 @@ client
 maps/unreadable.txt
 *.swp
 clienttest
+servertest

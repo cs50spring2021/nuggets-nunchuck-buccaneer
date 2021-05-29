@@ -52,7 +52,6 @@ map_t* map_new(char* mapFile)
 
     char* map_string = file_readFile(fp);
     fclose(fp);
-
     // allocate memory for the new struct
     map_t* map = mem_malloc_assert(sizeof(map_t), "map_new(): out of memory\n");
 
