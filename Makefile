@@ -63,8 +63,12 @@ testserver: server servertest
 testclient: client clienttest
 	./clienttest
 
+
 testnetwork: networktest
 	./networktest
+runserver: server
+	./server maps/hole.txt 4
+
 	
 clean:
 	rm -rf *.dSYM  # MacOS debugger info
