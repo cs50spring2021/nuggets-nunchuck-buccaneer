@@ -12,6 +12,8 @@ Here we focus on the following:
 
 ## Data structures 
 
+> good structures
+
 The Nuggets program uses several data structures which are all held on the server side, The central data structure is the gameInfo data structure which holds all the information about an ongoing game such as the amount of gold and gold piles remaining, the map, and information about each of the players.
 
 Information about each of the Players is held within a Transparent PlayerInfo struct that contains the player's sight grid, current position, score, their ID, address and username
@@ -23,6 +25,8 @@ The Grid is just a 2D array of characters that each can be set and gotten. The e
 The Map contains two of these grids as already described and each playerInfo also contains a grid which has a series of characters that are 0, 1, and 2 that correspond to positions on the map. 0s represent unseen squares, 1s represent seen squares, and 2s represent squares that are currently being seen.
 
 Throughout the entire project we also frequently use a helper pos2D struct that simply holds two integers to make it easy to transfer width and heights and 2D positions on the map.
+
+> **Implementation spec is C-specific,** so you can (and should) show the specific `struct` declarations for data structures, specific function prototypes, and so forth.
 
 ## Control flow
 
@@ -42,6 +46,7 @@ Psuedocode:
 
 ### parseArgs
 Psuedocode: 
+
 ```c
     * if seed is provided
         * get seed string
@@ -57,6 +62,7 @@ Psuedocode:
 
 ### initializeGame
 Psuedocode: 
+
 ```c
     * Check Args
     * Generate random number of gold piles
@@ -67,6 +73,7 @@ Psuedocode:
 
 ### movePlayer
 Psuedocode: 
+
 ```c
     * Check Args
     * Check if specator
@@ -85,6 +92,7 @@ Psuedocode:
 
 ### shortMove
 Psuedocode: 
+
 ```c
     * Check args
     * Find the pos we need to go to with dirToMovement
@@ -105,6 +113,7 @@ Psuedocode:
 
 ### dirToMovement
 Psuedocode: 
+
 ```c
     * Check Args
     * Get a dir and create a new pos to move to
@@ -113,6 +122,7 @@ Psuedocode:
 
 ### joinUser
 Psuedocode: 
+
 ```c
     * Check args
     * initalize variables nrows and ncols (int)
@@ -132,6 +142,7 @@ Psuedocode:
 
 ### leaveUser
 Psuedocode: 
+
 ```c
     * Check args
     * Get the map from gameinfo
@@ -145,6 +156,7 @@ Psuedocode:
 
 ### SendDisplays
 Psuedocode: 
+
 ```c
     * Check args
     * Get gold score remaining
@@ -161,6 +173,7 @@ Psuedocode:
 
 ### EndGame
 Psuedocode: 
+
 ```c
     * Check args
     * use gameInfo to get a scoreboard string
@@ -171,6 +184,7 @@ Psuedocode:
 ## Client
 ### main
 Psuedocode: 
+
 ```c
     * Check number of args
     * parse args
@@ -179,6 +193,7 @@ Psuedocode:
 ```
 ### display
 Psuedocode: 
+
 ```c
     * Check args
     * reset cursor to top left corner of screen 
@@ -199,6 +214,7 @@ Psuedocode:
 
 ### displayHeader
 Psuedocode: 
+
 ```c
     * Check args
     * Check if p == -1 for a spectator
@@ -216,6 +232,7 @@ Psuedocode:
 
 ### displayAction
 Psuedocode: 
+
 ```c
     * Check args
     * Get string length of the message, subtract 1 from it, and store it in a variable named charsLeft
@@ -230,6 +247,7 @@ Psuedocode:
 ```
 
 ### ensureDimensions
+
 ```c
     * initalize 2 pairs of nrows and ncols variables (one for game window size, one for client window size)
     * extract the pos2D struct passed to the function into the server nrows and ncols pair
@@ -240,14 +258,20 @@ Psuedocode:
 ```
 
 ### quitClient
+
 ```c
     * exit curses with endwin()
     * print the explanation passed in the quit message
     * exit main with zero;
 ```
 
+## Other modules
+> seems like you were missing a header here.
+
 ### pos2D
+
 Psuedocode: 
+
 ```c
 pos2D_new:
     * allocate memory to a new pos2D struct
@@ -263,7 +287,9 @@ pos2D_set:
     * set x and y values to parameterized x and y values
 ```
 ### grid
+
 Psuedocode:
+
 ```c
 struct grid
     * char* map;
@@ -374,6 +400,7 @@ map_clearSpot:
 
 ### visibility
 Psuedocode: 
+
 ```c
 visibility_getVisibility:
     * check args
@@ -508,21 +535,23 @@ gameInfo_delete:
 
 
 ### network
+> in which program? the client or server?
+
 ```c
-startNetworkServer:
+startNetworkServer: // seems misnamed
     * call message_init, which returns the port
-    * call message_loop, starting the loop which checks for messages from the client
+    * call message_loop, starting the loop which checks for messages from the client // if you call message_loop() you are doing more than 'starting' the server!  you're running the whole game
     * call message_done
-startNetworkClient:
+startNetworkClient: // seems misnamed
     * allocate memory for a addr_t struct (serverAddress) and char* (message)
     * create the initial play message thatll be sent to the server
     * call message_init, which returns the port
     * call message_setAddr, which sets the address of the server that the client will send messages to
     * call message_send, sending the initial join message to the server
-    * call message_loop, starting the loop which checks for messages from the server
+    * call message_loop, starting the loop which checks for messages from the server // if you call message_loop() you are doing more than 'starting' the client!  you're running the whole game
     * call message_done;
     * free the message and server address from memory
-numWords:
+numWords: // why is this needed?
     * initalize int variables numWords and i
     * while loop that runs until the character it reads is a null character.
         * if the next character is not a null char
@@ -534,7 +563,7 @@ numWords:
         * while loops that runs until a space or a null character is encountered
             * increment i by 1
     return numWords
-tokenizeMessage:
+tokenizeMessage: // ok, but likely overkill
     * initalize variables needed (specifically set word and rest to the first character in the message)
     * allocate memory for an array that will hold the tokens
     * while loop that runs (numWords) amount of times.
@@ -559,8 +588,8 @@ tokenizeMessage:
             * return the array
     * return the tokens array
 handleMessage:
-    * call numWords() to count the number of words in the message
-    * call tokenizeMessage to break apart the message into its individual parts, store the returned array in tokens
+    * call numWords() to count the number of words in the message // now I think I see why you need this
+    * call tokenizeMessage to break apart the message into its individual parts, store the returned array in tokens // likely overkill!
     * if the 0th index of the array is the word "PLAY"
         * call joinUser()
         * return false
@@ -591,17 +620,17 @@ handleMessage:
         * return false
     * print an error message indicating that the message was malformatted
     * return false
-handleTimeout:
+handleTimeout: // never needed – the specs provide for no timeout
     * if arg is not null
         * quitClient
         * return true
     * return false
-handleInput:
+handleInput: // not needed on the server; is this on the client?
     * initalize a character array with all the possible valid keystroke input (18 characters)
     * initalize the other variables
     * allocate memory for a message (string)
     * use scanf to read in the users keystroke input from stdin and store it in a char variable
-    * for each valid keystrokes in the array
+    * for each valid keystrokes in the array // no need for client to check keystrokes - just send them all to the server.
         * if the key inputted from the user is equal to the keystroke in the array (if its valid input)
             * create a "KEY" message
             * call displayAction on Client with "Key c" 

@@ -213,10 +213,17 @@ A sampling of tests that should be run:
 
 In the interest of efficiency, it makes sense to have each person work on modules of the project that are co-dependent. This allows each individual team member to build knowlege on one section of the project, without needing to know the nitty gritty detailed of every module. It also streamlines the workflow, as each team member is responsible for writing the code that their future code is dependent on, ensuring that we spend little to no time waiting on others to finish modules.
 
+> that indeed makes sense.
+> it's also one reason a good design strives to reduce *coupling* among modules, what you call "co-dependence"... because that gives you more options for dividing up the work.
+
 When writing the modules, if functionality from one module is requisite for functionality in another, team members are to assume that the functions being borrowed from other modules do exactly as described without fail. This allows for individuals to complete their code in the absence of worrying about functionality on the part of the others, thus enhancing efficiency.
 
+> indeed; and that is the reason why it is so critical to document 
+> the interface for a module with great precision.
+
 General Responsibilities
-James: Visibility Module & Testing, Server Main, Move, displayHeader, leaveUser, & Server Testing
-Will: Grid Module & Testing, Map Module & Testing, Various Functions in Player.c, Player EnsureDimensions
-Spencer: GameInfo Module & Testing, Pos2D module, server endGame, Player Testing
-Alan: Network Module & Testing, Server join User, display, display action
+
+* James: Visibility Module & Testing, Server Main, Move, displayHeader, leaveUser, & Server Testing
+* Will: Grid Module & Testing, Map Module & Testing, Various Functions in Player.c, Player EnsureDimensions
+* Spencer: GameInfo Module & Testing, Pos2D module, server endGame, Player Testing
+* Alan: Network Module & Testing, Server join User, display, display action
