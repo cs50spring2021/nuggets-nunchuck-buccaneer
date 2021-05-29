@@ -194,7 +194,7 @@ int gameInfo_getScoreRemaining(gameInfo_t* info);
  */
 map_t* gameInfo_getMap(gameInfo_t* info);
 
-/**************** gameInfo_getPlayerCount *****************/
+/**************** gameInfo_getNumPlayers *****************/
 /*
  * Grabs the number of players in the game
  * Caller provides:
@@ -205,7 +205,7 @@ map_t* gameInfo_getMap(gameInfo_t* info);
  * Caller is responsible for:
  *     nothing.
  */
-int gameInfo_getPlayerCount(gameInfo_t* info);
+int gameInfo_getNumPlayers(gameInfo_t* info);
 
 /**************** gameInfo_updateSightGrid ****************/
 /* 

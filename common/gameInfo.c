@@ -67,13 +67,8 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
     playerInfo_t* player = mem_malloc_assert(sizeof(playerInfo_t), "gameInfo_addPlayer: memory allocation error\n");
 
     // add all information
-<<<<<<< HEAD
     player->pos = pos2D_new(pos2D_getX(pos), pos2D_getY(pos));
     pos2D_delete(pos);
-=======
-    // player->pos = pos;
-    player->pos = pos2D_new(pos2D_getX(pos), pos2D_getY(pos));
->>>>>>> main
     player->score = 0;
     player->address = address;
     player->username = username;
@@ -420,6 +415,20 @@ gameInfo_getMap(gameInfo_t* info)
 
     // return the game map
     return info->map;
+}
+
+/**************** gameInfo_getNumPlayer *****************/
+/* see gameInfo.h for description */
+int 
+gameInfo_getNumPlayers(gameInfo_t* info)
+{
+    // arg checking
+    if (info == NULL) {
+        fprintf(stderr, "gameInfo_getNumPlayers: NULL gameInfo pointer\n");
+        return -1;
+    }
+
+    return info->numPlayers;
 }
 
 /******************* gameInfo_getGoldPiles *******************/
