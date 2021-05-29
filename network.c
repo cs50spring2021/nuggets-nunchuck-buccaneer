@@ -46,7 +46,7 @@ void
 startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
 {
   int port = 0;
-  int timeout = 10;
+  //int timeout = 10;
   // initalizes the message server
   if ((port = message_init(errorFile)) == 0) {
     // error occurred while initalizing the server
@@ -57,11 +57,12 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
   printf("PORT: %d", port);
   //Create args struct for loop
   loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "startNetworkServer(): Mem Error for args");
+  args->playerID = mem_malloc_assert(sizeof(char), "startNetworkServer(): Mem error id");
   args->gameinfo = gameInfo;
   *(args->playerID) = '@';
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
-  if (!message_loop(args, timeout, handleTimeout, handleInput, 
+  if (!message_loop(args, 0, NULL, handleInput, 
                     handleMessage)) {
     // message_loop is false: a fatal error stopped it from continuing to loop.
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
@@ -77,7 +78,7 @@ void
 startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
 {
   addr_t* serverAddress;
-  int timeout = 10;
+  //int timeout = 10;
   char* message;            // the initial join message sent to the server
 
   // allocating memory for the two variables
@@ -117,7 +118,7 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
   message_send(*serverAddress, message);
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
-  if (!message_loop(NULL, timeout, handleTimeout, handleInput, 
+  if (!message_loop(NULL, 0, NULL, handleInput, 
                     handleMessage)) {
     // message_loop is false: a fatal error stopped it from continuing to loop.
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
@@ -129,35 +130,33 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
   mem_free(serverAddress);
 }
 
-/**************** numWords() ****************/
-/* see network.h for description */
-  /* scans and reads the message until a null character is encountered. It
-  determines the number of words in the input line so that we can create 
-  an array of the appropriate size later. */
-int
-numWords(char* message) {
-  int numWords = 0;
-  int i = 0;
+// /**************** numWords() ****************/
+// /* see network.h for description */
+//   /* scans and reads the message until a null character is encountered. It
+//   determines the number of words in the input line so that we can create 
+//   an array of the appropriate size later. */
+// int
+// numWords(char* message) {
+//   int numWords = 0;
+//   int i = 0;
 
-  while (message[i] != '\0') {
-    if (message[i+1] != '\0') {
-      // detects a new line character
-      if (message[i] == '\\' && message[i+1] == 'n') {
-        i += 2;
-        numWords++;
-        continue;
-      }
-    }
+//   while (message[i] != '\0') {
+//     if (message[i] == '\n') {
+//         i++;
+//         numWords++;
+//         continue;
+//       }
+//     }
 
-    numWords++;
-    /* scans through the word until it encounters a space, which signifies 
-    the end of the word. Also makes sure it doesn't read a null character */
-    while (!isspace(message[i]) && message[i] != '\0') {
-      i++;
-    }
-  }
-  return numWords;
-}
+//     numWords++;
+//     /* scans through the word until it encounters a space, which signifies 
+//     the end of the word. Also makes sure it doesn't read a null character */
+//     while (!isspace(message[i]) && message[i] != '\0') {
+//       i++;
+//     }
+//   }
+//   return numWords;
+// }
 
 /**************** tokenizeMessage() ****************/
 /* see network.h for description */
@@ -170,27 +169,32 @@ tokenizeMessage(char* message)
   int i = 0;
 
   // allocates space in memory for the array
-  tokens = mem_malloc_assert(2 * sizeof(char*), "error: issue "
+  tokens = mem_malloc_assert(4 * sizeof(char*), "error: issue "
               "encountered while allocating memory for the array.\n");
   
-
+while (word[0] != '\0' ) {
+  rest = word;
   /* this loop is used to read the string and break it into its individual
   words. It separates words by spaces and also looks out for null characters.
   To separate the words from one another, it inserts null characters at the
   end of a word. Borrowed this from Alan Moss' Querier */
     // brings rest to the same spot as word
-    rest = word;
     while (!isspace(*rest) && *rest != '\0') {
-      if (*(rest+1) != '\0') {
-        if (*rest == '\\' && *(rest+1) == 'n') {
-          // this conditional is specifically for DISPLAY messages.
-          rest += 2;
-          word = rest;
-          tokens[i] = word;
-          return tokens;
-        }
-      }
       rest++;
+    }
+    if (*(rest) == '\n') {
+      // this conditional is specifically for DISPLAY messages.
+      *rest = '\0';
+      tokens[i] = word;
+      i++;
+      rest++;
+      word = rest;
+      tokens[i] = word;
+      return tokens;
+    }
+    if (*rest == '\0') {
+      tokens[i] = word;
+      break;
     }
     /* sets char to a null character, distinguishing the series of characters 
     before the null char as its own word */
@@ -202,20 +206,27 @@ tokenizeMessage(char* message)
     // go forward a character
     word++;
     
-    /* stops parsing the string after we parse the first word. The rest of the
-    string just goes into the 2nd slot in the array (1st). */
+    
+    /* stops parsing the string if the first word parsed is "QUIT". The rest 
+    of the string just goes into the 2nd slot in the array (1st). */
     if ((strcmp(tokens[0], "QUIT")) == 0) {
       tokens[1] = word;
       return tokens;
     }
-
-    /* stops parsing the string after we parse the first word. The rest of the
-    string just goes into the 2nd slot in the array (1st). */
+    /* stops parsing the string if the first word parsed is "PLAY". The rest of 
+    the string just goes into the 2nd slot in the array (1st). */
     if ((strcmp(tokens[0], "PLAY")) == 0) {
       tokens[1] = word;
       return tokens;
     }
-  return tokens;
+    /* stops parsing the string if the first word parsed is "ERROR". The rest of 
+    the string just goes into the 2nd slot in the array (1st). */
+    if ((strcmp(tokens[0], "ERROR")) == 0) {
+      tokens[1] = word;
+      return tokens;
+    }
+  }
+return tokens;
 }
 
 /**************** handleMessage() ****************/
@@ -231,7 +242,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
   playerID = argumentStruct->playerID;
 
   // breaks a part the message into its individual parts
-  char* copiedMessage = mem_malloc_assert(sizeof(char) * (strlen(message) + 1), "handleMessage(): Mem message Copy");
+  char* copiedMessage = mem_malloc_assert(sizeof(char) * (strlen(message) + 1), "handleMessage(): Mem message Copy\n");
   strcpy(copiedMessage, message);
   tokens = tokenizeMessage(copiedMessage);
 
@@ -313,16 +324,17 @@ handleMessage(void* arg, const addr_t from, const char* message)
     return false;
   }
   // the message received was malformatted
-  fprintf(stderr, "error: msg received was malformatted, ignoring the msg.");
+  fprintf(stderr, "error: msg received was malformatted, ignoring the msg.\n");
   mem_free(copiedMessage);
   return false;
 }
 
 /**************** handleTimeout() ****************/
-/* see network.h for description */
+/* see network.h for description 
 bool
 handleTimeout(void* arg)
 {
+  fprintf(stderr, "AHH");
   if (arg != NULL) {
     quitClient("");
     return true;
@@ -331,6 +343,7 @@ handleTimeout(void* arg)
   // keep looping in message_loop
   return false;
 }
+*/
 
 /**************** handleInput() ****************/
 /* see network.h for description */

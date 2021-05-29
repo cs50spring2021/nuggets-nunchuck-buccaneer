@@ -67,7 +67,8 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos, char* userna
     playerInfo_t* player = mem_malloc_assert(sizeof(playerInfo_t), "gameInfo_addPlayer: memory allocation error\n");
 
     // add all information
-    player->pos = pos;
+    // player->pos = pos;
+    player->pos = pos2D_new(pos2D_getX(pos), pos2D_getY(pos));
     player->score = 0;
     player->address = address;
     player->username = username;
@@ -89,17 +90,16 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos, char* userna
 
     // create the players initial sightGrid
     char* mapString = grid_toString(map_getBaseGrid(gameInfo_getMap(info)));
-    char* sightGridString_init = mem_malloc_assert(strlen(mapString) + 1, "gameInfo_addPlayer: memory allocation error\n");
-
+    char* sightGridString_init = mem_malloc_assert((strlen(mapString) * sizeof(char)) + 1, "gameInfo_addPlayer: memory allocation error\n");
     // create an empty sightGrid string
     char currSpot;
-    for (int i = 0; i < strlen(mapString); i++) {
+    for (int i = 0; i < strlen(mapString) + 1; i++) {
         currSpot = mapString[i];
         if (currSpot == '\n') sightGridString_init[i] = '\n'; // new line
-        // else if (currSpot == '\0') sightGridString_init[i] = '\0'; // end of the string
+        else if (currSpot == '\0') sightGridString_init[i] = '\0'; // end of the string
         else sightGridString_init[i] = '0'; // empty spot
     }
-    
+
     // create the empty sightGrid
     player->sightGrid = grid_new(sightGridString_init);
     mem_free(sightGridString_init);
@@ -168,10 +168,10 @@ gameInfo_addSpectator(gameInfo_t* info, addr_t* address)
 
     // create an empty sightGrid string
     char currSpot;
-    for (int i = 0; i < strlen(mapString); i++) {
+    for (int i = 0; i < strlen(mapString) + 1; i++) {
         currSpot = mapString[i];
         if (currSpot == '\n') sightGridString_init[i] = '\n'; // new line
-        // else if (currSpot == '\0') sightGridString_init[i] = '\0'; // end of the string
+        else if (currSpot == '\0') sightGridString_init[i] = '\0'; // end of the string
         else sightGridString_init[i] = '2'; // empty spot
     }
     
@@ -199,10 +199,8 @@ gameInfo_removePlayer(gameInfo_t* info, addr_t* address)
 
     // remove player from the list, decrement numPlayers, and free all info
     playerInfo_t* player = gameInfo_getPlayer(info, address);
-
     // remove player from list and change gameInfo
     int playerID = player->playerID;
-
     // free from memory
     grid_delete(player->sightGrid);
     pos2D_delete(player->pos);
@@ -290,8 +288,6 @@ gameInfo_getPlayerFromID(gameInfo_t* info, int playerID)
         }
         i++;
     }
-
-    fprintf(stderr, "gameInfo_getPlayer: player does not exist!\n");
     return NULL;
 }
 
@@ -494,7 +490,7 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
         i++;
     }
 
-    // mem_free(gridString);
+    mem_free(gridString);
     // successfully updated!
     return true;
 }
