@@ -34,6 +34,8 @@ maptest: $(OBJS) $(LLIBS) maptest.o
 gameInfotest: $(OBJS) $(LLIBS) gameInfoTest.o
 	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
 
+pos2Dtest: $(OBJS) $(LLIBS) pos2Dtest.o
+	$(CC) $(CFLAGS) $^ $(LIBS) -lm -o $@
 
 grid.o: grid.h pos2D.h mem.h
 visibility.o: visibility.h pos2D.h grid.h mem.h
@@ -58,6 +60,9 @@ test-map: maptest
 
 test-gameInfotest: gameInfotest
 	valgrind --leak-check=full --show-leak-kinds=all ./gameInfotest
+
+test-pos2Dtest: pos2Dtest
+	valgrind --leak-check=full --show-leak-kinds=all ./pos2Dtest
 
 clean:
 	rm -rf *.dSYM
