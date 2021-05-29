@@ -28,7 +28,7 @@
  *       address to be accessed.
  *     * message loop can then access gameInfo from the server.
  */
-void startNetworkServer(gameInfo_t* gameInfo);
+void startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile);
 
 /********************** startNetworkClient *******************/
 /*
@@ -39,6 +39,8 @@ void startNetworkServer(gameInfo_t* gameInfo);
  * Inputs:
  *     * serverHost - IP address to connect client to server
  *     * port - string holding port number to the server
+ *     * errorFile - file to write errors to
+ *     * name - the name for the client
  * Output:
  *     * returns nothing; will exit non-zero if there is an
  *       error connecting to the server.
@@ -46,8 +48,7 @@ void startNetworkServer(gameInfo_t* gameInfo);
  *       address to server.
  *     * start message loop for the client
  */
-void startNetworkClient(char* serverHost, char* port, FILE* logFile,
-        char* playerName);
+void startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name);
 
 /* ***************** numWords() ********************** */
 /*
@@ -71,12 +72,11 @@ void startNetworkClient(char* serverHost, char* port, FILE* logFile,
  * Inputs:
  *     * message - char* containing the keystrokes sent from the
  *       client to the server.
- *     * numWords - int the number of separate words found in a message.
  * Output:
  *     * char** tokens - char** pointing to tokens from the original
  *       message string passed to the server.
  */
-char** tokenizeMessage(const char* message, int numWords);
+char** tokenizeMessage(char* message);
 
 /********************** handleMessage() **********************/
 /*

@@ -11,7 +11,7 @@
 #include <string.h>
 #include <ncurses.h>
 #include <stdbool.h>
-#include "client.h"
+#include "clientCmds.h"
 #include "file.h"
 #include "grid.h"
 

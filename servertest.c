@@ -1,16 +1,21 @@
 /*
- * servertest.c - test program for server.c
+ * testing file for the network.c module
  *
- * Nunchuck-Buccaneers
- * 05/24/21
+ * Nunchuck Buccaneers
+ * CS50 - Spring 2021
+ * 05/28/21
  *
  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
+#include <unistd.h>
+#include "network.h"
+#include "serverCmds.h"
 
 int main(){
-    fprintf(stderr, "SERVER TEST");
+    srand(getpid());
+	gameInfo_t* gameInfo = mem_assert(initializeGame("../maps/hole.txt"), "Server Main: initializeGame mem");
+	startNetworkServer(gameInfo, stderr);
+	gameInfo_delete(gameInfo);    
 }
