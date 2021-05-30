@@ -20,7 +20,6 @@
 #include "serverCmds.h"
 
 // LOCAL FUNCTIONS, PROTOTYPES
-
 static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* seed);
 
 // FUNCTIONS
@@ -59,7 +58,6 @@ int main(const int argc, char *argv[]){
 	gameInfo_delete(gameInfo);
 }
 #endif
-
 /******************* parseArgs - helper for main *********************
 parses args and finds a seed and a mapFilePath, if no seed doesn't set it
 Caller Provides:
@@ -100,3 +98,4 @@ static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* see
   	fclose(fp);
 	return;
 }
+
