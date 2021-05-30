@@ -49,7 +49,7 @@ int
 main(const int argc, char *argv[])
 {
   if (!(argc == 3 || argc == 4)) {
-    fprintf(stderr, "main(): incorrect number of args passed; %d\n", argc);
+    fprintf(stderr, "usage: ./client hostname port [player_name]\n");
     exit(1);
   }
 
@@ -57,8 +57,16 @@ main(const int argc, char *argv[])
   char* hostname = argv[1]; 
   char* port = argv[2];
   char* playerName = NULL;
+  if (argc==4) {
+    playerName = argv[3];
+  }
+
   int portNum = 0;
-  str2int(port, &portNum);
+  if (!str2int(port, &portNum)) {
+    fprintf(stderr, "client main: non-integer port arg\n");
+    exit(2);
+  }
+
   //initialize ncurses
   initscr();
   noecho();
@@ -75,7 +83,6 @@ main(const int argc, char *argv[])
   // startNetworkClient exits after it recieves a 'QUIT' message
   exit(0);
 }
-#endif
 
 /* ***************** str2int ********************** */
 /*
@@ -90,3 +97,4 @@ static bool str2int(const char string[], int* number)
   char nextchar;
   return (sscanf(string, "%d%c", number, &nextchar) == 1);
 }
+#endif

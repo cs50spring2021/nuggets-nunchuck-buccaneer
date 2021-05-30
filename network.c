@@ -46,7 +46,6 @@ void
 startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
 {
   int port = 0;
-  //int timeout = 10;
   // initalizes the message server
   if ((port = message_init(errorFile)) == 0) {
     // error occurred while initalizing the server
@@ -78,26 +77,24 @@ void
 startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
 {
   addr_t* serverAddress;
-  //int timeout = 10;
   char* message;            // the initial join message sent to the server
 
   // allocating memory for the two variables
   serverAddress = mem_malloc_assert(sizeof(addr_t), "startNetworkClient(): Mem Server Address");
-  if (serverAddress == NULL) {
-    fprintf(stderr, "error: issue encountered while allocating memory for the"
-                    " server address.\n");
-    exit(1);
+
+  // if name is NULL, the user joining is a spectator.
+  if (name == NULL) {
+    // allocates memory for a "SPECTATE" message
+    message = mem_malloc_assert((sizeof(char) * 8) + 1, "startNetworkClient(): Mem Message");
+    // constructs the "SPECTATE" message
+    sprintf(message, "SPECTATE");
+  } else {
+    // allocate space for a "PLAY" message
+    message = mem_malloc_assert((sizeof(char) * (5 + strlen(name))) + 1, "startNetworkClient(): Mem Message");
+    // constructs the "PLAY" message with the user name included
+    sprintf(message, "PLAY %s", name);
   }
-
-  message = mem_malloc_assert((sizeof(char) * (5 + strlen(name))) + 1, "startNetworkClient(): Mem Message");
-  if (message == NULL) {
-    fprintf(stderr, "error: issue encountered while allocating memory for"
-    " the message that's sent to the server.\n");
-    exit(2);
-  }
-
-  sprintf(message, "PLAY %s", name);
-
+  
   // initalizes the message server
   if ((*port = message_init(errorFile)) == 0) {
     // error occurred while initalizing the client's connection
@@ -129,34 +126,6 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
   mem_free(message);
   mem_free(serverAddress);
 }
-
-// /**************** numWords() ****************/
-// /* see network.h for description */
-//   /* scans and reads the message until a null character is encountered. It
-//   determines the number of words in the input line so that we can create 
-//   an array of the appropriate size later. */
-// int
-// numWords(char* message) {
-//   int numWords = 0;
-//   int i = 0;
-
-//   while (message[i] != '\0') {
-//     if (message[i] == '\n') {
-//         i++;
-//         numWords++;
-//         continue;
-//       }
-//     }
-
-//     numWords++;
-//     /* scans through the word until it encounters a space, which signifies 
-//     the end of the word. Also makes sure it doesn't read a null character */
-//     while (!isspace(message[i]) && message[i] != '\0') {
-//       i++;
-//     }
-//   }
-//   return numWords;
-// }
 
 /**************** tokenizeMessage() ****************/
 /* see network.h for description */

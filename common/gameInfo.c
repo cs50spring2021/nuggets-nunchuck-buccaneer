@@ -300,7 +300,6 @@ gameInfo_getPlayerFromID(gameInfo_t* info, int playerID)
     }
 
     // search the players array and find the player with the given playerID
-    int i = 0;
     for(int i = 0; i < info->maxPlayers; i++){
         if((info->players)[i] != NULL){
             if (playerID == (info->players)[i]->playerID) {
@@ -436,7 +435,7 @@ gameInfo_getMap(gameInfo_t* info)
 {
     // arg checking
     if (info == NULL) {
-        fprintf(stderr, "gmaeInfo_getMap: NULL gameInfo pointer\n");
+        fprintf(stderr, "gameInfo_getMap: NULL gameInfo pointer\n");
         return NULL;
     }
 
