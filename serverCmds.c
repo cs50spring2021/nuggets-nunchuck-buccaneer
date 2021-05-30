@@ -266,16 +266,16 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		fprintf(stderr,"JOIN USER: %s\n", playerName);
 		// get the map
 		if ((map = gameInfo_getMap(gameinfo)) == NULL) {
-	  	fprintf(stderr, "error: gameinfo provided is NULL.\n");
-      free(message);
-	  	exit(2);
+	  		fprintf(stderr, "error: gameinfo provided is NULL.\n");
+      		free(message);
+	  		exit(2);
 		}
 		// generate a random position to place the new user in the map
 		if ((pos = map_randomEmptySquare(map)) == NULL) {
-	  	fprintf(stderr, "error: map provided is NULL.\n");
-      free(message);
-	  	exit(3);
-    }
+	  		fprintf(stderr, "error: map provided is NULL.\n");
+      		free(message);
+	  		exit(3);
+    	}
 
 		if (strlen(playerName) > maxNameLength) {
 			/* truncates the playername if its longer than 50 characters to exactly
@@ -286,7 +286,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		/* replace any character for which isgraph() and isblank() are both false
 		with an underscore */
 		for (int i = 0; i < strlen(playerName); i++) {
-			if (!isgraph(playerName[i]) && !isblank(playerName[i])) {
+			if (isgraph(playerName[i]) == 0 && isblank(playerName[i]) != 0) {
 				playerName[i] = '_';
 			}
 		}
@@ -294,6 +294,15 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		// add the new user to the game info
 		playerInfo_t* playerinfo = gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
 		map_setPlayerPos(map,pos,playerinfo);
+		//Create OK message
+		message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
+		 /* writes a message that'll be sent to the client to check the dimensions 
+ 		 of their window */
+  		sprintf(message, "OK %c", playerinfo->playerID + 65);
+
+  		// sends the OK message to the client
+ 		 message_send(player, message);
+
 		free(pos);
   }
 
