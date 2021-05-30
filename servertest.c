@@ -33,34 +33,41 @@ int main(){
 	addr_t player1 = message_noAddr();
 	message_setAddr("26346", "122345", &player1);
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nINVALID MESSAGE\n");
 	handleMessage(args, player1, "Message");
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nJOIN MESSAGE\n");
 	handleMessage(args, player1, "PLAY Doodle");
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nJOIN MESSAGE\n");
 	handleMessage(args, player1, "PLAY Beep");
 
 	showMap(gameInfo);
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nLEAVE MESSAGE\n");
 	handleMessage(args, player1, "KEY Q");
 
 	showMap(gameInfo);
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nLEAVE MESSAGE 2ND PLAYER\n");
 	handleMessage(args, player1, "KEY Q");
 
 	showMap(gameInfo);
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nJOIN MESSAGE\n");
 	handleMessage(args, player1, "PLAY Ahh");
 
 	showMap(gameInfo);
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nMOVE MESSAGE\n");
-	handleMessage(args, player1, "KEY Ahh");
+	handleMessage(args, player1, "KEY l");
 
 	//fprintf(stderr, "\nJOIN SPECTATOR\n");
 	//handleMessage(args, player1, "PLAY");
@@ -71,6 +78,7 @@ int main(){
 }
 
 static void showMap(gameInfo_t* gameinfo){
+	fprintf(stderr, "CURRENT MAP\n");
 	map_t* map = gameInfo_getMap(gameinfo);
 	pos2D_t* mapWH = map_getWidthheight(map);
 	for(int y = 0 ; y < pos2D_getY(mapWH); y++){

@@ -60,7 +60,7 @@ bool
 gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* username)
 {
     // arg checking
-    if (info == NULL || !message_isAddr(*address) || pos == NULL || username == NULL) {
+    if (info == NULL || pos == NULL || username == NULL) {
         fprintf(stderr, "gameInfo_addPlayer: invalid/NULL input\n");
         return false;
     }
@@ -70,7 +70,6 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
 
     // add all information
     player->pos = pos2D_new(pos2D_getX(pos), pos2D_getY(pos));
-    pos2D_delete(pos);
     player->score = 0;
     player->address = address;
     player->username = username;
@@ -107,7 +106,6 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
     player->sightGrid = grid_new(sightGridString_init);
     mem_free(sightGridString_init);
     mem_free(mapString);
-    
     // update the player's sightGrid based on position
     char* gridString = grid_toString(player->sightGrid);
 
@@ -119,7 +117,6 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
         // grab the currSpot char as well as x and y (height)
         currSpot = gridString[i];
         pos2D_t* otherPos = pos2D_new(x, height);
-
         // increment height if encounters '\n'
         if (currSpot == '\n') {
             height++;
@@ -150,7 +147,7 @@ void
 gameInfo_addSpectator(gameInfo_t* info, const addr_t* address)
 {
     // arg checking
-    if (info == NULL || !message_isAddr(*address)) {
+    if (info == NULL) {
         fprintf(stderr, "gameInfo_addSpectator: NULL/invalid gameInfo pointer or address pointer\n");
         exit (1);
     }
@@ -194,7 +191,7 @@ void
 gameInfo_removePlayer(gameInfo_t* info, const addr_t* address)
 {
     // arg checking
-    if (info == NULL || !message_isAddr(*address)) {
+    if (info == NULL) {
         fprintf(stderr, "gameInfo_removePlayer: NULL/invalid gameInfo pointer or address pointer\n");
         exit (1);
     }
@@ -237,7 +234,7 @@ playerInfo_t*
 gameInfo_getPlayer(gameInfo_t* info, const addr_t* address)
 {
     // arg checking
-    if (info == NULL || !message_isAddr(*address)) {
+    if (info == NULL) {
         fprintf(stderr, "gameInfo_getPlayer: NULL gameInfo pointer or address pointer\n");
         return NULL;
     }
@@ -246,10 +243,14 @@ gameInfo_getPlayer(gameInfo_t* info, const addr_t* address)
     int i = 0;
     while (i < info->maxPlayers) {
         if((info->players)[i] != NULL){
+            #ifndef TESTING
             if (message_eqAddr(*address, *((info->players)[i]->address))) {
+            #endif
                 playerInfo_t* player = (info->players)[i];
                 return player;
+            #ifndef TESTING
             }
+            #endif
         }
         i++;
     }
@@ -285,14 +286,13 @@ gameInfo_getPlayerFromID(gameInfo_t* info, int playerID)
 
     // search the players array and find the player with the given playerID
     int i = 0;
-    while (i < info->numPlayers) {
+    for(int i = 0; i < info->maxPlayers; i++){
         if((info->players)[i] != NULL){
             if (playerID == (info->players)[i]->playerID) {
                 playerInfo_t* player = (info->players)[i];
                 return player;
             }
         }
-        i++;
     }
     return NULL;
 }
@@ -303,7 +303,7 @@ int
 gameInfo_pickupGold(gameInfo_t* info, const addr_t* address)
 {
     // arg checking
-    if (info == NULL || !message_isAddr(*address)) {
+    if (info == NULL) {
         fprintf(stderr, "gameInfo_pickupGold: NULL gameInfo pointer or address pointer\n");
         return -1;
     }
@@ -456,7 +456,7 @@ bool
 gameInfo_updateSightGrid(gameInfo_t* info, const addr_t* address)
 {
     // arg checking
-    if (info == NULL || !message_isAddr(*address)) {
+    if (info == NULL) {
         fprintf(stderr, "gameInfo_updateSightGrid: NULL/invalid gameInfo pointer or address pointer\n");
         return false;
     }

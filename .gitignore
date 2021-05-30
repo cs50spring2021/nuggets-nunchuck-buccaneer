@@ -43,3 +43,4 @@ maps/unreadable.txt
 clienttest
 networktest
 servertest
+quickcompile.sh

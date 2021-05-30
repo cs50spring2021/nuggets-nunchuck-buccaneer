@@ -242,6 +242,8 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   nrows = pos2D_getX(terminalSize);
   ncols = pos2D_getY(terminalSize);
   mem_free(terminalSize);
+
+  addr_t* playerP = &player;
   message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
   if (message == NULL) {
     fprintf(stderr, "error: issue encountered while allocating memory for"
@@ -256,7 +258,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   // if player name is not provided, add the user as a spectator
   if (playerName == NULL) {
 	fprintf(stderr,"JOIN SPEC");
-	gameInfo_addSpectator(gameinfo, player);
+	gameInfo_addSpectator(gameinfo, playerP);
   } else {
 	fprintf(stderr,"JOIN USER: %s\n", playerName);
 	// get the map
@@ -272,8 +274,8 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 	  exit(3);
     } 
 	// add the new user to the game info
-	gameInfo_addPlayer(gameinfo, player, pos, playerName);
-	playerInfo_t* playerinfo = gameInfo_getPlayer(gameinfo, player);
+	gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
+	playerInfo_t* playerinfo = gameInfo_getPlayer(gameinfo, playerP);
 	map_setPlayerPos(map,pos,playerinfo);
 	free(pos);
   }
@@ -304,14 +306,14 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
   map_t* map;
   playerInfo_t* playerinfo;
   pos2D_t* pos;
-
+  addr_t* playerP = &player;
   // get the map
   if ((map = gameInfo_getMap(gameinfo)) == NULL) {
     fprintf(stderr, "error: gameinfo provided is NULL.\n");
 	exit(1);
   }	
   // gets the playerinfo struct
-  if ((playerinfo = gameInfo_getPlayer(gameinfo, player)) == NULL) {
+  if ((playerinfo = gameInfo_getPlayer(gameinfo, playerP)) == NULL) {
     fprintf(stderr, "error: couldn't retrieve playerinfo struct.\n");
     exit(2);
   }
@@ -320,30 +322,9 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
   // clears the spot on the map
   map_clearSpot(map, pos);
   // player is removed from gameinfo
-  gameInfo_removePlayer(gameinfo, player);
+  gameInfo_removePlayer(gameinfo, playerP);
   // send the updated display to all players
   sendDisplays(gameinfo, message_noAddr(), 0);
-
-	// get the map
-	if ((map = gameInfo_getMap(gameinfo)) == NULL) {
-		fprintf(stderr, "error: gameinfo provided is NULL.\n");
-		exit(1);
-	}	
-	// gets the playerinfo struct
-	if ((playerinfo = gameInfo_getPlayer(gameinfo, playerP)) == NULL) {
-		fprintf(stderr, "error: couldn't retrieve playerinfo struct.\n");
-		exit(2);
-	}
-	// gets the position of the player that will be cleared on the map
-	pos = playerinfo->pos;
-
-	// clears the spot on the map
-	map_clearSpot(map, pos);
-	// player is removed from gameinfo
-	gameInfo_removePlayer(gameinfo, playerP);
-	// send the updated display to all players
-	sendDisplays(gameinfo, message_noAddr(), 0);
-
 	// checks to see if the last player has left the server
 	if (gameInfo_getNumPlayers(gameinfo) == 0) {
 		return true;
@@ -393,6 +374,9 @@ static void sendDisplays(gameInfo_t* gameinfo, addr_t addr, int goldCollected){
 				}
 			}
 			//Send the displayHeader message
+			#ifdef TESTING
+			fprintf(stderr, "%s\n", msgBuffer);
+			#endif
 			message_send(*(player->address), msgBuffer);
 			// Get visible map from player
 			grid_t* seen = map_getVisibleMap(gameInfo_getMap(gameinfo), player->sightGrid);
@@ -400,6 +384,10 @@ static void sendDisplays(gameInfo_t* gameinfo, addr_t addr, int goldCollected){
 			char* stringOfSeen = grid_toString(seen);
 			char* displayMsg = mem_malloc_assert(sizeof(char) * (strlen(stringOfSeen) + strlen("DISPLAY\n") + 1), "sendDisplays: mem for display msg failed");
 			sprintf(displayMsg, "DISPLAY\n%s", stringOfSeen);
+			#ifdef TESTING
+			fprintf(stderr, "%s\n", displayMsg);
+			#endif
+			message_send(*(player->address), displayMsg);
 			mem_free(stringOfSeen);
 			//Clean up
 			mem_free(displayMsg);
