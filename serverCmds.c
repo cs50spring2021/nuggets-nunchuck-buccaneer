@@ -86,7 +86,9 @@ bool movePlayer(gameInfo_t* gameinfo, addr_t addr, char input){
 		shortMove(gameinfo, addr, input, &goldCollected);
 	} else {
 		//Loop short moves until unable to
-		while(shortMove(gameinfo, addr, tolower(input), &goldCollected));
+		while (shortMove(gameinfo, addr, tolower(input), &goldCollected)) {
+			gameInfo_updateSightGrid(gameinfo, &addr);
+		}
 	}
 	//Send new Game State
 	sendDisplays(gameinfo, addr, goldCollected);
