@@ -1,36 +1,29 @@
-CLIENT TEST
-
-Basic Ensure Dimensions Test
-
-Negative Ensure Dimensions Test
-pos2D_new: invalid x or y input -- must be >= 0
-ensureDimensions(): NULL 'pos' passed
-
-NULL Ensure Dimensions Test
-
-Basic Header Test
-
-Basic Action Test
-
-NULL Action Test
-displayAction(): NULL 'message' passed
-
-Second Basic Ensure Test
-
-Display Header Test 2
-
-Basic Display Test
-
-Basic Third Ensure Test
-
-Spectator Header Test 2
-
-Basic Change Display Test
-
-NULL Display Test
-
-QuitClient NULL Test
-
-QuitClient Test
-free(): invalid pointer
-make: *** [testclient] Aborted (core dumped)
+==41910== Memcheck, a memory error detector
+==41910== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==41910== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==41910== Command: ./client plank 56658 me
+==41910== 
+START OF LOG
+message_init: ready at port '43766'
+message_send: TO 129.170.64.104:43766
+message_send: 1 lines:
+PLAY me
+message_loop: message ready on socket
+message_loop: FROM 129.170.64.104:43766
+message_loop: 1 lines:
+PLAY me
+Args: 0x5c31e90joinUser: Invalid Args passed==41910== 
+==41910== HEAP SUMMARY:
+==41910==     in use at exit: 67,629 bytes in 64 blocks
+==41910==   total heap usage: 139 allocs, 75 frees, 100,100 bytes allocated
+==41910== 
+==41910== LEAK SUMMARY:
+==41910==    definitely lost: 0 bytes in 0 blocks
+==41910==    indirectly lost: 0 bytes in 0 blocks
+==41910==      possibly lost: 0 bytes in 0 blocks
+==41910==    still reachable: 67,629 bytes in 64 blocks
+==41910==         suppressed: 0 bytes in 0 blocks
+==41910== Rerun with --leak-check=full to see details of leaked memory
+==41910== 
+==41910== For counts of detected and suppressed errors, rerun with: -v
+==41910== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
