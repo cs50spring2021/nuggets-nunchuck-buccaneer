@@ -76,7 +76,7 @@ void gameInfo_addSpectator(gameInfo_t* info, const addr_t* address);
 
 /****************** gameInfo_removePlayer *****************/
 /*
- * Removes a player from the gameInfo player array
+ * Removes a player's functionality from the gameInfo player array
  * Caller provides:
  *     desired gameInfo struct,
  *     player address.
@@ -87,6 +87,20 @@ void gameInfo_addSpectator(gameInfo_t* info, const addr_t* address);
  *     nothing.
  */
 void gameInfo_removePlayer(gameInfo_t* info, const addr_t* address);
+
+/******************** gameInfo_deletePlayer ******************/
+/*
+ * Removes a player from the gameInfo player array
+ * Caller provides:
+ *     desired gameInfo struct,
+ *     player address.
+ * We return:
+ *     nothing,
+ *     exit non-zero if any errors are encountered.
+ * Caller is responsible for:
+ *     nothing.
+ */
+void gameInfo_deletePlayer(gameInfo_t* info, const addr_t* address);
 
 /****************** gameInfo_removeSpectator *****************/
 /*

@@ -15,7 +15,6 @@ const int maxPlayers = 26;      		// maximum number of players
 const int goldTotal = 250;      		// amount of gold in the game
 const int goldMinNumPiles = 10; 		// minimum number of gold piles
 const int goldMaxNumPiles = 30; 		// maximum number of gold piles
-const int message_MaxBytes = 65507; // max number of chars in a message
 
 static void sendDisplays(gameInfo_t* gameinfo, addr_t Player, int goldCollected);
 static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldCollected);
