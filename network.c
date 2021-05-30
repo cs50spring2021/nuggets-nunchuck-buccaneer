@@ -81,7 +81,11 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
 
   // allocating memory for the two variables
   serverAddress = mem_malloc_assert(sizeof(addr_t), "startNetworkClient(): Mem Server Address");
-
+  //Create args struct for loop
+  loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "startNetworkServer(): Mem Error for args");
+  args->playerID = mem_malloc_assert(sizeof(char), "startNetworkServer(): Mem error id");
+  args->gameinfo = NULL;
+  *(args->playerID) = '@';
   // if name is NULL, the user joining is a spectator.
   if (name == NULL) {
     // allocates memory for a "SPECTATE" message
@@ -115,7 +119,7 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
   message_send(*serverAddress, message);
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
-  if (!message_loop(NULL, 0, NULL, handleInput, 
+  if (!message_loop(args, 0, NULL, handleInput, 
                     handleMessage)) {
     // message_loop is false: a fatal error stopped it from continuing to loop.
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
@@ -207,6 +211,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
   char* playerID;
   char** tokens;
   loopArgs_t* argumentStruct = arg;
+  fprintf(stderr, "Args: %p", argumentStruct);
   gameinfo = argumentStruct->gameinfo;
   playerID = argumentStruct->playerID;
 
