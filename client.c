@@ -48,7 +48,7 @@ static bool str2int(const char string[], int* number);
 int
 main(const int argc, char *argv[])
 {
-  if (argc != 3 || argc != 4) {
+  if (!(argc == 3 || argc == 4)) {
     fprintf(stderr, "main(): inccoret number of args passed; %d\n", argc);
     exit(1);
   }
