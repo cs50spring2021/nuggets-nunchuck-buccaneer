@@ -13,3 +13,9 @@ When all gold nuggets are collected, the game ends and a summary is printed.
 See the [support library](support/README.md) for some useful modules.
 
 See the [maps](maps/README.md) for some draft maps.
+
+## Assumptions
+
+Assuming that player names don't have any spaces in them
+Specs say optionally including spaces but unclear whether player has the option or we as the designers have the option
+we assumed it was us that had the option.

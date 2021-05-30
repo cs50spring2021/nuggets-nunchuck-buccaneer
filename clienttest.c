@@ -14,8 +14,12 @@
 #include "clientCmds.h"
 #include "file.h"
 #include "grid.h"
+#include "network.h"
 
-
+typedef struct loopArgs {
+    gameInfo_t* gameinfo;
+    char* playerID;
+} loopArgs_t;
 
 int main(){
     fprintf(stderr, "CLIENT TEST\n");
@@ -39,56 +43,78 @@ int main(){
     grid_t* challengeGrid = grid_new(readMap);
     free(readMap);
     fclose(gridFile);
+    //Setup stuff for loop
+    loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "Mem: Test args");
+    args->playerID = mem_malloc_assert(sizeof(char), "Mem: player");
+    *(args->playerID) = 'B';
+    addr_t server = message_noAddr();
+	message_setAddr("26346", "122345", &server);
+
     int c;
     int stage = 0;
     while((c = getch()) != 'x'){
         if(c == 'c'){
             if(stage == 0){
                 fprintf(stderr, "\nBasic Ensure Dimensions Test\n");
-                pos2D_t* dim = pos2D_new(30,15);
-                ensureDimensions(dim);
+                handleMessage(args, server, "GRID 30 15");
+
                 fprintf(stderr, "\nNegative Ensure Dimensions Test\n");
-                pos2D_set(dim, -1, -4);
-                ensureDimensions(dim);
-                pos2D_delete(dim);
+                handleMessage(args, server, "GRID -1 -4");
+
                 fprintf(stderr, "\nNULL Ensure Dimensions Test\n");
-                ensureDimensions(NULL);
+                //handleMessage(args, server, "GRID");
+
                 fprintf(stderr, "\nBasic Header Test\n");
-                displayHeader(0, 0, 0, 'B');
+                handleMessage(args, server, "GOLD 0 0 0");
+
                 fprintf(stderr, "\nBasic Action Test\n");
                 displayAction("Unknown Keystroke");
+
                 fprintf(stderr, "\nNULL Action Test\n");
                 displayAction(NULL);
             }
             if(stage == 1){
                 fprintf(stderr, "\nSecond Basic Ensure Test\n");
                 pos2D_t* hw = grid_getWidthheight(holeGrid);
-                ensureDimensions(hw);
+                char* msg = mem_malloc_assert(sizeof(char) * (30), "MEM: msg HW");
+                sprintf(msg, "GRID %d %d", pos2D_getX(hw), pos2D_getY(hw));
+                handleMessage(args, server, msg);
+                mem_free(msg);
                 pos2D_delete(hw);
+
                 fprintf(stderr, "\nDisplay Header Test 2\n");
-                displayHeader(5, 10, 15, 'A');
+                handleMessage(args, server, "GOLD 5 10 15");
             }
             if(stage == 2){
                 fprintf(stderr, "\nBasic Display Test\n");
                 char* gridDisplay = grid_toString(holeGrid);
-                display(gridDisplay);
+                char* msg = mem_malloc_assert(sizeof(char) * (30 + strlen(gridDisplay)), "MEM: msg HW");
+                sprintf(msg, "DISPLAY\n%s", gridDisplay);
+                handleMessage(args, server, msg);
+                mem_free(msg);
                 free(gridDisplay);
             }
             if(stage == 3){
                 fprintf(stderr, "\nBasic Third Ensure Test\n");
                 pos2D_t* hw = grid_getWidthheight(challengeGrid);
-                ensureDimensions(hw);
+                char* msg = mem_malloc_assert(sizeof(char) * (30), "MEM: msg HW");
+                sprintf(msg, "GRID %d %d", pos2D_getX(hw), pos2D_getY(hw));
+                handleMessage(args, server, msg);
+                mem_free(msg);
                 pos2D_delete(hw);
                 fprintf(stderr, "\nSpectator Header Test 2\n");
-                displayHeader(0, -1, 15, 'C');
+                handleMessage(args, server, "GOLD 0 -1 15");
                 fprintf(stderr, "\nBasic Change Display Test\n");
                 char* gridDisplay = grid_toString(challengeGrid);
-                display(gridDisplay);
+                msg = mem_malloc_assert(sizeof(char) * (30 + strlen(gridDisplay)), "MEM: msg HW");
+                sprintf(msg, "DISPLAY\n%s", gridDisplay);
+                handleMessage(args, server, msg);
+                mem_free(msg);
                 free(gridDisplay);
             }
             if(stage == 4){
                 fprintf(stderr, "\nNULL Display Test\n");
-                display(NULL);
+                handleMessage(args, server, "DISPLAY\n");
             }
             if(stage == 5){
                 break;
@@ -97,9 +123,7 @@ int main(){
         }
         c = 'n';
     }
-    fprintf(stderr, "\nQuitClient NULL Test\n");
-    quitClient(NULL);
     fprintf(stderr, "\nQuitClient Test\n");
-    quitClient("End of test");
+    handleMessage(args, server, "QUIT End of Test");
     printf("ENDED");
 }

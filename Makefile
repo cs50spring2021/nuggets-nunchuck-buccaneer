@@ -49,7 +49,7 @@ serverCmds.o: serverCmds.h server.c $C/pos2D.h $S/message.h $C/gameInfo.h $C/map
 
 servertest.o: servertest.c
 
-clienttest.o: clienttest.c $C/file.h $C/grid.h clientCmds.h
+clienttest.o: clienttest.c $C/file.h $C/grid.h clientCmds.h network.h
 
 networktest.o: networktest.c network.h $C/mem.h $C/pos2D.h $C/file.h $S/message.h clientCmds.h serverCmds.h
 
@@ -64,7 +64,7 @@ Vtestserver: servertest
 	$(VALGRIND) ./servertest
 
 testclient: clienttest
-	$(VALGRIND) ./clienttest
+	./clienttest
 
 
 testnetwork: networktest
