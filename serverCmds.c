@@ -246,7 +246,8 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   nrows = pos2D_getX(terminalSize);
   ncols = pos2D_getY(terminalSize);
   mem_free(terminalSize);
-  addr_t* playerP = &player;
+  addr_t* playerP = mem_malloc_assert(sizeof(addr_t), "MEM: Join AddressCpy");
+  *playerP = player;
   message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
 
   /* writes a message that'll be sent to the client to check the dimensions 

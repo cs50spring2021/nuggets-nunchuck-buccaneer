@@ -27,6 +27,7 @@
 typedef struct loopArgs {
     gameInfo_t* gameinfo;
     char* playerID;
+    addr_t* addy;
 } loopArgs_t;
 
 /**************** global types ****************/
@@ -85,6 +86,7 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
   loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "startNetworkServer(): Mem Error for args");
   args->playerID = mem_malloc_assert(sizeof(char), "startNetworkServer(): Mem error id");
   args->gameinfo = NULL;
+  args->addy = serverAddress;
   *(args->playerID) = '@';
   // if name is NULL, the user joining is a spectator.
   if (name == NULL) {
@@ -98,14 +100,16 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
     // constructs the "PLAY" message with the user name included
     sprintf(message, "PLAY %s", name);
   }
-  
+  message_init(errorFile);
   // initalizes the message server
+  /*
   if ((*port = message_init(errorFile)) == 0) {
     // error occurred while initalizing the client's connection
     fprintf(stderr, "error: issue encountered while initializing the"
                        " client's connection\n");
     exit(3);
   }
+  */
   //Convert port to string
   char portStr[10];
   sprintf(portStr, "%d", *port);
@@ -211,7 +215,6 @@ handleMessage(void* arg, const addr_t from, const char* message)
   char* playerID;
   char** tokens;
   loopArgs_t* argumentStruct = arg;
-  fprintf(stderr, "Args: %p", argumentStruct);
   gameinfo = argumentStruct->gameinfo;
   playerID = argumentStruct->playerID;
 
@@ -341,7 +344,8 @@ handleInput(void* arg) {
                     'J', 'Y', 'U', 'B', 'N', 'Q'};
     int arrayItems = 17;              // number of items in the above array
     char* message;
-    addr_t* address = arg;
+    loopArgs_t* args = arg;
+    addr_t* address = args->addy;
 
     message = mem_malloc_assert((sizeof(char) * 6) + 1, "handleInput(): mem message");
     if (message == NULL) {
@@ -351,8 +355,8 @@ handleInput(void* arg) {
     }
 
     char key = '\0';
-    key = getch();
-
+    key = fgetc(stdin);
+    fprintf(stderr, "%c\n", key);
     // loops over all of the valid keystrokes that can be inputted
     for (int i = 0; i < arrayItems; i++) {
       if (key == array[i]) {
