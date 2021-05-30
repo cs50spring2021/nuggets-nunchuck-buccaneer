@@ -115,13 +115,69 @@ int main(){
 	fprintf(stderr, "\nMOVE INTO EMPTY\n");
 	handleMessage(args, player1, "KEY j");
 
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nJOIN SPECTATOR\n");
+	handleMessage(args, player1, "SPECTATE");
 
-	//fprintf(stderr, "\nJOIN SPECTATOR\n");
-	//handleMessage(args, player1, "PLAY");
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nJOIN NEW SPECTATOR\n");
+	handleMessage(args, player1, "SPECTATE");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nLEAVE MESSAGE 3RD PLAYER\n");
+	if(handleMessage(args, player1, "KEY Q")){
+		fprintf(stderr, "END GAME\n");
+	} else {
+		fprintf(stderr, "CONTINUE GAME\n");
+	}
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nLEAVE MESSAGE SPECTATOR\n");
+	if(handleMessage(args, player1, "KEY Q")){
+		fprintf(stderr, "END GAME\n");
+	} else {
+		fprintf(stderr, "CONTINUE GAME\n");
+	}
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nJOIN SPECTATOR\n");
+	handleMessage(args, player1, "SPECTATE");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nJOIN A PLAYER\n");
+	handleMessage(args, player1, "PLAY uhoh");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nJOIN ANOTHER PLAYER\n");
+	handleMessage(args, player1, "PLAY alright");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\n COLLIDE THEM\n");
+	handleMessage(args, player1, "KEY J");
+	handleMessage(args, player1, "KEY H");
+
+	
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nLEAVE MESSAGE\n");
+	if(handleMessage(args, player1, "KEY Q")){
+		fprintf(stderr, "END GAME\n");
+	} else {
+		fprintf(stderr, "CONTINUE GAME\n");
+	}
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\n MOVE TO CHECK PROPER DISPLACEMENT\n");
+	handleMessage(args, player1, "KEY U");
+	handleMessage(args, player1, "KEY J");
+
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nEND GAME\n");
+	endGame(gameInfo);
 
 	mem_free(args->playerID);
 	mem_free(args);
-	gameInfo_delete(gameInfo);    
+	gameInfo_delete(gameInfo);
 }
 
 static void showMap(gameInfo_t* gameinfo){

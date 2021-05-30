@@ -18,7 +18,6 @@ const int goldMaxNumPiles = 30; // maximum number of gold piles
 static void sendDisplays(gameInfo_t* gameinfo, addr_t Player, int goldCollected);
 static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldCollected);
 static pos2D_t* dirToMovement(pos2D_t* start, char dir);
-static void endGame(gameInfo_t* gameinfo);
 
 /******************* initializeGame *********************
 Makes the map places gold on the map and initializes a gameInfo struct
@@ -139,7 +138,7 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldColl
 	int movedPlayer = -1;
 	playerInfo_t* displaced = NULL;
 	//Check for another Player, Capital letter
-	if(isupper(current) == 1){
+	if(isupper(current) != 0){
 		//Find ID
 		movedPlayer = current - 65;
 		//Set player recorded pos
@@ -258,7 +257,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   message_send(player, message);
   // if player name is not provided, add the user as a spectator
   if (playerName == NULL) {
-	fprintf(stderr,"JOIN SPEC");
+	fprintf(stderr,"JOIN SPEC\n");
 	gameInfo_addSpectator(gameinfo, playerP);
   } else {
 	fprintf(stderr,"JOIN USER: %s\n", playerName);
@@ -282,6 +281,9 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   // send the updated gameinfo to all clients.
   sendDisplays(gameinfo, message_noAddr(), 0);
   free(message);
+  #ifdef TESTING
+  fprintf(stderr, "PLAYER COUNT - > %d\n", gameInfo_getNumPlayers(gameinfo));
+  #endif
 }
 
 /******************* leaveUser *********************
@@ -297,7 +299,6 @@ We return:
 */
 bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 {
-  fprintf(stderr,"LEAVE USER:\n");
   // Check args
   if (gameinfo == NULL) {
 	fprintf(stderr, "leaveUser: Invalid Args passed.\n");
@@ -317,14 +318,35 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
     fprintf(stderr, "error: couldn't retrieve playerinfo struct.\n");
     exit(2);
   }
-  // gets the position of the player that will be cleared on the map
-  pos = playerinfo->pos;
-  // clears the spot on the map
-  map_clearSpot(map, pos);
-  // player is removed from gameinfo
-  gameInfo_removePlayer(gameinfo, playerP);
+  //Check if it is a spectator
+  if(playerinfo->username != NULL){
+	// gets the position of the player that will be cleared on the map
+	pos = playerinfo->pos;
+	// clears the spot on the map
+	map_clearSpot(map, pos);
+	char msgBuffer[81];
+	sprintf(msgBuffer, "QUIT Thanks for Playing!");
+	#ifdef TESTING
+	fprintf(stderr, "%s\n", msgBuffer);
+	#endif
+	message_send(*(playerinfo->address), msgBuffer);
+	// player is removed from gameinfo
+	gameInfo_removePlayer(gameinfo, playerP);
+  } else {
+	char msgBuffer[81];
+	sprintf(msgBuffer, "QUIT Thanks for Watching!");
+	#ifdef TESTING
+	fprintf(stderr, "%s\n", msgBuffer);
+	#endif
+	message_send(*(playerinfo->address), msgBuffer);
+	// Spectator is removed from gameinfo
+	gameInfo_removeSpectator(gameinfo);
+  }
   // send the updated display to all players
   sendDisplays(gameinfo, message_noAddr(), 0);
+  	#ifdef TESTING
+    fprintf(stderr, "PLAYER COUNT - > %d\n", gameInfo_getNumPlayers(gameinfo));
+	#endif
 	// checks to see if the last player has left the server
 	if (gameInfo_getNumPlayers(gameinfo) == 0) {
 		return true;
@@ -408,8 +430,9 @@ We Do:
 	Send a new display to each player that contains the endgame scoreboard constructed from gameinfo
 	Send a quit message to all players
 */
-static void endGame(gameInfo_t* gameinfo)
+void endGame(gameInfo_t* gameinfo)
 {
+  fprintf(stderr, "END GAME CALLED\n");
   // Check args
   if (gameinfo == NULL) {
 	fprintf(stderr, "endGame: Invalid gameinfo struct passed.\n");
@@ -427,7 +450,7 @@ static void endGame(gameInfo_t* gameinfo)
   }
 
   // allocates memory for the message that'll be sent to the user
-  message = mem_malloc_assert((sizeof(char*) * (5 + strlen(scoreboard))) + 1, "endGame(): Mem message");
+  message = mem_malloc_assert(sizeof(char) * (5 + 1 + strlen(scoreboard)), "endGame(): Mem message");
   if (message == NULL) {
     fprintf(stderr, "error: issue encountered while allocating memory for"
     " the message.\n");
@@ -435,16 +458,29 @@ static void endGame(gameInfo_t* gameinfo)
   }
   // constructs the quit message sent to the user
   sprintf(message, "QUIT %s", scoreboard);
-
+  mem_free(scoreboard);
   // loop over all the playerIDs and disconnect all of the players
-  for (int i = 0; i < 26; i++) {
+  for (int i = 0; i < maxPlayers; i++) {
     if ((player = gameInfo_getPlayerFromID(gameinfo, i)) == NULL) {
       // error occurred or a player does not exist at this index
       continue;
     }
     // grab the player address
+	if(player->address == NULL){
+		fprintf(stderr, "WTF");
+	}
     playerAddress = *(player->address);
     // send the quit message to the specific player
+	#ifdef TESTING
+	fprintf(stderr, "%s\n", message);
+	#endif
     message_send(playerAddress, message);
-  }	
+	//If spectator
+	if(i == 25){
+		gameInfo_removeSpectator(gameinfo);
+	} else {
+		gameInfo_removePlayer(gameinfo, player->address);
+	}
+  }
+  mem_free(message);
 }
