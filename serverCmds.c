@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
+#include <ctype.h>
 #include "pos2D.h"
 #include "message.h"
 #include "gameInfo.h"
 #include "playerInfo.h"
 #include "map.h"
-#include <ctype.h>
 #include "serverCmds.h"
 
 
@@ -245,39 +246,54 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 
   addr_t* playerP = &player;
   message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
-  if (message == NULL) {
-    fprintf(stderr, "error: issue encountered while allocating memory for"
-    " the message that's sent to the server.\n");
-    exit(1);
-  }
+
   /* writes a message that'll be sent to the client to check the dimensions 
   of their window */
   sprintf(message, "GRID %d %d", nrows, ncols);
+
   // sends the GRID message to the client
   message_send(player, message);
+
   // if player name is not provided, add the user as a spectator
   if (playerName == NULL) {
-	fprintf(stderr,"JOIN SPEC\n");
-	gameInfo_addSpectator(gameinfo, playerP);
+		fprintf(stderr,"JOIN SPEC\n");
+		gameInfo_addSpectator(gameinfo, playerP);
   } else {
-	fprintf(stderr,"JOIN USER: %s\n", playerName);
-	// get the map
-	if ((map = gameInfo_getMap(gameinfo)) == NULL) {
-	  fprintf(stderr, "error: gameinfo provided is NULL.\n");
+		// add the user as a player
+		fprintf(stderr,"JOIN USER: %s\n", playerName);
+		// get the map
+		if ((map = gameInfo_getMap(gameinfo)) == NULL) {
+	  	fprintf(stderr, "error: gameinfo provided is NULL.\n");
       free(message);
-	  exit(2);
-	}
-	// generate a random position to place the new user in the map
-	if ((pos = map_randomEmptySquare(map)) == NULL) {
-	  fprintf(stderr, "error: map provided is NULL.\n");
+	  	exit(2);
+		}
+		// generate a random position to place the new user in the map
+		if ((pos = map_randomEmptySquare(map)) == NULL) {
+	  	fprintf(stderr, "error: map provided is NULL.\n");
       free(message);
-	  exit(3);
-    } 
-	// add the new user to the game info
-	playerInfo_t* playerinfo = gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
-	map_setPlayerPos(map,pos,playerinfo);
-	free(pos);
+	  	exit(3);
+    }
+
+		if (strlen(playerName) > maxNameLength) {
+			/* truncates the playername if its longer than 50 characters to exactly
+			50 characters long. */
+			playerName[50] = '\0';
+		}
+		
+		/* replace any character for which isgraph() and isblank() are both false
+		with an underscore */
+		for (int i = 0; i < strlen(playerName); i++) {
+			if (!(isgraph(playerName[i]) && isblank(playerName[i]))) {
+				playerName[i] = '_';
+			}
+		}
+
+		// add the new user to the game info
+		playerInfo_t* playerinfo = gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
+		map_setPlayerPos(map,pos,playerinfo);
+		free(pos);
   }
+
   // send the updated gameinfo to all clients.
   sendDisplays(gameinfo, message_noAddr(), 0);
   free(message);
