@@ -45,13 +45,23 @@ main(int argc, char* argv[])
     printf("%s\n", grid_toString(player2->sightGrid));
     printf("%s\n", grid_toString(map_getVisibleMap(gameInfo_getMap(info), player2->sightGrid)));
 
+    addr_t address3 = message_noAddr();
+    message_setAddr("localhost", "8181", &address3);
+    pos2D_t* pos3 = map_randomEmptySquare(gameInfo_getMap(info));
+
+    gameInfo_addPlayer(info, &address3, pos3, "testplayer3");
+    playerInfo_t* player3 = gameInfo_getPlayer(info, &address3);
+    printf("%s added!\n", player3->username);
+    printf("%s\n", grid_toString(player3->sightGrid));
+    printf("%s\n", grid_toString(map_getVisibleMap(gameInfo_getMap(info), player3->sightGrid)));
+
 
     printf("******************* ADD SPECTATOR/GET SPECTATOR TESTING *******************\n");
     /* add spectator get spectator testing */
-    addr_t address3 = message_noAddr();
-    message_setAddr("localhost", "4343", &address3);
+    addr_t address4 = message_noAddr();
+    message_setAddr("localhost", "4343", &address4);
 
-    gameInfo_addSpectator(info, &address3);
+    gameInfo_addSpectator(info, &address4);
     playerInfo_t* spectator = gameInfo_getSpectator(info);
     printf("%s added!\n", spectator->username);
 
@@ -60,19 +70,25 @@ main(int argc, char* argv[])
     while (gameInfo_getScoreRemaining(info) > 0) {
         printf("GOLD remaining: %d\n", gameInfo_getScoreRemaining(info));
         int prevAmt;
-        int i = rand() % 2;
+        int i = rand() % 3;
         if (i == 0) {
             prevAmt = player1->score;
             gameInfo_pickupGold(info, player1->address);
             printf("%s picked up %d, score: %d\n", player1->username, player1->score - prevAmt, player1->score);
-        } else {
+        } else if (i == 1) {
             prevAmt = player2->score;
             gameInfo_pickupGold(info, player2->address);
             printf("%s picked up %d, score: %d\n", player2->username, player2->score - prevAmt, player2->score);
+        } else {
+            prevAmt = player3->score;
+            gameInfo_pickupGold(info, player3->address);
+            printf("%s picked up %d, score: %d\n", player3->username, player3->score - prevAmt, player3->score);
         }
         printf("\n");
     }
     printf("GOLD remaining: %d\n", gameInfo_getScoreRemaining(info));
+    gameInfo_removePlayer(info, player3->address);
+    printf("%s removed!\n", player3->username);
 
     printf("*********************** SCOREBOARD TESTING ********************\n");
     char* scoreboard = gameInfo_createScoreBoard(info);
@@ -97,7 +113,9 @@ main(int argc, char* argv[])
     printf("player2 updated!\n");
 
     gameInfo_removeSpectator(info);
+    printf("SPECTATOR REMOVED\n");
     gameInfo_delete(info);
+    printf("GAMEINFO DELETED\n");
     mem_free(baseGridString);
 
     printf("Test Passed!\n");

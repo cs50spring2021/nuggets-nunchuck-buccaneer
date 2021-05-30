@@ -25,9 +25,11 @@
 /********************** global types **********************/
 typedef struct gameInfo {
     playerInfo_t** players;
+    playerInfo_t** removedPlayers;
     int goldPiles;
     int goldScore;
     int numPlayers;
+    int inactivePlayers;
     map_t* map;
     int maxPlayers;
 } gameInfo_t;
@@ -44,10 +46,12 @@ gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUsers)
     }
 
     gameInfo_t* gameInfo = mem_malloc_assert(sizeof(gameInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
-    gameInfo->players = mem_calloc_assert(maxUsers, sizeof(playerInfo_t*), "gameInfo_newGameInfo: memory allocation error\n");
+    gameInfo->players = mem_calloc_assert(maxUsers, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
+    gameInfo->removedPlayers = mem_calloc_assert(maxUsers, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
     gameInfo->goldPiles = piles;
     gameInfo->goldScore = score;
     gameInfo->numPlayers = 0;
+    gameInfo->inactivePlayers = 0;
     gameInfo->map = map_new(mapFile);
     gameInfo->maxPlayers = maxUsers;
 
@@ -79,12 +83,8 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
 
     // handle for number of players
     if (info->numPlayers < (info->maxPlayers) - 1) {
-        // find first empty spot and set playerID to that
-        int i = 0;
-        while ((info->players)[i] != NULL) {
-            i++;
-        }
-        player->playerID = i;
+        // set playerID
+        player->playerID = info->numPlayers;
     }
     else {
         mem_free(player);
@@ -202,7 +202,33 @@ gameInfo_removePlayer(gameInfo_t* info, const addr_t* address)
 {
     // arg checking
     if (info == NULL) {
-        fprintf(stderr, "gameInfo_removePlayer: NULL/invalid gameInfo pointer or address pointer\n");
+        fprintf(stderr, "gameInfo_removePlayer: NULL gameInfo pointer\n");
+        exit (1);
+    }
+
+    /* remove player's functionality
+     * 
+     * this is done through:
+     *     moving the player from the players array to removedPlayers array
+     *     note: do NOT change numPlayers, as we only accept 25 *total*
+     *     increment number of inactive players in the game
+     */
+    playerInfo_t* removedPlayer = gameInfo_getPlayer(info, address);
+    info->players[removedPlayer->playerID] = NULL;
+    removedPlayer->playerID = info->inactivePlayers;
+    info->removedPlayers[removedPlayer->playerID] = removedPlayer;
+
+    info->inactivePlayers++;
+}
+
+/******************** gameInfo_deletePlayer ******************/
+/* see gameInfo.h for description */
+void 
+gameInfo_deletePlayer(gameInfo_t* info, const addr_t* address)
+{
+    // arg checking
+    if (info == NULL) {
+        fprintf(stderr, "gameInfo_deletePlayer: NULL/invalid gameInfo pointer or address pointer\n");
         exit (1);
     }
 
@@ -210,8 +236,8 @@ gameInfo_removePlayer(gameInfo_t* info, const addr_t* address)
     playerInfo_t* player = gameInfo_getPlayer(info, address);
     // remove player from list and change gameInfo
     int playerID = player->playerID;
-    // free from memory
 
+    // free from memory
     grid_delete(player->sightGrid);
     //Check if spectator
     if(player->username != NULL){
@@ -322,7 +348,6 @@ gameInfo_pickupGold(gameInfo_t* info, const addr_t* address)
         fprintf(stderr, "gameInfo_pickupGold: NULL gameInfo pointer or address pointer\n");
         return -1;
     }
-
     /* 
      * grab a random amount of gold: 
      *     add to player score
@@ -330,20 +355,18 @@ gameInfo_pickupGold(gameInfo_t* info, const addr_t* address)
      */
     // seed & goldAmt
     int goldAmt;
-    if (info->goldScore > (info->maxPlayers) - 1 && info->goldPiles > 1) {
-        int avgGoldScore = info->goldScore % info->goldPiles;
-        goldAmt = rand() % 60 + avgGoldScore;
-    } 
-    else {
+    double  avgGoldScore = (double)info->goldScore / (double)info->goldPiles;
+    int deviation = (int)(avgGoldScore / 1.5);
+    int halfDev = (int)((double)deviation / 2); 
+    goldAmt = ((rand() % deviation) - halfDev) + (int)avgGoldScore; 
+    if (info->goldPiles == 1) {
         goldAmt = info->goldScore;
     }
-
     // make changes
     playerInfo_t* player = gameInfo_getPlayer(info, address);
     player->score += goldAmt;
     info->goldPiles--;
     info->goldScore -= goldAmt;
-
     // gold added!
     return goldAmt;
 }
@@ -391,9 +414,15 @@ gameInfo_createScoreBoard(gameInfo_t* info)
     int addedPlayers = 0;
     playerInfo_t* scoreboard[info->numPlayers];
     for (int i = 0; i < info->maxPlayers; i++) {
-        if(info->players[i] != NULL){
-            if(info->players[i]->username != NULL){
+        if (info->players[i] != NULL){
+            if (info->players[i]->username != NULL){
                 scoreboard[addedPlayers] = info->players[i];
+                addedPlayers++;
+            }
+        }
+        if (info->removedPlayers[i] != NULL) {
+            if (info->removedPlayers[i]->username != NULL) {
+                scoreboard[addedPlayers] = info->removedPlayers[i];
                 addedPlayers++;
             }
         }
@@ -558,17 +587,35 @@ gameInfo_delete(gameInfo_t* info)
      */
 
     // free memory for all players and singular spectator
-    for (int i = 0; i < (info->maxPlayers); i++) {
+    for (int i = 0; i < info->maxPlayers; i++) {
         if(info->players[i] != NULL){
             if(info->players[i]->username != NULL){
-                gameInfo_removePlayer(info, info->players[i]->address);
+                gameInfo_deletePlayer(info, info->players[i]->address);
             }
         }
     }
     gameInfo_removeSpectator(info);
 
+    for (int i = 0; i < info->inactivePlayers; i++) {
+        if (info->removedPlayers[i] != NULL) {
+            if (info->removedPlayers[i]->username != NULL) {
+                // grab the player from removedPlayers
+                playerInfo_t* player = info->removedPlayers[i];
+
+                // remove similarly to as in deletePlayer
+                grid_delete(player->sightGrid);
+                pos2D_delete(player->pos);
+                mem_free(player->username);
+                mem_free(player);
+                info->removedPlayers[i] = NULL;
+                info->inactivePlayers--;
+            }
+        }
+    }
+
     // free the players array
     mem_free(info->players);
+    mem_free(info->removedPlayers);
 
     // free map memory and gameInfo memory
     map_delete(info->map);

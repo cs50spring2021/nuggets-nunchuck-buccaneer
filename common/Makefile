@@ -12,7 +12,7 @@ LIB = common.a
 LLIBS = $S/support.a
 
 #Uncomment for server tests
-#DEFINES = -DTESTING
+DEFINES = -DTESTING
 CFLAGS = -Wall -pedantic -std=c11 -ggdb $(DEFINES) -I$S
 CC = gcc
 MAKE = make
