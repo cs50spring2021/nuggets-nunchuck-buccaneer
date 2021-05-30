@@ -221,6 +221,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
   char* copiedMessage = mem_malloc_assert(sizeof(char) * (strlen(message) + 1), "handleMessage(): Mem message Copy\n");
   strcpy(copiedMessage, message);
   tokens = tokenizeMessage(copiedMessage);
+  fprintf(stderr, "tokens my guy: %s,  %c\n", tokens[0], *tokens[1]);
 
   // look at the first (0th) slot in each array to see what the command is
   if ((strcmp(tokens[0], "PLAY")) == 0) {
@@ -279,10 +280,11 @@ handleMessage(void* arg, const addr_t from, const char* message)
       mem_free(tokens);
      return leaveUser(gameinfo, from);
     } else {
+      bool out = movePlayer(gameinfo, from, *(tokens[1]));
       // sends a single-character keystroke typed by the user to the server.
       mem_free(copiedMessage);
       mem_free(tokens);
-      return movePlayer(gameinfo, from, *(tokens[1]));
+      return out;
     }
   }
 
