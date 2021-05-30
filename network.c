@@ -254,6 +254,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     ensureDimensions(pos2D);
     mem_free(copiedMessage);
     mem_free(tokens);
+    pos2D_delete(pos2D);
     return false;
   }
 
@@ -362,9 +363,11 @@ handleInput(void* arg) {
       if (key == array[i]) {
         sprintf(message, "KEY %c", key);
         message_send(*address, message);
+        free(message);
         return false;
       }
     }
+    free(message);  
   }
   // if a message wasn't sent, the key inputted was not a valid keystroke
   return false;
