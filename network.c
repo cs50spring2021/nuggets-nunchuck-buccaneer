@@ -27,6 +27,7 @@
 typedef struct loopArgs {
     gameInfo_t* gameinfo;
     char* playerID;
+    addr_t* addy;
 } loopArgs_t;
 
 /**************** global types ****************/
@@ -81,7 +82,12 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
 
   // allocating memory for the two variables
   serverAddress = mem_malloc_assert(sizeof(addr_t), "startNetworkClient(): Mem Server Address");
-
+  //Create args struct for loop
+  loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "startNetworkServer(): Mem Error for args");
+  args->playerID = mem_malloc_assert(sizeof(char), "startNetworkServer(): Mem error id");
+  args->gameinfo = NULL;
+  args->addy = serverAddress;
+  *(args->playerID) = '@';
   // if name is NULL, the user joining is a spectator.
   if (name == NULL) {
     // allocates memory for a "SPECTATE" message
@@ -94,14 +100,16 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
     // constructs the "PLAY" message with the user name included
     sprintf(message, "PLAY %s", name);
   }
-  
+  message_init(errorFile);
   // initalizes the message server
+  /*
   if ((*port = message_init(errorFile)) == 0) {
     // error occurred while initalizing the client's connection
     fprintf(stderr, "error: issue encountered while initializing the"
                        " client's connection\n");
     exit(3);
   }
+  */
   //Convert port to string
   char portStr[10];
   sprintf(portStr, "%d", *port);
@@ -115,7 +123,7 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
   message_send(*serverAddress, message);
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
-  if (!message_loop(NULL, 0, NULL, handleInput, 
+  if (!message_loop(args, 0, NULL, handleInput, 
                     handleMessage)) {
     // message_loop is false: a fatal error stopped it from continuing to loop.
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
@@ -336,7 +344,8 @@ handleInput(void* arg) {
                     'J', 'Y', 'U', 'B', 'N', 'Q'};
     int arrayItems = 17;              // number of items in the above array
     char* message;
-    addr_t* address = arg;
+    loopArgs_t* args = arg;
+    addr_t* address = args->addy;
 
     message = mem_malloc_assert((sizeof(char) * 6) + 1, "handleInput(): mem message");
     if (message == NULL) {
@@ -346,8 +355,8 @@ handleInput(void* arg) {
     }
 
     char key = '\0';
-    key = getch();
-
+    key = fgetc(stdin);
+    fprintf(stderr, "%c\n", key);
     // loops over all of the valid keystrokes that can be inputted
     for (int i = 0; i < arrayItems; i++) {
       if (key == array[i]) {
