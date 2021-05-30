@@ -133,6 +133,8 @@ grid_t* map_getVisibleMap(map_t* map, grid_t* sightGrid)
             outString[i] = baseString[i];
         } else if (sightString[i] == '2') {
             outString[i] = gameString[i];
+        } else if (sightString[i] == '3') {
+            outString[i] = '@';
         } else {
             fprintf(stderr, "map_getVisibleMap(): sightGrid contains unexpected "
                     "character '%c'\n", sightString[i]);
