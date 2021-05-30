@@ -62,8 +62,7 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
   *(args->playerID) = '@';
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
-  if (!message_loop(args, 0, NULL, handleInput, 
-                    handleMessage)) {
+  if (!message_loop(args, 0, NULL, handleInput, handleMessage)) {
     // message_loop is false: a fatal error stopped it from continuing to loop.
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
     exit(2);
@@ -280,10 +279,9 @@ handleMessage(void* arg, const addr_t from, const char* message)
      return leaveUser(gameinfo, from);
     } else {
       // sends a single-character keystroke typed by the user to the server.
-      movePlayer(gameinfo, from, *(tokens[1]));
       mem_free(copiedMessage);
       mem_free(tokens);
-      return false;
+      return movePlayer(gameinfo, from, *(tokens[1]));
     }
   }
 
