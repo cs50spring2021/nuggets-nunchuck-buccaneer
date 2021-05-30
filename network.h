@@ -75,6 +75,8 @@ void startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name
  * Output:
  *     * char** tokens - char** pointing to tokens from the original
  *       message string passed to the server.
+ * Caller is responsible for:
+ *       freeing tokens array
  */
 char** tokenizeMessage(char* message);
 

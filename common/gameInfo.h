@@ -36,13 +36,14 @@ typedef struct gameInfo gameInfo_t;
  *     total score remaining in the game,
  *     the mapFile .txt file passed in to display,
  *     seed for random functions in the game.
+ *     Maxusers for the game
  * We return:
  *     pointer to a gameInfo struct,
  *     NULL if an error occurred while creating the pointer.
  * Caller is responsible for:
  *     later calling gameInfo_delete.
  */
-gameInfo_t* gameInfo_newGameInfo(int piles, int score, char* mapFile);
+gameInfo_t* gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUsers);
 
 /******************* gameInfo_add Player ******************/
 /*

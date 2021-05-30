@@ -40,7 +40,7 @@ gameInfo_t* initializeGame(char* mapFile){
 	int piles = goldMinNumPiles + (rand() % (goldMaxNumPiles - goldMinNumPiles));
 	printf("PILES: %d\n", piles);
 	//Create a gameInfo
-	gameInfo_t* gameInfo = mem_assert(gameInfo_newGameInfo(piles, goldTotal, mapFile),"Server Main: mem gameInfo");
+	gameInfo_t* gameInfo = mem_assert(gameInfo_newGameInfo(piles, goldTotal, mapFile, maxPlayers),"Server Main: mem gameInfo");
 	//Add gold piles to the map
 	map_t* map = gameInfo_getMap(gameInfo);
 	for(int i = 0 ; i < piles; i++){
@@ -226,63 +226,60 @@ We Do:
 */
 void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName) 
 {
-  	// Check args
-  	if (gameinfo == NULL || playerName == NULL) {
-    	fprintf(stderr, "joinUser: Invalid Args passed");
-    	return;
-  	}
+  // Check arg
+  if (gameinfo == NULL) {
+    fprintf(stderr, "joinUser: Invalid Args passed");
+    return;
+  }
+  char* message;
+  int nrows = 0; 
+  int ncols = 0;
+  pos2D_t* pos;
 
-	// grab address pointer
-	const addr_t* playerP = &player;
-
-	char* message;
-	int nrows = 0; 
-	int ncols = 0;
-	pos2D_t* pos;
-
-	// gets the rows by columns from the pos2D struct
-	map_t* map = gameInfo_getMap(gameinfo);
-	pos2D_t* terminalSize = map_getWidthheight(map);
-	nrows = pos2D_getX(terminalSize);
-	ncols = pos2D_getY(terminalSize);
-	mem_free(terminalSize);
-	message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
-	if (message == NULL) {
-		fprintf(stderr, "error: issue encountered while allocating memory for"
-		" the message that's sent to the server.\n");
-		exit(1);
+  // gets the rows by columns from the pos2D struct
+  map_t* map = gameInfo_getMap(gameinfo);
+  pos2D_t* terminalSize = map_getWidthheight(map);
+  nrows = pos2D_getX(terminalSize);
+  ncols = pos2D_getY(terminalSize);
+  mem_free(terminalSize);
+  message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
+  if (message == NULL) {
+    fprintf(stderr, "error: issue encountered while allocating memory for"
+    " the message that's sent to the server.\n");
+    exit(1);
+  }
+  /* writes a message that'll be sent to the client to check the dimensions 
+  of their window */
+  sprintf(message, "GRID %d %d", nrows, ncols);
+  // sends the GRID message to the client
+  message_send(player, message);
+  // if player name is not provided, add the user as a spectator
+  if (playerName == NULL) {
+	fprintf(stderr,"JOIN SPEC");
+	gameInfo_addSpectator(gameinfo, player);
+  } else {
+	fprintf(stderr,"JOIN USER: %s\n", playerName);
+	// get the map
+	if ((map = gameInfo_getMap(gameinfo)) == NULL) {
+	  fprintf(stderr, "error: gameinfo provided is NULL.\n");
+      free(message);
+	  exit(2);
 	}
-
-	/* writes a message that'll be sent to the client to check the dimensions 
-	of their window */
-	sprintf(message, "GRID %d %d", nrows, ncols);
-	// sends the GRID message to the client
-	message_send(player, message);
-
-	// if player name is not provided, add the user as a spectator
-	if (playerName == NULL) {
-		gameInfo_addSpectator(gameinfo, playerP);
-	} else {
-		// get the map
-		if ((map = gameInfo_getMap(gameinfo)) == NULL) {
-		fprintf(stderr, "error: gameinfo provided is NULL.\n");
-		free(message);
-		exit(2);
-		}
-		// generate a random position to place the new user in the map
-		if ((pos = map_randomEmptySquare(map)) == NULL) {
-		fprintf(stderr, "error: map provided is NULL.\n");
-		free(message);
-		exit(3);
-		} 
-		// add the new user to the game info
-		gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
-
-		free(pos);
-	}
-	// send the updated gameinfo to all clients.
-	sendDisplays(gameinfo, message_noAddr(), 0);
-	free(message);
+	// generate a random position to place the new user in the map
+	if ((pos = map_randomEmptySquare(map)) == NULL) {
+	  fprintf(stderr, "error: map provided is NULL.\n");
+      free(message);
+	  exit(3);
+    } 
+	// add the new user to the game info
+	gameInfo_addPlayer(gameinfo, player, pos, playerName);
+	playerInfo_t* playerinfo = gameInfo_getPlayer(gameinfo, player);
+	map_setPlayerPos(map,pos,playerinfo);
+	free(pos);
+  }
+  // send the updated gameinfo to all clients.
+  sendDisplays(gameinfo, message_noAddr(), 0);
+  free(message);
 }
 
 /******************* leaveUser *********************
@@ -298,18 +295,34 @@ We return:
 */
 bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 {
-	// Check args
-	if (gameinfo == NULL) {
-		fprintf(stderr, "leaveUser: Invalid Args passed.\n");
-		return false;
-	}
+  fprintf(stderr,"LEAVE USER:\n");
+  // Check args
+  if (gameinfo == NULL) {
+	fprintf(stderr, "leaveUser: Invalid Args passed.\n");
+	return false;
+  }
+  map_t* map;
+  playerInfo_t* playerinfo;
+  pos2D_t* pos;
 
-	// grab address pointer
-	const addr_t* playerP = &player;
-
-	map_t* map;
-	playerInfo_t* playerinfo;
-	pos2D_t* pos;
+  // get the map
+  if ((map = gameInfo_getMap(gameinfo)) == NULL) {
+    fprintf(stderr, "error: gameinfo provided is NULL.\n");
+	exit(1);
+  }	
+  // gets the playerinfo struct
+  if ((playerinfo = gameInfo_getPlayer(gameinfo, player)) == NULL) {
+    fprintf(stderr, "error: couldn't retrieve playerinfo struct.\n");
+    exit(2);
+  }
+  // gets the position of the player that will be cleared on the map
+  pos = playerinfo->pos;
+  // clears the spot on the map
+  map_clearSpot(map, pos);
+  // player is removed from gameinfo
+  gameInfo_removePlayer(gameinfo, player);
+  // send the updated display to all players
+  sendDisplays(gameinfo, message_noAddr(), 0);
 
 	// get the map
 	if ((map = gameInfo_getMap(gameinfo)) == NULL) {

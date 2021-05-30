@@ -29,13 +29,14 @@ typedef struct gameInfo {
     int goldScore;
     int numPlayers;
     map_t* map;
+    int maxPlayers;
 } gameInfo_t;
 
 /*********************** global functions ************************/
 /****************** gameInfo_newGameInfo ******************/
 /* see gameInfo.h for description */
 gameInfo_t* 
-gameInfo_newGameInfo(int piles, int score, char* mapFile)
+gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUsers)
 {
     if (piles < 0 || score < 0 || mapFile == NULL) {
         fprintf(stderr, "gameInfo_newGameInfo: invalid/NULL input\n");
@@ -43,11 +44,12 @@ gameInfo_newGameInfo(int piles, int score, char* mapFile)
     }
 
     gameInfo_t* gameInfo = mem_malloc_assert(sizeof(gameInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
-    gameInfo->players = mem_calloc_assert(26, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
+    gameInfo->players = mem_calloc_assert(maxUsers, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
     gameInfo->goldPiles = piles;
     gameInfo->goldScore = score;
     gameInfo->numPlayers = 0;
     gameInfo->map = map_new(mapFile);
+    gameInfo->maxPlayers = maxUsers;
 
     return gameInfo;
 }
@@ -75,7 +77,7 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
     player->sightGrid = NULL;
 
     // handle for number of players
-    if (info->numPlayers < 25) {
+    if (info->numPlayers < (info->maxPlayers) - 1) {
         // find first empty spot and set playerID to that
         int i = 0;
         while ((info->players)[i] != NULL) {
@@ -133,7 +135,6 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
         pos2D_delete(otherPos);
         i++;
     }
-
     // update gameInfo struct
     info->players[player->playerID] = player;
     info->numPlayers++;
@@ -158,7 +159,7 @@ gameInfo_addSpectator(gameInfo_t* info, const addr_t* address)
     playerInfo_t* spectator = mem_malloc_assert(sizeof(playerInfo_t), "memory allocation error\n");
     spectator->pos = NULL;
     spectator->score = -1;
-    spectator->playerID = 25;
+    spectator->playerID = (info->maxPlayers) - 1;
     spectator->address = address;
     spectator->username = "spectator";
 
@@ -184,7 +185,7 @@ gameInfo_addSpectator(gameInfo_t* info, const addr_t* address)
 
     // check to see if there is already a spectator
     gameInfo_removeSpectator(info);
-    (info->players)[25] = spectator;
+    (info->players)[(info->maxPlayers) - 1] = spectator;
 }
 
 /****************** gameInfo_removePlayer *****************/
@@ -226,7 +227,7 @@ gameInfo_removeSpectator(gameInfo_t* info)
         playerInfo_t* spectator = gameInfo_getSpectator(info);
         grid_delete(spectator->sightGrid);
         mem_free(spectator);
-        (info->players)[25] = NULL;
+        (info->players)[(info->maxPlayers) - 1] = NULL;
     }
 }
 
@@ -243,10 +244,12 @@ gameInfo_getPlayer(gameInfo_t* info, const addr_t* address)
 
     // return player info for given address
     int i = 0;
-    while (i < info->numPlayers) {
-        if (message_eqAddr(*address, *((info->players)[i]->address))) {
-            playerInfo_t* player = (info->players)[i];
-            return player;
+    while (i < info->maxPlayers) {
+        if((info->players)[i] != NULL){
+            if (message_eqAddr(*address, *((info->players)[i]->address))) {
+                playerInfo_t* player = (info->players)[i];
+                return player;
+            }
         }
         i++;
     }
@@ -266,7 +269,7 @@ gameInfo_getSpectator(gameInfo_t* info)
         return NULL;
     }
 
-    return (info->players)[25];
+    return (info->players)[(info->maxPlayers) - 1];
 }
 
 /******************* gameInfo_getPlayerFromID *******************/
@@ -283,9 +286,11 @@ gameInfo_getPlayerFromID(gameInfo_t* info, int playerID)
     // search the players array and find the player with the given playerID
     int i = 0;
     while (i < info->numPlayers) {
-        if (playerID == (info->players)[i]->playerID) {
-            playerInfo_t* player = (info->players)[i];
-            return player;
+        if((info->players)[i] != NULL){
+            if (playerID == (info->players)[i]->playerID) {
+                playerInfo_t* player = (info->players)[i];
+                return player;
+            }
         }
         i++;
     }
@@ -310,7 +315,7 @@ gameInfo_pickupGold(gameInfo_t* info, const addr_t* address)
      */
     // seed & goldAmt
     int goldAmt;
-    if (info->goldScore > 25 && info->goldPiles > 1) {
+    if (info->goldScore > (info->maxPlayers) - 1 && info->goldPiles > 1) {
         int avgGoldScore = info->goldScore % info->goldPiles;
         goldAmt = rand() % 60 + avgGoldScore;
     } 
@@ -531,8 +536,10 @@ gameInfo_delete(gameInfo_t* info)
      */
 
     // free memory for all players and singular spectator
-    for (int i = 0; i < info->numPlayers; i++) {
-        gameInfo_removePlayer(info, info->players[i]->address);
+    for (int i = 0; i < (info->maxPlayers); i++) {
+        if(info->players[i] != NULL){
+            gameInfo_removePlayer(info, info->players[i]->address);
+        }
     }
     gameInfo_removeSpectator(info);
 

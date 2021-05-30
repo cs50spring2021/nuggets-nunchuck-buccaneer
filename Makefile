@@ -34,7 +34,7 @@ client: $(OBJS2) $(LLIBS)
 servertest: servertest.o network.o serverCmds.o clientCmds.o $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
-clienttest: $(OBJS2) $(LLIBS)
+clienttest: clienttest.o network.o serverCmds.o clientCmds.o $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 networktest: $(OBJS3) $(LLIBS)
