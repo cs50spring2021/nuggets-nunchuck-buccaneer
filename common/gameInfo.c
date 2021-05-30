@@ -44,7 +44,7 @@ gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUsers)
     }
 
     gameInfo_t* gameInfo = mem_malloc_assert(sizeof(gameInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
-    gameInfo->players = mem_calloc_assert(maxUsers, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
+    gameInfo->players = mem_calloc_assert(maxUsers, sizeof(playerInfo_t*), "gameInfo_newGameInfo: memory allocation error\n");
     gameInfo->goldPiles = piles;
     gameInfo->goldScore = score;
     gameInfo->numPlayers = 0;
@@ -258,6 +258,7 @@ gameInfo_getPlayer(gameInfo_t* info, const addr_t* address)
     int i = 0;
     while (i < info->maxPlayers) {
         if((info->players)[i] != NULL){
+            fprintf(stderr, "RAN\n");
             #ifndef TESTING
             if (message_eqAddr(*address, *((info->players)[i]->address))) {
             #endif
