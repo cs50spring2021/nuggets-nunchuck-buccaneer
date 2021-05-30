@@ -49,14 +49,21 @@ int main(){
 
 	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nLEAVE MESSAGE\n");
-	handleMessage(args, player1, "KEY Q");
+	if(handleMessage(args, player1, "KEY Q")){
+		fprintf(stderr, "END GAME\n");
+	} else {
+		fprintf(stderr, "CONTINUE GAME\n");
+	}
 
 	showMap(gameInfo);
 
 	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nLEAVE MESSAGE 2ND PLAYER\n");
-	handleMessage(args, player1, "KEY Q");
-
+	if(handleMessage(args, player1, "KEY Q")){
+		fprintf(stderr, "END GAME\n");
+	} else {
+		fprintf(stderr, "CONTINUE GAME\n");
+	}
 	showMap(gameInfo);
 
 	fprintf(stderr, "\n************************************\n");
@@ -68,6 +75,46 @@ int main(){
 	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nMOVE MESSAGE\n");
 	handleMessage(args, player1, "KEY l");
+
+	showMap(gameInfo);
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE AND COLLECT GOLD\n");
+	handleMessage(args, player1, "KEY l");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE AWAY\n");
+	handleMessage(args, player1, "KEY l");
+
+	
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nSPRINT DOWN\n");
+	handleMessage(args, player1, "KEY J");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE INTO WALL\n");
+	handleMessage(args, player1, "KEY j");
+	
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nSPRINT RIGHT\n");
+	handleMessage(args, player1, "KEY L");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE UP X3\n");
+	handleMessage(args, player1, "KEY k");
+	handleMessage(args, player1, "KEY k");
+	handleMessage(args, player1, "KEY k");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE RIGHT X3\n");
+	handleMessage(args, player1, "KEY l");
+	handleMessage(args, player1, "KEY l");
+	handleMessage(args, player1, "KEY l");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE INTO EMPTY\n");
+	handleMessage(args, player1, "KEY j");
+
 
 	//fprintf(stderr, "\nJOIN SPECTATOR\n");
 	//handleMessage(args, player1, "PLAY");

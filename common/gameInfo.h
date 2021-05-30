@@ -53,12 +53,12 @@ gameInfo_t* gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUse
  *     player address,
  *     player coordinates (pos2D).
  * We return:
- *     true if added,
- *     false if player limit already reached.
+ *     Player info if added
+ *     Null on an error;
  * Caller is responsible for:
  *     later calling gameInfo_removePlayer.
  */
-bool gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* username);
+playerInfo_t* gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* username);
 
 /****************** gameInfo_addSpectator *****************/
 /*

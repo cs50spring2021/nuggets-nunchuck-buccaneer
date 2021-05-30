@@ -124,10 +124,12 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldColl
 	char current = map_getGamePos(map, toPos);
 	//Check if out of bounds
 	if(current == '\0'){
+		pos2D_delete(toPos);
 		return false;
 	}
 	//Check if wall or empty space
 	if(current == '+' || current == ' '){
+		pos2D_delete(toPos);
 		return false;
 	}
 	//Check if gold
@@ -145,8 +147,7 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldColl
 		pos2D_set(displaced->pos, pos2D_getX(player->pos), pos2D_getY(player->pos));
 	}
 	//Move player to spot on map
-	pos2D_set(player->pos, pos2D_getX(toPos), pos2D_getY(toPos));
-	map_setPlayerPos(map, player->pos, player);
+	map_setPlayerPos(map, toPos, player);
 	if(movedPlayer != -1){
 		//Update displaced on the map
 		map_setPlayerPos(map, displaced->pos, displaced);
@@ -274,8 +275,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 	  exit(3);
     } 
 	// add the new user to the game info
-	gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
-	playerInfo_t* playerinfo = gameInfo_getPlayer(gameinfo, playerP);
+	playerInfo_t* playerinfo = gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
 	map_setPlayerPos(map,pos,playerinfo);
 	free(pos);
   }
@@ -362,13 +362,17 @@ static void sendDisplays(gameInfo_t* gameinfo, addr_t addr, int goldCollected){
 				sprintf(msgBuffer, "GOLD 0 -1 %d", scoreLeft);
 			} else {
 				//Check if it was this player that collected gold
+				#ifndef TESTING
 				if(message_eqAddr(addr, *(player->address))){
+				#endif
 					// Create the header message for collecting player
 					sprintf(msgBuffer, "GOLD %d %d %d", goldCollected, (player->score), scoreLeft);
+				#ifndef TESTING
 				} else {
 					// Create the header message for non-collecting player
 					sprintf(msgBuffer, "GOLD 0 %d %d", (player->score), scoreLeft);
 				}
+				#endif
 				if(!gameInfo_updateSightGrid(gameinfo, (player->address))){
 					fprintf(stderr, "sendDisplays: SightGrid update failed");
 				}

@@ -56,13 +56,13 @@ gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUsers)
 
 /******************* gameInfo_addPlayer *******************/
 /* see gameInfo.h for description */
-bool
+playerInfo_t*
 gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* username)
 {
     // arg checking
     if (info == NULL || pos == NULL || username == NULL) {
         fprintf(stderr, "gameInfo_addPlayer: invalid/NULL input\n");
-        return false;
+        return NULL;
     }
 
     // create a new player
@@ -138,7 +138,7 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
 
     // player created!
     mem_free(gridString);
-    return true;
+    return player;
 }
 
 /****************** gameInfo_addSpectator *****************/
