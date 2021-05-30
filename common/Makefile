@@ -11,7 +11,9 @@ OBJS = grid.o pos2D.o mem.o visibility.o file.o gameInfo.o map.o
 LIB = common.a
 LLIBS = $S/support.a
 
-CFLAGS = -Wall -pedantic -std=c11 -ggdb $(FLAGS) -I$S
+#Uncomment for server tests
+DEFINES = -DTESTING
+CFLAGS = -Wall -pedantic -std=c11 -ggdb $(DEFINES) -I$S
 CC = gcc
 MAKE = make
 
@@ -48,6 +50,7 @@ visibilitytest.o: pos2D.o grid.o grid.h pos2D.h file.h mem.h
 maptest.o: mem.o map.h grid.h
 gameInfo.o: gameInfo.h mem.h pos2D.h grid.h $S/message.h visibility.h map.h
 playerInfo.o: $S/message.h
+gameInfoTest.o: gameInfoTest.c gameInfo.h mem.h pos2D.h grid.h $S/message.h visibility.h map.h
 
 test-grid: gridtest
 	valgrind --leak-check=full --show-leak-kinds=all ./gridtest

@@ -26,4 +26,5 @@
 bool movePlayer(gameInfo_t* gameinfo, addr_t addr, char input);
 void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName);
 bool leaveUser(gameInfo_t* gameinfo, addr_t player);
+void endGame(gameInfo_t* gameinfo);
 gameInfo_t* initializeGame(char* mapFile);

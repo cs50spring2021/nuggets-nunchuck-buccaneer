@@ -18,7 +18,7 @@
 int
 main(int argc, char* argv[])
 {
-    gameInfo_t* info = gameInfo_newGameInfo(10, 500, "../maps/challenge.txt");
+    gameInfo_t* info = gameInfo_newGameInfo(10, 500, "../maps/challenge.txt", 26);
     
     // initialize player/spectator addresses
     srand(time(0));

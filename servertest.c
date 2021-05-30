@@ -33,44 +33,155 @@ int main(){
 	addr_t player1 = message_noAddr();
 	message_setAddr("26346", "122345", &player1);
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nINVALID MESSAGE\n");
 	handleMessage(args, player1, "Message");
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nJOIN MESSAGE\n");
 	handleMessage(args, player1, "PLAY Doodle");
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nJOIN MESSAGE\n");
 	handleMessage(args, player1, "PLAY Beep");
 
 	showMap(gameInfo);
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nLEAVE MESSAGE\n");
-	handleMessage(args, player1, "KEY Q");
+	if(handleMessage(args, player1, "KEY Q")){
+		fprintf(stderr, "END GAME\n");
+	} else {
+		fprintf(stderr, "CONTINUE GAME\n");
+	}
 
 	showMap(gameInfo);
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nLEAVE MESSAGE 2ND PLAYER\n");
-	handleMessage(args, player1, "KEY Q");
-
+	if(handleMessage(args, player1, "KEY Q")){
+		fprintf(stderr, "END GAME\n");
+	} else {
+		fprintf(stderr, "CONTINUE GAME\n");
+	}
 	showMap(gameInfo);
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nJOIN MESSAGE\n");
 	handleMessage(args, player1, "PLAY Ahh");
 
 	showMap(gameInfo);
 
+	fprintf(stderr, "\n************************************\n");
 	fprintf(stderr, "\nMOVE MESSAGE\n");
-	handleMessage(args, player1, "KEY Ahh");
+	handleMessage(args, player1, "KEY l");
 
-	//fprintf(stderr, "\nJOIN SPECTATOR\n");
-	//handleMessage(args, player1, "PLAY");
+	showMap(gameInfo);
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE AND COLLECT GOLD\n");
+	handleMessage(args, player1, "KEY l");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE AWAY\n");
+	handleMessage(args, player1, "KEY l");
+
+	
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nSPRINT DOWN\n");
+	handleMessage(args, player1, "KEY J");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE INTO WALL\n");
+	handleMessage(args, player1, "KEY j");
+	
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nSPRINT RIGHT\n");
+	handleMessage(args, player1, "KEY L");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE UP X3\n");
+	handleMessage(args, player1, "KEY k");
+	handleMessage(args, player1, "KEY k");
+	handleMessage(args, player1, "KEY k");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE RIGHT X3\n");
+	handleMessage(args, player1, "KEY l");
+	handleMessage(args, player1, "KEY l");
+	handleMessage(args, player1, "KEY l");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nMOVE INTO EMPTY\n");
+	handleMessage(args, player1, "KEY j");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nJOIN SPECTATOR\n");
+	handleMessage(args, player1, "SPECTATE");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nJOIN NEW SPECTATOR\n");
+	handleMessage(args, player1, "SPECTATE");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nLEAVE MESSAGE 3RD PLAYER\n");
+	if(handleMessage(args, player1, "KEY Q")){
+		fprintf(stderr, "END GAME\n");
+	} else {
+		fprintf(stderr, "CONTINUE GAME\n");
+	}
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nLEAVE MESSAGE SPECTATOR\n");
+	if(handleMessage(args, player1, "KEY Q")){
+		fprintf(stderr, "END GAME\n");
+	} else {
+		fprintf(stderr, "CONTINUE GAME\n");
+	}
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nJOIN SPECTATOR\n");
+	handleMessage(args, player1, "SPECTATE");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nJOIN A PLAYER\n");
+	handleMessage(args, player1, "PLAY uhoh");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nJOIN ANOTHER PLAYER\n");
+	handleMessage(args, player1, "PLAY alright");
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\n COLLIDE THEM\n");
+	handleMessage(args, player1, "KEY J");
+	handleMessage(args, player1, "KEY H");
+
+	
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nLEAVE MESSAGE\n");
+	if(handleMessage(args, player1, "KEY Q")){
+		fprintf(stderr, "END GAME\n");
+	} else {
+		fprintf(stderr, "CONTINUE GAME\n");
+	}
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\n MOVE TO CHECK PROPER DISPLACEMENT\n");
+	handleMessage(args, player1, "KEY U");
+	handleMessage(args, player1, "KEY J");
+
+
+	fprintf(stderr, "\n************************************\n");
+	fprintf(stderr, "\nEND GAME\n");
+	endGame(gameInfo);
 
 	mem_free(args->playerID);
 	mem_free(args);
-	gameInfo_delete(gameInfo);    
+	gameInfo_delete(gameInfo);
 }
 
 static void showMap(gameInfo_t* gameinfo){
+	fprintf(stderr, "CURRENT MAP\n");
 	map_t* map = gameInfo_getMap(gameinfo);
 	pos2D_t* mapWH = map_getWidthheight(map);
 	for(int y = 0 ; y < pos2D_getY(mapWH); y++){
