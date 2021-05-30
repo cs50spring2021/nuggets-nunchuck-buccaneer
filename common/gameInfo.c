@@ -57,10 +57,10 @@ gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUsers)
 /******************* gameInfo_addPlayer *******************/
 /* see gameInfo.h for description */
 bool
-gameInfo_addPlayer(gameInfo_t* info, addr_t address, pos2D_t* pos, char* username)
+gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* username)
 {
     // arg checking
-    if (info == NULL || pos == NULL || username == NULL) {
+    if (info == NULL || !message_isAddr(*address) || pos == NULL || username == NULL) {
         fprintf(stderr, "gameInfo_addPlayer: invalid/NULL input\n");
         return false;
     }
@@ -69,11 +69,12 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t address, pos2D_t* pos, char* usernam
     playerInfo_t* player = mem_malloc_assert(sizeof(playerInfo_t), "gameInfo_addPlayer: memory allocation error\n");
 
     // add all information
-    // player->pos = pos;
     player->pos = pos2D_new(pos2D_getX(pos), pos2D_getY(pos));
+    pos2D_delete(pos);
     player->score = 0;
     player->address = address;
     player->username = username;
+    player->sightGrid = NULL;
 
     // handle for number of players
     if (info->numPlayers < (info->maxPlayers) - 1) {
@@ -146,10 +147,10 @@ gameInfo_addPlayer(gameInfo_t* info, addr_t address, pos2D_t* pos, char* usernam
 /****************** gameInfo_addSpectator *****************/
 /* see gameInfo.h for description */
 void 
-gameInfo_addSpectator(gameInfo_t* info, addr_t address)
+gameInfo_addSpectator(gameInfo_t* info, const addr_t* address)
 {
     // arg checking
-    if (info == NULL) {
+    if (info == NULL || !message_isAddr(*address)) {
         fprintf(stderr, "gameInfo_addSpectator: NULL/invalid gameInfo pointer or address pointer\n");
         exit (1);
     }
@@ -190,10 +191,10 @@ gameInfo_addSpectator(gameInfo_t* info, addr_t address)
 /****************** gameInfo_removePlayer *****************/
 /* see gameInfo.h for description */
 void 
-gameInfo_removePlayer(gameInfo_t* info, addr_t address)
+gameInfo_removePlayer(gameInfo_t* info, const addr_t* address)
 {
     // arg checking
-    if (info == NULL) {
+    if (info == NULL || !message_isAddr(*address)) {
         fprintf(stderr, "gameInfo_removePlayer: NULL/invalid gameInfo pointer or address pointer\n");
         exit (1);
     }
@@ -233,10 +234,10 @@ gameInfo_removeSpectator(gameInfo_t* info)
 /******************* gameInfo_getPlayer *******************/
 /* see gameInfo.h for description */
 playerInfo_t* 
-gameInfo_getPlayer(gameInfo_t* info, addr_t address)
+gameInfo_getPlayer(gameInfo_t* info, const addr_t* address)
 {
     // arg checking
-    if (info == NULL) {
+    if (info == NULL || !message_isAddr(*address)) {
         fprintf(stderr, "gameInfo_getPlayer: NULL gameInfo pointer or address pointer\n");
         return NULL;
     }
@@ -245,7 +246,7 @@ gameInfo_getPlayer(gameInfo_t* info, addr_t address)
     int i = 0;
     while (i < info->maxPlayers) {
         if((info->players)[i] != NULL){
-            if (message_eqAddr(address, (info->players)[i]->address)) {
+            if (message_eqAddr(*address, *((info->players)[i]->address))) {
                 playerInfo_t* player = (info->players)[i];
                 return player;
             }
@@ -299,10 +300,10 @@ gameInfo_getPlayerFromID(gameInfo_t* info, int playerID)
 /****************** gameInfo_pickupGold *******************/
 /* see gameInfo.h for description */
 int
-gameInfo_pickupGold(gameInfo_t* info, addr_t address)
+gameInfo_pickupGold(gameInfo_t* info, const addr_t* address)
 {
     // arg checking
-    if (info == NULL) {
+    if (info == NULL || !message_isAddr(*address)) {
         fprintf(stderr, "gameInfo_pickupGold: NULL gameInfo pointer or address pointer\n");
         return -1;
     }
@@ -421,13 +422,41 @@ gameInfo_getMap(gameInfo_t* info)
     return info->map;
 }
 
-/**************** gameInfo_updateSightGrid ****************/
+/**************** gameInfo_getNumPlayer *****************/
 /* see gameInfo.h for description */
-bool 
-gameInfo_updateSightGrid(gameInfo_t* info, addr_t address)
+int 
+gameInfo_getNumPlayers(gameInfo_t* info)
 {
     // arg checking
     if (info == NULL) {
+        fprintf(stderr, "gameInfo_getNumPlayers: NULL gameInfo pointer\n");
+        return -1;
+    }
+
+    return info->numPlayers;
+}
+
+/******************* gameInfo_getGoldPiles *******************/
+/* see gameInfo.h for description */
+int 
+gameInfo_getGoldPiles(gameInfo_t* info)
+{
+    // arg checking
+    if (info == NULL) {
+        fprintf(stderr, "gameInfo_getGoldPiles: NULL gameInfo pointer\n");
+        return -1;
+    }
+
+    return info->goldPiles;
+}
+
+/**************** gameInfo_updateSightGrid ****************/
+/* see gameInfo.h for description */
+bool 
+gameInfo_updateSightGrid(gameInfo_t* info, const addr_t* address)
+{
+    // arg checking
+    if (info == NULL || !message_isAddr(*address)) {
         fprintf(stderr, "gameInfo_updateSightGrid: NULL/invalid gameInfo pointer or address pointer\n");
         return false;
     }
@@ -484,20 +513,6 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t address)
     mem_free(gridString);
     // successfully updated!
     return true;
-}
-
-/******************* gameInfo_getGoldPiles *******************/
-/* see gameInfo.h for description */
-int 
-gameInfo_getGoldPiles(gameInfo_t* info)
-{
-    // arg checking
-    if (info == NULL) {
-        fprintf(stderr, "gameInfo_getGoldPiles: NULL gameInfo pointer\n");
-        return -1;
-    }
-
-    return info->goldPiles;
 }
 
 /********************* gameInfo_delete ********************/

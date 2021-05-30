@@ -9,9 +9,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <string.h>
+#include "server.c"
 #include "network.h"
-#include "serverCmds.h"
+#include "gameInfo.h"
 
 typedef struct loopArgs {
     gameInfo_t* gameinfo;

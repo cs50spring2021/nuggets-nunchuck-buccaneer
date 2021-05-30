@@ -58,7 +58,7 @@ gameInfo_t* gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUse
  * Caller is responsible for:
  *     later calling gameInfo_removePlayer.
  */
-bool gameInfo_addPlayer(gameInfo_t* info, addr_t address, pos2D_t* pos, char* username);
+bool gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* username);
 
 /****************** gameInfo_addSpectator *****************/
 /*
@@ -72,7 +72,7 @@ bool gameInfo_addPlayer(gameInfo_t* info, addr_t address, pos2D_t* pos, char* us
  * Caller is responsible for:
  *     nothing.
  */
-void gameInfo_addSpectator(gameInfo_t* info, addr_t address);
+void gameInfo_addSpectator(gameInfo_t* info, const addr_t* address);
 
 /****************** gameInfo_removePlayer *****************/
 /*
@@ -86,7 +86,7 @@ void gameInfo_addSpectator(gameInfo_t* info, addr_t address);
  * Caller is responsible for:
  *     nothing.
  */
-void gameInfo_removePlayer(gameInfo_t* info, addr_t address);
+void gameInfo_removePlayer(gameInfo_t* info, const addr_t* address);
 
 /****************** gameInfo_removeSpectator *****************/
 /*
@@ -113,7 +113,7 @@ void gameInfo_removePlayer(gameInfo_t* info, addr_t address);
  * Caller is responsible for:
  *     nothing.
  */
-playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, addr_t address);
+playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, const addr_t* address);
 
 /******************* gameInfo_getSpectator *******************/
 /*
@@ -154,7 +154,7 @@ playerInfo_t* gameInfo_getPlayerFromID(gameInfo_t* info, int playerID);
  * Caller is responsible for:
  *     nothing.
  */
-int gameInfo_pickupGold(gameInfo_t* info, addr_t address);
+int gameInfo_pickupGold(gameInfo_t* info, const addr_t* address);
 
 /*************** gameInfo_createScoreBoard ****************/
 /*
@@ -195,6 +195,19 @@ int gameInfo_getScoreRemaining(gameInfo_t* info);
  */
 map_t* gameInfo_getMap(gameInfo_t* info);
 
+/**************** gameInfo_getNumPlayers *****************/
+/*
+ * Grabs the number of players in the game
+ * Caller provides:
+ *     desired gameInfo struct pointer.
+ * We return:
+ *     int stored w number of players.
+ *     return -1 if null pointer.
+ * Caller is responsible for:
+ *     nothing.
+ */
+int gameInfo_getNumPlayers(gameInfo_t* info);
+
 /**************** gameInfo_updateSightGrid ****************/
 /* 
  * Updates sightGrid for the player
@@ -207,13 +220,13 @@ map_t* gameInfo_getMap(gameInfo_t* info);
  * Caller is responsible for:
  *     nothing.
  */
-bool gameInfo_updateSightGrid(gameInfo_t* info, addr_t address);
+bool gameInfo_updateSightGrid(gameInfo_t* info, const addr_t* address);
 
 /******************* gameInfo_getGoldPiles *******************/
 /*
  * Getter for gold amount in gameInfo struct
  * Caller provides:
- *     desired gameInfo struct,
+ *     desired gameInfo struct.
  * We return:
  *     gold piles left over
  * Caller is responsible for:

@@ -64,7 +64,7 @@ Vtestserver: servertest
 	$(VALGRIND) ./servertest
 
 testclient: clienttest
-	./clienttest
+	$(VALGRIND) ./clienttest
 
 
 testnetwork: networktest
