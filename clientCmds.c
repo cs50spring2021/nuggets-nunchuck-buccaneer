@@ -271,6 +271,5 @@ quitClient(char* explanation)
     // exit Ncurses window
     endwin();
     printf("%s\n", explanation);
-    free(explanation);
 }
 
