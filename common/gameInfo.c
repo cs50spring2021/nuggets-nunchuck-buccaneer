@@ -526,7 +526,6 @@ gameInfo_updateSightGrid(gameInfo_t* info, const addr_t* address)
         return false;
     }
     char* gridString = grid_toString(player->sightGrid);
-
     // loop to set all non '\n' chars to 0, 1, or 2
     char currSpot;
     int height = 0;
@@ -552,7 +551,7 @@ gameInfo_updateSightGrid(gameInfo_t* info, const addr_t* address)
             if (visibility_getVisibility(player->pos, otherPos, map_getBaseGrid(info->map)) && currSpot != '2') {
                 grid_setPos(player->sightGrid, otherPos, '2');
             }
-            else if (!visibility_getVisibility(player->pos, otherPos, map_getBaseGrid(info->map)) && currSpot == '2') {
+            else if (!visibility_getVisibility(player->pos, otherPos, map_getBaseGrid(info->map)) && (currSpot == '2' || currSpot == '3')) {
                 grid_setPos(player->sightGrid, otherPos, '1');
             }
             x++;
@@ -560,6 +559,9 @@ gameInfo_updateSightGrid(gameInfo_t* info, const addr_t* address)
         pos2D_delete(otherPos);
         i++;
     }
+    
+    // set the current players position to '3'
+    grid_setPos(player->sightGrid, player->pos, '3');
 
     mem_free(gridString);
     // successfully updated!
