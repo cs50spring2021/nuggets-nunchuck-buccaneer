@@ -12,7 +12,7 @@ LIBS = -lm -lncurses
 LLIBS = $C/common.a $S/support.a
 
 #Uncomment for server tests
-DEFINES = -DTESTING
+#DEFINES = -DTESTING
 CFLAGS = -Wall -pedantic -std=c11 -ggdb $(DEFINES) -I$S -I$C
 CC = gcc
 MAKE = make
