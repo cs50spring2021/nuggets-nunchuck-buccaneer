@@ -520,12 +520,12 @@ void endGame(gameInfo_t* gameinfo)
 		#endif
     message_send(playerAddress, message);
 
-		//If spectator
-		if (i == 25) {
-			gameInfo_removeSpectator(gameinfo);
-		} else {
-			gameInfo_removePlayer(gameinfo, player->address);
-		}
+		// //If spectator
+		// if (i == 25) {
+		// 	gameInfo_removeSpectator(gameinfo);
+		// } else {
+		// 	gameInfo_removePlayer(gameinfo, player->address);
+		// }
   }
   mem_free(message);
 }
