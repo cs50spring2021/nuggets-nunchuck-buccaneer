@@ -12,12 +12,12 @@ LIBS = -lm -lncurses
 LLIBS = $C/common.a $S/support.a
 
 #Uncomment for server tests
-DEFINES = -DTESTING
+#DEFINES = -DTESTING
 CFLAGS = -Wall -pedantic -std=c11 -ggdb $(DEFINES) -I$S -I$C
 CC = gcc
 MAKE = make
 # for memory-leak tests
-VALGRIND = valgrind --leak-check=full --show-leak-kinds=all
+VALGRIND = valgrind --leak-check=full --show-leak-kinds=all -v
 
 all:
 	make -C support

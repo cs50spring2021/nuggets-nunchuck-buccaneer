@@ -436,7 +436,7 @@ gameInfo_getMap(gameInfo_t* info)
 {
     // arg checking
     if (info == NULL) {
-        fprintf(stderr, "gmaeInfo_getMap: NULL gameInfo pointer\n");
+        fprintf(stderr, "gameInfo_getMap: NULL gameInfo pointer\n");
         return NULL;
     }
 
