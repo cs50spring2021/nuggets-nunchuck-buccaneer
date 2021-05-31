@@ -393,12 +393,16 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 }
 
 /******************* sendDisplays *********************
-Send visible map (get it via the maps getVisibleMap) and the relevant information that's displayed at the top of the screen. To all players
+Send visible map (get it via the maps getVisibleMap) and the relevant 
+information that's displayed at the top of the screen. To all players
 Caller Provides:
-	A gameInfo to use for the header and to get the map from and to get the playerInfos from
+	A gameInfo to use for the header and to get the map from and to get the 
+	playerInfos from
 We Do:
-	Send each player a line containing their current nuggets and the nuggets left to collect in the game with their visable map contained below 
-	it. To get the visible map we use the sightmaps from each playerinfo struct to combine into get VisibleMap
+	Send each player a line containing their current nuggets and the nuggets 
+	left to collect in the game with their visable map contained below it. To get
+	the visible map we use the sightmaps from each playerinfo struct to combine
+	into get VisibleMap
 */
 
 static void sendDisplays(gameInfo_t* gameinfo, addr_t addr, int goldCollected)
@@ -510,8 +514,7 @@ void endGame(gameInfo_t* gameinfo)
     }
     // grab the player address
 		if (player->address == NULL) {
-			fprintf(stderr, "WTF");
-		
+			fprintf(stderr, "Address is NULL");
 		}
     playerAddress = *(player->address);
     // send the quit message to the specific player
@@ -520,12 +523,12 @@ void endGame(gameInfo_t* gameinfo)
 		#endif
     message_send(playerAddress, message);
 
-		//If spectator
-		if (i == 25) {
-			gameInfo_removeSpectator(gameinfo);
-		} else {
-			gameInfo_removePlayer(gameinfo, player->address);
-		}
+		// //If spectator
+		// if (i == 25) {
+		// 	gameInfo_removeSpectator(gameinfo);
+		// } else {
+		// 	gameInfo_removePlayer(gameinfo, player->address);
+		// }
   }
   mem_free(message);
 }

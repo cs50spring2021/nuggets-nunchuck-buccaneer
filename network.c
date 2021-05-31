@@ -62,8 +62,7 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
   *(args->playerID) = '@';
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
-  if (!message_loop(args, 0, NULL, handleInput, 
-                    handleMessage)) {
+  if (!message_loop(args, 0, NULL, handleInput, handleMessage)) {
     // message_loop is false: a fatal error stopped it from continuing to loop.
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
     exit(2);
@@ -222,6 +221,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
   char* copiedMessage = mem_malloc_assert(sizeof(char) * (strlen(message) + 1), "handleMessage(): Mem message Copy\n");
   strcpy(copiedMessage, message);
   tokens = tokenizeMessage(copiedMessage);
+  fprintf(stderr, "tokens my guy: %s,  %c\n", tokens[0], *tokens[1]);
 
   // look at the first (0th) slot in each array to see what the command is
   if ((strcmp(tokens[0], "PLAY")) == 0) {
@@ -254,6 +254,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     ensureDimensions(pos2D);
     mem_free(copiedMessage);
     mem_free(tokens);
+    pos2D_delete(pos2D);
     return false;
   }
 
@@ -279,11 +280,11 @@ handleMessage(void* arg, const addr_t from, const char* message)
       mem_free(tokens);
      return leaveUser(gameinfo, from);
     } else {
+      bool out = movePlayer(gameinfo, from, *(tokens[1]));
       // sends a single-character keystroke typed by the user to the server.
-      movePlayer(gameinfo, from, *(tokens[1]));
       mem_free(copiedMessage);
       mem_free(tokens);
-      return false;
+      return out;
     }
   }
 
@@ -362,9 +363,11 @@ handleInput(void* arg) {
       if (key == array[i]) {
         sprintf(message, "KEY %c", key);
         message_send(*address, message);
+        free(message);
         return false;
       }
     }
+    free(message);  
   }
   // if a message wasn't sent, the key inputted was not a valid keystroke
   return false;
