@@ -66,8 +66,8 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
     exit(2);
   }
-  free(args);
   message_done();
+  mem_free(args);
 }
 
 /**************** startNetworkClient() ****************/
@@ -281,10 +281,6 @@ handleMessage(void* arg, const addr_t from, const char* message)
       // sends a single-character keystroke typed by the user to the server.
       mem_free(copiedMessage);
       mem_free(tokens);
-      if (out) {
-        mem_free(argumentStruct->playerID);
-        mem_free(argumentStruct);
-      }
       return out;
     }
   }

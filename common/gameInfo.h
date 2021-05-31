@@ -58,7 +58,7 @@ gameInfo_t* gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUse
  * Caller is responsible for:
  *     later calling gameInfo_removePlayer.
  */
-playerInfo_t* gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* username);
+playerInfo_t* gameInfo_addPlayer(gameInfo_t* info,  addr_t* address, pos2D_t* pos, char* username);
 
 /****************** gameInfo_addSpectator *****************/
 /*
@@ -72,7 +72,7 @@ playerInfo_t* gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_
  * Caller is responsible for:
  *     nothing.
  */
-void gameInfo_addSpectator(gameInfo_t* info, const addr_t* address);
+void gameInfo_addSpectator(gameInfo_t* info, addr_t* address);
 
 /****************** gameInfo_removePlayer *****************/
 /*
@@ -86,7 +86,7 @@ void gameInfo_addSpectator(gameInfo_t* info, const addr_t* address);
  * Caller is responsible for:
  *     nothing.
  */
-void gameInfo_removePlayer(gameInfo_t* info, const addr_t* address);
+void gameInfo_removePlayer(gameInfo_t* info, addr_t* address);
 
 /******************** gameInfo_deletePlayer ******************/
 /*
@@ -100,7 +100,7 @@ void gameInfo_removePlayer(gameInfo_t* info, const addr_t* address);
  * Caller is responsible for:
  *     nothing.
  */
-void gameInfo_deletePlayer(gameInfo_t* info, const addr_t* address);
+void gameInfo_deletePlayer(gameInfo_t* info, addr_t* address);
 
 /****************** gameInfo_removeSpectator *****************/
 /*
@@ -127,7 +127,7 @@ void gameInfo_deletePlayer(gameInfo_t* info, const addr_t* address);
  * Caller is responsible for:
  *     nothing.
  */
-playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, const addr_t* address);
+playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, addr_t* address);
 
 /******************* gameInfo_getSpectator *******************/
 /*
@@ -168,7 +168,7 @@ playerInfo_t* gameInfo_getPlayerFromID(gameInfo_t* info, int playerID);
  * Caller is responsible for:
  *     nothing.
  */
-int gameInfo_pickupGold(gameInfo_t* info, const addr_t* address);
+int gameInfo_pickupGold(gameInfo_t* info, addr_t* address);
 
 /*************** gameInfo_createScoreBoard ****************/
 /*
@@ -247,7 +247,7 @@ int gameInfo_getActivePlayers(gameInfo_t* info);
  * Caller is responsible for:
  *     nothing.
  */
-bool gameInfo_updateSightGrid(gameInfo_t* info, const addr_t* address);
+bool gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address);
 
 /******************* gameInfo_getGoldPiles *******************/
 /*
