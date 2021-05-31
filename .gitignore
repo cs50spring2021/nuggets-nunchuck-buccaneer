@@ -44,3 +44,5 @@ clienttest
 networktest
 servertest
 quickcompile.sh
+testing.out
+client.log

@@ -18,7 +18,7 @@ const int goldMaxNumPiles = 30; 		// maximum number of gold piles
 
 static void sendDisplays(gameInfo_t* gameinfo, addr_t Player, int goldCollected);
 static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldCollected);
-static pos2D_t* dirToMovement(pos2D_t* start, char dir);
+static pos2D_t* dirToMovement(pos2D_t* start, char dir, pos2D_t* mapWH);
 
 /******************* initializeGame *********************
 Makes the map places gold on the map and initializes a gameInfo struct
@@ -124,14 +124,15 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldColl
 
 	//Find the pos we need to go to 
 	playerInfo_t* player = gameInfo_getPlayer(gameinfo, addrP);
-	pos2D_t* toPos = dirToMovement(player->pos, dir);
 	map_t* map = gameInfo_getMap(gameinfo);
-	char current = map_getGamePos(map, toPos);
-	//Check if out of bounds
-	if (current == '\0') {
-		pos2D_delete(toPos);
+	pos2D_t* mapWH = map_getWidthheight(map);
+	pos2D_t* toPos = dirToMovement(player->pos, dir, mapWH);
+	//Check in Bounds
+	if(toPos == NULL){
 		return false;
 	}
+	pos2D_delete(mapWH);
+	char current = map_getGamePos(map, toPos);
 	//Check if wall or empty space
 	if (current == '+' || current == ' ') {
 		pos2D_delete(toPos);
@@ -173,50 +174,63 @@ We Return:
 Caller is Responsible For:
 	Later freeing the returned pos
 */
-static pos2D_t* dirToMovement(pos2D_t* start, char dir){
+static pos2D_t* dirToMovement(pos2D_t* start, char dir, pos2D_t* mapWH){
 	//Change Args
 	if (start == NULL) {
 		fprintf(stderr, "dirToMovement: Invalid Args passed");
 		return NULL;
 	}
+	int x = pos2D_getX(start);
+	int y = pos2D_getY(start);
 	//Get direction and return a new pos that is the appropriate spot to move
 	switch(dir) {
 		case 'k'  :
 			//UP
-			return mem_assert(pos2D_new(pos2D_getX(start), pos2D_getY(start) - 1), "dirToMovement: Pos Memory");
+			y--;
       		break;
 		case 'l'  :
 			//RIGHT
-			return mem_assert(pos2D_new(pos2D_getX(start) + 1, pos2D_getY(start)), "dirToMovement: Pos Memory");
+			x++;
       		break;
 		case 'j'  :
 			//DOWN
-			return mem_assert(pos2D_new(pos2D_getX(start), pos2D_getY(start) + 1), "dirToMovement: Pos Memory");
+			y++;
       		break;
 		case 'h'  :
 			//LEFT
-			return mem_assert(pos2D_new(pos2D_getX(start) - 1, pos2D_getY(start)), "dirToMovement: Pos Memory");
+			x--;
       		break;
 		case 'u'  :
 			//UPRIGHT
-			return mem_assert(pos2D_new(pos2D_getX(start) + 1, pos2D_getY(start) - 1), "dirToMovement: Pos Memory");
+			y--;
+			x++;
       		break;
 		case 'n'  :
 			//DOWNRIGHT
-			return mem_assert(pos2D_new(pos2D_getX(start) + 1, pos2D_getY(start) + 1), "dirToMovement: Pos Memory");
+			y++;
+			x++;
       		break;
 		case 'y'  :
 			//UPLEFT
-			return mem_assert(pos2D_new(pos2D_getX(start) - 1, pos2D_getY(start) - 1), "dirToMovement: Pos Memory");
+			y--;
+			x--;
       		break;
 		case 'b'  :
 			//DOWNLEFT
-			return mem_assert(pos2D_new(pos2D_getX(start) - 1, pos2D_getY(start) + 1), "dirToMovement: Pos Memory");
+			y++;
+			x--;
       		break;
 		default : 
 			fprintf(stderr, "shortMove: Invalid movement key");
 			return NULL;
 	}
+	if(x < 0 || x >= pos2D_getX(mapWH)){
+		return NULL;
+	}
+	if(y < 0 || y >= pos2D_getY(mapWH)){
+		return NULL;
+	}
+	return mem_assert(pos2D_new(x, y), "dirToMovement: Pos Memory");
 }
 
 /******************* joinUser *********************
