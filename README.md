@@ -19,3 +19,8 @@ See the [maps](maps/README.md) for some draft maps.
 Assuming that player names don't have any spaces in them
 Specs say optionally including spaces but unclear whether player has the option or we as the designers have the option
 we assumed it was us that had the option.
+
+## Spec Differ
+
+Spec asks for ensure dimensions to ensure large enough for the grid but we instead check that the num of cols is both enough
+for the grid and the header messages
