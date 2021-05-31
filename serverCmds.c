@@ -94,6 +94,7 @@ bool movePlayer(gameInfo_t* gameinfo, addr_t addr, char input){
 	sendDisplays(gameinfo, addr, goldCollected);
 	//Check for end
 	if (gameInfo_getGoldPiles(gameinfo) == 0) {
+		printf("Server Ended: Gold Piles All Gone\n");
 		endGame(gameinfo);
 		return true;
 	}
@@ -401,6 +402,7 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 
 	// checks to see if the last player has left the server
 	if (gameInfo_getNumPlayers(gameinfo) == 0) {
+		printf("Server Ended: Active Players All Gone\n");
 		return true;
 	}
 	return false;
