@@ -318,8 +318,12 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		
 		/* replace any character for which isgraph() and isblank() are both false
 		with an underscore */
+		/* use this to check for spaces as well */
 		for (int i = 0; i < strlen(playerName); i++) {
 			if (isgraph(playerName[i]) == 0 && isblank(playerName[i]) != 0) {
+				playerName[i] = '_';
+			}
+			if (isspace(playerName[i]) == 0) {
 				playerName[i] = '_';
 			}
 		}
@@ -327,6 +331,14 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		// add the new user to the game info
 		playerInfo_t* playerinfo = gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
 		map_setPlayerPos(map,pos,playerinfo);
+		//Create OK message
+		message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
+		 /* writes a message that'll be sent to the client to check the dimensions 
+ 		 of their window */
+  		sprintf(message, "OK %c", playerinfo->playerID + 65);
+
+  		// sends the OK message to the client
+ 		message_send(player, message);
 
 		/* writes a message that'll be sent to the client to check the dimensions 
  		of their window */

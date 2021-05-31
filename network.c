@@ -40,6 +40,7 @@ typedef struct loopArgs {
 /**************** local functions ****************/
 /* not visible outside this file */
 bool str2int(const char string[], int* number);
+static int numSlots(char** arr);
 
 /**************** startNetworkServer() ****************/
 /* see network.h for description */
@@ -67,8 +68,8 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
     exit(2);
   }
-  free(args);
   message_done();
+  free(args);
 }
 
 /**************** startNetworkClient() ****************/
@@ -153,6 +154,9 @@ tokenizeMessage(char* message)
   // allocates memory for the array (tokens array has a max of 4 indices)
   tokens = mem_malloc_assert(4 * sizeof(char*), "error: issue "
               "encountered while allocating memory for the array.\n");
+  for (int i = 0; i < 4; i++) {
+    tokens[i] = NULL;
+  }
   
   /* this loop is used to read the string and break it into its individual
   words. It separates words by spaces and also looks out for null characters.
@@ -223,6 +227,14 @@ handleMessage(void* arg, const addr_t from, const char* message)
   // look at the first (0th) slot in each array to see what the command is
   if ((strcmp(tokens[0], "PLAY")) == 0) {
     // if the command is "PLAY", send a message to server with username
+    if (tokens[1] == NULL) {
+      fprintf(stderr, "ERROR: player name must be provided\n");
+      mem_free(copiedMessage);
+      mem_free(tokens);
+      return false;
+    }
+
+    // join the user if a name has been sent
     joinUser(gameinfo, from, tokens[1]);
     mem_free(copiedMessage);
     mem_free(tokens);
@@ -243,9 +255,34 @@ handleMessage(void* arg, const addr_t from, const char* message)
     int ncols = 0; 
     pos2D_t* pos2D = NULL;
 
+   /*
+    * check to see if tokens has 3 total args
+    * make sure that int chars* are passed, not alphabetical chars*
+    */
+    if (numSlots(tokens) != 3) {
+      fprintf(stderr, "ERROR: invalid number of args passed in\n");
+      mem_free(copiedMessage);
+      mem_free(tokens);
+      return false;
+    }
+
     // converts the string dimensions of the window into integers
-    str2int(tokens[1], &nrows);
-    str2int(tokens[2], &ncols);
+    if (!str2int(tokens[1], &nrows) || !str2int(tokens[2], &ncols)) {
+      fprintf(stderr, "ERROR: non-integer value passed for\n");
+      mem_free(copiedMessage);
+      mem_free(tokens);
+      return false;
+    }
+    // str2int(tokens[1], &nrows);
+    // str2int(tokens[2], &ncols);
+
+    // dimension checking
+    if (nrows < 0 || ncols < 0) {
+      fprintf(stderr, "ERROR: negative value(s) passed for dimensions\n");
+      mem_free(copiedMessage);
+      mem_free(tokens);
+      return false;
+    }
 
     pos2D = pos2D_new(nrows, ncols);
     ensureDimensions(pos2D);
@@ -274,19 +311,37 @@ handleMessage(void* arg, const addr_t from, const char* message)
   }
 
   if ((strcmp(tokens[0], "KEY")) == 0) {
+    // check to ensure only two args
+    if (numSlots(tokens) != 2) {
+      fprintf(stderr, "ERROR: invalid number of arguments passed\n");
+      mem_free(copiedMessage);
+      mem_free(tokens);
+      return false;
+    }
+    // check for quit message
     if ((strcmp(tokens[1], "Q")) == 0) {
       mem_free(copiedMessage);
       mem_free(tokens);
      return leaveUser(gameinfo, from);
     } else {
+      char validKeystrokes[] = {'h', 'l', 'k', 'j', 'y', 'u', 'b', 'n', 'H', 'L', 'K',
+                    'J', 'Y', 'U', 'B', 'N', 'Q'};
+      // error checking: see if keystroke is valid (in above array of 17 chars)
+      bool valid = false;
+      for (int i = 0; i < 17; i++) {
+        if (*(tokens[1]) == validKeystrokes[i]) valid = true;
+      }
+
+      if (!valid) {
+        fprintf(stderr, "ERROR: invalid keystroke passed\n");
+        mem_free(copiedMessage);
+        mem_free(tokens);
+        return false;
+      }
       bool out = movePlayer(gameinfo, from, *(tokens[1]));
       // sends a single-character keystroke typed by the user to the server.
       mem_free(copiedMessage);
       mem_free(tokens);
-      if (out) {
-        mem_free(argumentStruct->playerID);
-        mem_free(argumentStruct);
-      }
       return out;
     }
   }
@@ -305,9 +360,25 @@ handleMessage(void* arg, const addr_t from, const char* message)
     int p = 0;
     int r = 0;
 
-    str2int(tokens[1], &n);
-    str2int(tokens[2], &p);
-    str2int(tokens[3], &r);
+    // check number of args
+    if (numSlots(tokens) != 4) {
+      fprintf(stderr, "ERROR: invalid number of arguments passed\n");
+      mem_free(copiedMessage);
+      mem_free(tokens);
+      return false;
+    }
+
+    // check str2int on all 3 ints sent in
+    if (!str2int(tokens[1], &n) || !str2int(tokens[2], &p) || 
+                                      !str2int(tokens[3], &r)) {
+      fprintf(stderr, "ERROR: non-Integer values input\n");
+      mem_free(copiedMessage);
+      mem_free(tokens);
+      return false;
+    }
+    // str2int(tokens[1], &n);
+    // str2int(tokens[2], &p);
+    // str2int(tokens[3], &r);
 
     displayHeader(n, p, r, *playerID);
     mem_free(copiedMessage);
@@ -315,7 +386,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     return false;
   }
   // the message received was malformatted
-  fprintf(stderr, "error: msg received was malformatted, ignoring the msg.\n");
+  fprintf(stderr, "ERROR: msg received was malformatted, ignoring the msg.\n");
   mem_free(copiedMessage);
   mem_free(tokens);
   return false;
@@ -404,3 +475,18 @@ str2int(const char string[], int* number)
   return (sscanf(string, "%d%c", number, &nextchar) == 1);
 }
 
+
+/* ***************** numSlots ********************** */
+/*
+ * Checks the number of non-NULL slots in a char* array.
+ * No need to do anything (no memory allocation)
+ */
+ static int
+ numSlots(char** arr) 
+ {
+   int i = 0;
+   for (int j = 0; j < 4; j++) {
+    if (arr[i] != NULL) i++;
+   }
+   return i;
+ }
