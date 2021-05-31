@@ -483,7 +483,7 @@ gameInfo_getNumPlayers(gameInfo_t* info)
         return -1;
     }
 
-    return info->numPlayers;
+    return (info->numPlayers - info->inactivePlayers);
 }
 
 /******************* gameInfo_getGoldPiles *******************/

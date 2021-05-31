@@ -100,24 +100,22 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
     sprintf(message, "PLAY %s", name);
   }
   message_init(errorFile);
-  // initalizes the message server
-  /*
-  if ((*port = message_init(errorFile)) == 0) {
-    // error occurred while initalizing the client's connection
-    fprintf(stderr, "error: issue encountered while initializing the"
-                       " client's connection\n");
-    exit(3);
-  }
-  */
   //Convert port to string
   char portStr[10];
   sprintf(portStr, "%d", *port);
+  fprintf(stderr, "Got: %s\n", portStr);
+
   if (!message_setAddr(serverHost, portStr, serverAddress)) {
     fprintf(stderr, "error: issue encountered likely due to a bad hostname or"
                     " port number\n");
+    quitClient("Bad port or Hostname");
     exit(4);
   }
-
+  if(!message_isAddr(*serverAddress)){
+    fprintf(stderr, "error: Not an address\n");
+    quitClient("Filed to Connect");
+    exit(5);
+  }
   // user joins the server
   message_send(*serverAddress, message);
   /* responsible for the bulk of server communication, handles input messages,
