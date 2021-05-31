@@ -48,3 +48,7 @@ testing.out
 testing2.out
 client.log
 vgcore.*
+client.log
+server.log
+joinlotsplayers.sh
+

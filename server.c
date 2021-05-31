@@ -44,9 +44,11 @@ int main(const int argc, char *argv[]){
 	int seed = -1;
 	parseArgs(argc, argv, &mapFilePath, &seed);
 	//Do randomness initialization
-	if(seed == -1){
+	if(seed != -1){
+		fprintf(stderr, "SEEDED: %d\n", seed);
 		srand(seed);
 	} else {
+		fprintf(stderr, "RANDOM\n");
 		srand(getpid());
 	}
 	//Create game info

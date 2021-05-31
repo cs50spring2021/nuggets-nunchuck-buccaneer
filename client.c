@@ -19,6 +19,7 @@
 #include "pos2D.h"
 #include "mem.h"
 #include "network.h"
+#include "clientCmds.h"
 #include <unistd.h>
 
 /**************** file-local global variables ****************/
@@ -75,6 +76,7 @@ main(const int argc, char *argv[])
   start_color();
   init_pair(1, COLOR_RED, COLOR_BLACK);
   attron(COLOR_PAIR(1));
+
   //Start the network 
   // We pass 'stderr' to errorFile because we will redirect log messages to 
   // stderr when calling them, then redirect stderr to a file in the command line
