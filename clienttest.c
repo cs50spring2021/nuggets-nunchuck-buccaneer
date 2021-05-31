@@ -58,10 +58,10 @@ int main(){
                 fprintf(stderr, "\nBasic Ensure Dimensions Test\n");
                 handleMessage(args, server, "GRID 30 15");
 
-                fprintf(stderr, "\nNegative Ensure Dimensions Test\n");
-                handleMessage(args, server, "GRID -1 -4");
+                //fprintf(stderr, "\nNegative Ensure Dimensions Test\n");
+                //handleMessage(args, server, "GRID -1 -4");
 
-                fprintf(stderr, "\nNULL Ensure Dimensions Test\n");
+                //fprintf(stderr, "\nNULL Ensure Dimensions Test\n");
                 //handleMessage(args, server, "GRID");
 
                 fprintf(stderr, "\nBasic Header Test\n");
