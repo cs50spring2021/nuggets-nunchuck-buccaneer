@@ -82,3 +82,6 @@ clean:
 	make -C common clean
 	make -C support clean
 	rm -rf networktest
+	rm -rf servertest
+	rm -rf vgcore.*
+	rm -rf core

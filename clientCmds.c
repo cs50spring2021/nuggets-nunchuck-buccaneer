@@ -61,6 +61,23 @@ clearAction(void)
     getyx(stdscr, y, x);
   }
 }
+/* ********** clearDisplay ********** */
+/* sets the display part of the top line to blank spaces in ncurses
+ * does not 'refresh()'
+ */
+void
+clearDisplay(void){
+    int NROWS;  // the number of rows on the client 
+    int NCOLS;  // the number of columns on the client
+    getmaxyx(stdscr, NROWS, NCOLS);
+    // clear the old Display message
+    for(int y = 1; y < NROWS; y++){
+        for(int x = 0; x < NCOLS; x++){
+            move(y, x);
+            addch(' ');
+        }
+    }
+}
 
 /*************** displayHeader() ****************/
 /*
@@ -163,16 +180,7 @@ display(const char* grid)
     fprintf(stderr, "displayGrid(): NULL 'grid' passed\n");
     return;
   }
-  int NROWS;  // the number of rows on the client 
-  int NCOLS;  // the number of columns on the client
-  getmaxyx(stdscr, NROWS, NCOLS);
-  // clear the old Display message
-  for (int y = 1; y < NROWS; y++) {
-    for (int x = 0; x < NCOLS; x++) {
-      move(y, x);
-      addch(' ');
-    }
-  }
+  clearDisplay();
   move(1,0);
   int i = 0;
   int x;
@@ -187,8 +195,8 @@ display(const char* grid)
     }
     i++;
   }
-refresh();
-return;
+  refresh();
+  return;
 }
 
 /**************** ensureDimensions() ****************/
@@ -201,14 +209,20 @@ return;
 void
 ensureDimensions(pos2D_t* display_hW)
 {
-  if (display_hW == NULL) {
+  if(display_hW == NULL){
     fprintf(stderr, "ensureDimensions(): NULL 'pos' passed\n");
     return;
   }
-  if (pos2D_getX(display_hW) <= 0 || pos2D_getY(display_hW) <= 0) {
+  if(pos2D_getX(display_hW) <= 0 || pos2D_getY(display_hW) <= 0){
     fprintf(stderr, "ensureDimensions(): Negative HW passed\n");
     return;
   }
+  
+  //Reset Screen
+  clearAction();
+  clearHeader();
+  clearDisplay();
+  refresh();
 
   int NROWS;  // the number of rows on the client 
   int NCOLS;  // the number of columns on the client

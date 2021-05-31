@@ -81,16 +81,8 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
     player->username = usernameCpy;
     player->sightGrid = NULL;
 
-    // handle for number of players
-    if (info->numPlayers < (info->maxPlayers) - 1) {
-        // set playerID
-        player->playerID = info->numPlayers;
-    }
-    else {
-        mem_free(player);
-        pos2D_delete(pos);
-        return false;
-    }
+    // set playerID
+    player->playerID = info->numPlayers;
 
     // create the players initial sightGrid
     char* mapString = grid_toString(map_getBaseGrid(gameInfo_getMap(info)));
@@ -485,6 +477,20 @@ gameInfo_getNumPlayers(gameInfo_t* info)
     }
 
     return info->numPlayers;
+}
+
+/**************** gameInfo_getActivePlayers *****************/
+/* see gameInfo.h for description */
+int 
+gameInfo_getActivePlayers(gameInfo_t* info)
+{
+    // arg checking
+    if (info == NULL) {
+        fprintf(stderr, "gameInfo_getActivePlayers: NULL gameInfo pointer\n");
+        return -1;
+    }
+
+    return (info->numPlayers - info->inactivePlayers);
 }
 
 /******************* gameInfo_getGoldPiles *******************/

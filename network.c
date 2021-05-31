@@ -54,7 +54,7 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
                        "server\n");
     exit(1);
   }
-  printf("PORT: %d", port);
+  printf("Ready to Play, waiting at port %d\n", port);
   //Create args struct for loop
   loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "startNetworkServer(): Mem Error for args");
   args->playerID = mem_malloc_assert(sizeof(char), "startNetworkServer(): Mem error id");
@@ -111,12 +111,19 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
   //Convert port to string
   char portStr[10];
   sprintf(portStr, "%d", *port);
+  fprintf(stderr, "Got: %s\n", portStr);
+
   if (!message_setAddr(serverHost, portStr, serverAddress)) {
     fprintf(stderr, "error: issue encountered likely due to a bad hostname or"
                     " port number\n");
+    quitClient("Bad port or Hostname");
     exit(4);
   }
-
+  if(!message_isAddr(*serverAddress)){
+    fprintf(stderr, "error: Not an address\n");
+    quitClient("Filed to Connect");
+    exit(5);
+  }
   // user joins the server
   message_send(*serverAddress, message);
   /* responsible for the bulk of server communication, handles input messages,
@@ -253,6 +260,8 @@ handleMessage(void* arg, const addr_t from, const char* message)
     quitClient(tokens[1]);
     mem_free(copiedMessage);
     mem_free(tokens);
+    mem_free(argumentStruct->playerID);
+    mem_free(argumentStruct);
     return true;
   }
 
@@ -274,6 +283,10 @@ handleMessage(void* arg, const addr_t from, const char* message)
       // sends a single-character keystroke typed by the user to the server.
       mem_free(copiedMessage);
       mem_free(tokens);
+      if (out) {
+        mem_free(argumentStruct->playerID);
+        mem_free(argumentStruct);
+      }
       return out;
     }
   }
@@ -349,6 +362,9 @@ handleInput(void* arg) {
     char key = '\0';
     key = fgetc(stdin);
     fprintf(stderr, "%c\n", key);
+    if (feof(stdin)) {
+        key = 'Q';
+    }
     // loops over all of the valid keystrokes that can be inputted
     for (int i = 0; i < arrayItems; i++) {
       if (key == array[i]) {
