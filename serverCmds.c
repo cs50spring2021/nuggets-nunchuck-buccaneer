@@ -20,7 +20,7 @@
 
 
 static const int maxNameLength = 50;   		// max number of chars in playerName
-static const int maxPlayers = 2;      		// maximum number of players
+static const int maxPlayers = 26;      		// maximum number of players
 static const int goldTotal = 250;      		// amount of gold in the game
 static const int goldMinNumPiles = 10; 		// minimum number of gold piles
 static const int goldMaxNumPiles = 30; 		// maximum number of gold piles
@@ -332,7 +332,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 			if (isgraph(playerName[i]) == 0 && isblank(playerName[i]) != 0) {
 				playerName[i] = '_';
 			}
-			if (isspace(playerName[i]) == 0) {
+			if (isspace(playerName[i]) != 0) {
 				playerName[i] = '_';
 			}
 		}
