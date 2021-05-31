@@ -176,7 +176,7 @@ gameInfo_addSpectator(gameInfo_t* info, const addr_t* address)
     // check to see if there is already a spectator
     playerInfo_t* oldSpectator = gameInfo_getSpectator(info);
     if(oldSpectator != NULL){
-        char msgBuffer[81];
+        char msgBuffer[message_MaxBytes];
 		sprintf(msgBuffer, "QUIT You have been replaced by a new spectator.");
         #ifdef TESTING
         fprintf(stderr, "%s\n", msgBuffer);
@@ -396,6 +396,7 @@ gameInfo_createScoreBoard(gameInfo_t* info)
         fprintf(stderr, "gameInfo_createScoreBoard: NULL gameInfo pointer\n");
         return NULL;
     }
+    int charsEachLine = 50;     // characters on each line
 
     /*
      * create scoreboard for the game:
@@ -421,12 +422,12 @@ gameInfo_createScoreBoard(gameInfo_t* info)
 
     // sort and create a string
     sortFunc(scoreboard, info->numPlayers);
-    char* scoreboardLine = mem_calloc_assert(info->numPlayers, 50, "memory allocation error\n"); // 50 chars for each line
+    char* scoreboardLine = mem_calloc_assert(info->numPlayers, charsEachLine, "memory allocation error\n"); // 50 chars for each line
 
     // print out players in decreasing order to a string
     sprintf(scoreboardLine, "GAME OVER: \n");
     for (int i = 0; i < info->numPlayers; i++) {
-        char* playerLine = mem_malloc_assert(50, "memory allocation error\n");
+        char* playerLine = mem_malloc_assert(charsEachLine, "memory allocation error\n");
         sprintf(playerLine, "%c \t%d \t%s\n", scoreboard[i]->playerID+65, scoreboard[i]->score, scoreboard[i]->username);
         strcat(scoreboardLine, playerLine);
         mem_free(playerLine);
