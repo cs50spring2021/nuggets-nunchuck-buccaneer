@@ -54,7 +54,7 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
                        "server\n");
     exit(1);
   }
-  printf("PORT: %d", port);
+  printf("Ready to Play, waiting at port %d\n", port);
   //Create args struct for loop
   loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "startNetworkServer(): Mem Error for args");
   args->playerID = mem_malloc_assert(sizeof(char), "startNetworkServer(): Mem error id");

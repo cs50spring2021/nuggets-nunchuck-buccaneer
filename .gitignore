@@ -46,3 +46,4 @@ servertest
 quickcompile.sh
 testing.out
 client.log
+server.log

@@ -38,7 +38,7 @@ gameInfo_t* initializeGame(char* mapFile){
 	}
 	//Generate Random gold pile numbers
 	int piles = goldMinNumPiles + (rand() % (goldMaxNumPiles - goldMinNumPiles));
-	printf("PILES: %d\n", piles);
+	fprintf(stderr, "PILES: %d\n", piles);
 
 	//Create a gameInfo
 	gameInfo_t* gameInfo = mem_assert(gameInfo_newGameInfo(piles, goldTotal, mapFile, maxPlayers),"Server Main: mem gameInfo");
