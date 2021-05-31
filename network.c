@@ -351,6 +351,7 @@ handleInput(void* arg) {
     char* message;
     loopArgs_t* args = arg;
     addr_t* address = args->addy;
+    char* userID = args->playerID;
 
     message = mem_malloc_assert(maxLengthMsg + 1, "handleInput(): mem message");
     if (message == NULL) {
@@ -365,13 +366,21 @@ handleInput(void* arg) {
     if (feof(stdin)) {
         key = 'Q';
     }
-    // loops over all of the valid keystrokes that can be inputted
-    for (int i = 0; i < arrayItems; i++) {
-      if (key == array[i]) {
+    fprintf(stderr, "USERID: %c\n", *userID);
+    if (*userID != '@') {
+      // loops over all of the valid keystrokes that can be inputted
+      for (int i = 0; i < arrayItems; i++) {
+        if (key == array[i]) {
+          sprintf(message, "KEY %c", key);
+          message_send(*address, message);
+        }
+      }
+    } else {
+      /* userID is 25, which means the user is a spectator. The spectator is
+      only allowed to input "Q"). */
+      if (key == 'Q') {
         sprintf(message, "KEY %c", key);
         message_send(*address, message);
-        free(message);
-        return false;
       }
     }
     free(message);  
