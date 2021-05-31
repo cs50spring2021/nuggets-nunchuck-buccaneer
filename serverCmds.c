@@ -1,3 +1,10 @@
+/*
+ * serverCmds.c  - impliments commands to be run on server by network
+ *  
+ * nunchuck buccaneers
+ * CS5 - Spring 2021
+ */
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -265,7 +272,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   ncols = pos2D_getY(terminalSize);
   mem_free(terminalSize);
   addr_t* playerP = mem_malloc_assert(sizeof(addr_t), "MEM: Join AddressCpy");
-  *playerP = player;
+  *(playerP) = player;
   message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
 
   /* writes a message that'll be sent to the client to check the dimensions 
@@ -318,8 +325,9 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 
 		// add the new user to the game info
 		playerInfo_t* playerinfo = gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
-		map_setPlayerPos(map,pos,playerinfo);
+        map_setPlayerPos(map,pos,playerinfo);
 		//Create OK message
+        free(message);
 		message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
 		 /* writes a message that'll be sent to the client to check the dimensions 
  		 of their window */

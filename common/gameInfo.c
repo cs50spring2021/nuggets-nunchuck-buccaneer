@@ -553,10 +553,13 @@ gameInfo_updateSightGrid(gameInfo_t* info, const addr_t* address)
              *     if '2' and not visible, switch to '1'
              *     if visible, switch to '2'
              */
-            if (visibility_getVisibility(player->pos, otherPos, map_getBaseGrid(info->map)) && currSpot != '2') {
+            if (visibility_getVisibility(player->pos, otherPos, 
+                        map_getBaseGrid(info->map)) && currSpot != '2') {
                 grid_setPos(player->sightGrid, otherPos, '2');
             }
-            else if (!visibility_getVisibility(player->pos, otherPos, map_getBaseGrid(info->map)) && (currSpot == '2' || currSpot == '3')) {
+            else if (!visibility_getVisibility(player->pos, otherPos, 
+                        map_getBaseGrid(info->map)) && (currSpot == '2' || 
+                        currSpot == '3')) {
                 grid_setPos(player->sightGrid, otherPos, '1');
             }
             x++;
