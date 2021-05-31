@@ -45,4 +45,6 @@ networktest
 servertest
 quickcompile.sh
 testing.out
+testing2.out
 client.log
+vgcore.*
