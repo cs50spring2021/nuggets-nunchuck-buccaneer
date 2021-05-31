@@ -284,7 +284,6 @@ gameInfo_getPlayer(gameInfo_t* info, const addr_t* address)
     int i = 0;
     while (i < info->maxPlayers) {
         if((info->players)[i] != NULL){
-            fprintf(stderr, "RAN\n");
             #ifndef TESTING
             if (message_eqAddr(*address, *((info->players)[i]->address))) {
             #endif
