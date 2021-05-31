@@ -46,7 +46,7 @@ gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUsers)
     }
 
     gameInfo_t* gameInfo = mem_malloc_assert(sizeof(gameInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
-    gameInfo->players = mem_calloc_assert(maxUsers, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
+    gameInfo->players = mem_calloc_assert(maxUsers + 1, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
     gameInfo->removedPlayers = mem_calloc_assert(maxUsers, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
     gameInfo->goldPiles = piles;
     gameInfo->goldScore = score;
@@ -150,7 +150,7 @@ gameInfo_addSpectator(gameInfo_t* info, addr_t* address)
     playerInfo_t* spectator = mem_malloc_assert(sizeof(playerInfo_t), "memory allocation error\n");
     spectator->pos = NULL;
     spectator->score = -1;
-    spectator->playerID = (info->maxPlayers) - 1;
+    spectator->playerID = (info->maxPlayers);
     spectator->address = address;
     spectator->username = NULL;
 
@@ -184,7 +184,7 @@ gameInfo_addSpectator(gameInfo_t* info, addr_t* address)
         message_send(*(oldSpectator->address), msgBuffer);
         gameInfo_removeSpectator(info);
     }
-    (info->players)[(info->maxPlayers) - 1] = spectator;
+    (info->players)[(info->maxPlayers)] = spectator;
 }
 
 /****************** gameInfo_removePlayer *****************/
@@ -277,7 +277,7 @@ gameInfo_getPlayer(gameInfo_t* info, addr_t* address)
 
     // return player info for given address
     int i = 0;
-    while (i < info->maxPlayers) {
+    while (i < info->maxPlayers + 1) {
         if((info->players)[i] != NULL){
             #ifndef TESTING
             if (message_eqAddr(*address, *((info->players)[i]->address))) {
@@ -306,7 +306,7 @@ gameInfo_getSpectator(gameInfo_t* info)
         return NULL;
     }
 
-    return (info->players)[(info->maxPlayers) - 1];
+    return (info->players)[(info->maxPlayers)];
 }
 
 /******************* gameInfo_getPlayerFromID *******************/
@@ -321,7 +321,7 @@ gameInfo_getPlayerFromID(gameInfo_t* info, int playerID)
     }
 
     // search the players array and find the player with the given playerID
-    for (int i = 0; i < info->maxPlayers; i++){
+    for (int i = 0; i < info->maxPlayers + 1; i++){
         if ((info->players)[i] != NULL){
             if (playerID == (info->players)[i]->playerID) {
                 playerInfo_t* player = (info->players)[i];
@@ -408,7 +408,7 @@ gameInfo_createScoreBoard(gameInfo_t* info)
      */
     int addedPlayers = 0;
     playerInfo_t* scoreboard[info->numPlayers];
-    for (int i = 0; i < info->maxPlayers; i++) {
+    for (int i = 0; i < info->maxPlayers + 1; i++) {
         if (info->players[i] != NULL){
             if (info->players[i]->username != NULL){
                 scoreboard[addedPlayers] = info->players[i];

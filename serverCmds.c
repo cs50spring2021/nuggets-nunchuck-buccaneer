@@ -20,7 +20,7 @@
 
 
 static const int maxNameLength = 50;   		// max number of chars in playerName
-static const int maxPlayers = 26;      		// maximum number of players
+static const int maxPlayers = 2;      		// maximum number of players
 static const int goldTotal = 250;      		// amount of gold in the game
 static const int goldMinNumPiles = 10; 		// minimum number of gold piles
 static const int goldMaxNumPiles = 30; 		// maximum number of gold piles
@@ -327,8 +327,12 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		
 		/* replace any character for which isgraph() and isblank() are both false
 		with an underscore */
+		/* use this to check for spaces as well */
 		for (int i = 0; i < strlen(playerName); i++) {
 			if (isgraph(playerName[i]) == 0 && isblank(playerName[i]) != 0) {
+				playerName[i] = '_';
+			}
+			if (isspace(playerName[i]) == 0) {
 				playerName[i] = '_';
 			}
 		}
@@ -469,7 +473,7 @@ static void sendDisplays(gameInfo_t* gameinfo, addr_t addr, int goldCollected)
 	// Get Gold Score Remaining
 	int scoreLeft = gameInfo_getScoreRemaining(gameinfo);
 	//Loop through IDs for players
-	for (int i = 0; i < maxPlayers; i++) {
+	for (int i = 0; i < maxPlayers + 1; i++) {
 		playerInfo_t* player = NULL; 
 		if ((player = gameInfo_getPlayerFromID(gameinfo, i)) != NULL) {
 			//Check if Spectator
@@ -558,7 +562,7 @@ void endGame(gameInfo_t* gameinfo)
   mem_free(scoreboard);
 
   // loop over all the playerIDs and disconnect all of the players
-  for (int i = 0; i < maxPlayers; i++) {
+  for (int i = 0; i < maxPlayers + 1; i++) {
     if ((player = gameInfo_getPlayerFromID(gameinfo, i)) == NULL) {
       // error occurred or a player does not exist at this index
       continue;
