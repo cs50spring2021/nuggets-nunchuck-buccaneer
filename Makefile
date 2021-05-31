@@ -56,23 +56,29 @@ networktest.o: networktest.c network.h $C/mem.h $C/pos2D.h $C/file.h $S/message.
 .PHONY: test valgrind clean
 
 #  Tests
-testserver: servertest
+testModuleAndMains:
+	make clean
+	make
+	make test-grid -C common
+	make test-visibility -C common
+	make test-map -C common
+	make test-gameInfotest -C common
+	make test-pos2Dtest -C common
+
+testCmdsAndNetwork:
+	make clean
+	make -i
+	make servertest
+	make networktest
 	./servertest
-#bash -v testing.sh
+	./networktest
 
-Vtestserver: servertest
-	$(VALGRIND) ./servertest
-
-testclient: clienttest
+testClient:
+	make clean
+	make -i
+	make clienttest
 	./clienttest
 
-
-testnetwork: networktest
-	./networktest
-runserver: server
-	./server maps/hole.txt 4
-
-	
 clean:
 	rm -rf *.dSYM  # MacOS debugger info
 	rm -f *~ *.o
