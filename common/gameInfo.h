@@ -222,6 +222,19 @@ map_t* gameInfo_getMap(gameInfo_t* info);
  */
 int gameInfo_getNumPlayers(gameInfo_t* info);
 
+/**************** gameInfo_getActivePlayers *****************/
+/*
+ * Grabs number of active players in the game
+ * Caller provides:
+ *     desired gameInfo struct pointer.
+ * We return:
+ *     int stored w number of players that are active.
+ *     return -1 if null pointer.
+ * Caller is responsible for:
+ *     nothing.
+ */
+int gameInfo_getActivePlayers(gameInfo_t* info);
+
 /**************** gameInfo_updateSightGrid ****************/
 /* 
  * Updates sightGrid for the player

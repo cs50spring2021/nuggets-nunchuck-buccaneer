@@ -11,7 +11,7 @@
 
 
 const int maxNameLength = 50;   		// max number of chars in playerName
-const int maxPlayers = 26;      		// maximum number of players
+const int maxPlayers = 3;      		// maximum number of players
 const int goldTotal = 250;      		// amount of gold in the game
 const int goldMinNumPiles = 10; 		// minimum number of gold piles
 const int goldMaxNumPiles = 30; 		// maximum number of gold piles
@@ -252,6 +252,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
     fprintf(stderr, "joinUser: Invalid Args passed");
     return;
   }
+
   char* message;
   int nrows = 0; 
   int ncols = 0;
@@ -281,6 +282,13 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   } else {
 		// add the user as a player
 		fprintf(stderr,"JOIN USER: %s\n", playerName);
+		// Check that not at max players
+		/*
+		if(gameInfo_getActivePlayers(gameinfo) >= maxPlayers){
+			fprintf(stderr, "joinUser: Max Players Hit");
+			message_send(player, "QUIT Already at Max Players");
+		}
+		*/
 		// get the map
 		if ((map = gameInfo_getMap(gameinfo)) == NULL) {
 	  		fprintf(stderr, "error: gameinfo provided is NULL.\n");
@@ -327,7 +335,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   sendDisplays(gameinfo, message_noAddr(), 0);
   free(message);
   #ifdef TESTING
-  fprintf(stderr, "PLAYER COUNT - > %d\n", gameInfo_getNumPlayers(gameinfo));
+  fprintf(stderr, "PLAYER COUNT - > %d\n", gameInfo_getActivePlayers(gameinfo));
   #endif
 }
 
@@ -397,11 +405,11 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
   sendDisplays(gameinfo, message_noAddr(), 0);
 
   #ifdef TESTING
-  fprintf(stderr, "PLAYER COUNT - > %d\n", gameInfo_getNumPlayers(gameinfo));
+  fprintf(stderr, "PLAYER COUNT - > %d\n", gameInfo_getActivePlayers(gameinfo));
 	#endif
 
 	// checks to see if the last player has left the server
-	if (gameInfo_getNumPlayers(gameinfo) == 0) {
+	if (gameInfo_getActivePlayers(gameinfo) == 0) {
 		printf("Server Ended: Active Players All Gone\n");
 		endGame(gameinfo);
 		return true;
