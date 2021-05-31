@@ -261,7 +261,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     quitClient(tokens[1]);
     mem_free(copiedMessage);
     mem_free(tokens);
-    return false;
+    return true;
   }
 
   if ((strcmp(tokens[0], "OK")) == 0) {

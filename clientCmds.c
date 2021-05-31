@@ -45,9 +45,9 @@ clearHeader(void)
 void
 clearAction(void)
 {   
-    int y;
-    int x;
-    int maxX;
+    int y = 0;
+    int x = 0;
+    int maxX = 0;
     maxX = getmaxx(stdscr); // the width of the screen
     maxX -= 2;
     move(0, maxX - actionLen);
