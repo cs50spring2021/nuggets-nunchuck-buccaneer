@@ -259,6 +259,8 @@ handleMessage(void* arg, const addr_t from, const char* message)
     quitClient(tokens[1]);
     mem_free(copiedMessage);
     mem_free(tokens);
+    mem_free(argumentStruct->playerID);
+    mem_free(argumentStruct);
     return true;
   }
 
@@ -280,6 +282,10 @@ handleMessage(void* arg, const addr_t from, const char* message)
       // sends a single-character keystroke typed by the user to the server.
       mem_free(copiedMessage);
       mem_free(tokens);
+      if (out) {
+        mem_free(argumentStruct->playerID);
+        mem_free(argumentStruct);
+      }
       return out;
     }
   }
@@ -354,6 +360,9 @@ handleInput(void* arg) {
     char key = '\0';
     key = fgetc(stdin);
     fprintf(stderr, "%c\n", key);
+    if (feof(stdin)) {
+        key = 'Q';
+    }
     // loops over all of the valid keystrokes that can be inputted
     for (int i = 0; i < arrayItems; i++) {
       if (key == array[i]) {
