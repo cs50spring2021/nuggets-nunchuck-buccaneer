@@ -8,7 +8,6 @@
 */
 
 // INCLUSIONS
-
 #include <stdio.h>
 #include <unistd.h>
 #include "pos2D.h"
@@ -35,7 +34,7 @@ We Do:
 */
 int main(const int argc, char *argv[]){
 	// Check Num Args
-	if(argc != 3 && argc != 2){
+	if (argc != 3 && argc != 2) {
 		fprintf(stderr, "Usage: ./server map.txt [seed]\n");
 		exit(1);
 	}
@@ -44,7 +43,7 @@ int main(const int argc, char *argv[]){
 	int seed = -1;
 	parseArgs(argc, argv, &mapFilePath, &seed);
 	//Do randomness initialization
-	if(seed == -1){
+	if (seed == -1) {
 		srand(seed);
 	} else {
 		srand(getpid());
@@ -70,32 +69,36 @@ We Do:
 	Otherwise we fillout the mapFile string and seed int with the provided
 	values, leaving seed alone if no seed is provided
 */
-static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* seed){
+static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* seed)
+{
 	// Parse seed if provided
-	if(argc == 3){
+	if (argc == 3) {
 		char* seedString = argv[2];
 		char excess;
 		//Get Seed
-    	if (sscanf(seedString, "%d%c", seed, &excess) != 1) {
+    if (sscanf(seedString, "%d%c", seed, &excess) != 1) {
 			fprintf(stderr, "Seed is not a valid integer\n");
 			exit(1);
 		}
 		//Check if seed is negative
-		if(*seed < 0){
-			fprintf(stderr, "Seed must be positive\n");
+		if (*seed < 0) {
+		  fprintf(stderr, "Seed must be positive\n");
 			exit(1);
 		}
 	}
+
 	//Check Map
 	*mapFilePath = argv[1];
-    FILE *fp;
+  FILE *fp;
+
 	//Open Map file
-  	if ((fp = fopen(*mapFilePath, "r")) == NULL) {
-    	fprintf(stderr, "Map is not readable\n");
-    	exit(1);
-  	}
+  if ((fp = fopen(*mapFilePath, "r")) == NULL) {
+    fprintf(stderr, "Map is not readable\n");
+    exit(1);
+  }
+	
 	//Close map file
-  	fclose(fp);
+  fclose(fp);
 	return;
 }
 

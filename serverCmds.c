@@ -1,3 +1,11 @@
+/* 
+ * serverCmds.c - Handles the server-side functions of the game
+ *
+ * Nunchuck Buccaneers
+ * cs50 - Spring 2021
+ * 05/31/21
+ */
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -10,11 +18,11 @@
 #include "serverCmds.h"
 
 
-const int maxNameLength = 50;   		// max number of chars in playerName
-const int maxPlayers = 26;      		// maximum number of players
-const int goldTotal = 250;      		// amount of gold in the game
-const int goldMinNumPiles = 10; 		// minimum number of gold piles
-const int goldMaxNumPiles = 30; 		// maximum number of gold piles
+static const int maxNameLength = 50;   		// max number of chars in playerName
+static const int maxPlayers = 26;      		// maximum number of players
+static const int goldTotal = 250;      		// amount of gold in the game
+static const int goldMinNumPiles = 10; 		// minimum number of gold piles
+static const int goldMaxNumPiles = 30; 		// maximum number of gold piles
 
 static void sendDisplays(gameInfo_t* gameinfo, addr_t Player, int goldCollected);
 static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldCollected);
@@ -32,7 +40,7 @@ Caller is Responsible For:
 */
 gameInfo_t* initializeGame(char* mapFile){
 	//Check Args
-	if (mapFile == NULL){
+	if (mapFile == NULL) {
 		fprintf(stderr, "initializeGame: Invalid Args passed");
 		return NULL;
 	}
@@ -264,7 +272,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   mem_free(terminalSize);
   addr_t* playerP = mem_malloc_assert(sizeof(addr_t), "MEM: Join AddressCpy");
   *playerP = player;
-  message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
+  message = mem_malloc_assert(message_MaxBytes, "joinUser(): Mem Message");
 
   /* writes a message that'll be sent to the client to check the dimensions 
   of their window */
@@ -282,16 +290,16 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		fprintf(stderr,"JOIN USER: %s\n", playerName);
 		// get the map
 		if ((map = gameInfo_getMap(gameinfo)) == NULL) {
-	  		fprintf(stderr, "error: gameinfo provided is NULL.\n");
-      		free(message);
-	  		exit(2);
+	  	fprintf(stderr, "error: gameinfo provided is NULL.\n");
+      free(message);
+	  	exit(2);
 		}
 		// generate a random position to place the new user in the map
 		if ((pos = map_randomEmptySquare(map)) == NULL) {
-	  		fprintf(stderr, "error: map provided is NULL.\n");
-      		free(message);
-	  		exit(3);
-    	}
+	  	fprintf(stderr, "error: map provided is NULL.\n");
+      free(message);
+	  	exit(3);
+    }
 
 		if (strlen(playerName) > maxNameLength) {
 			/* truncates the playername if its longer than 50 characters to exactly
@@ -310,15 +318,12 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		// add the new user to the game info
 		playerInfo_t* playerinfo = gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
 		map_setPlayerPos(map,pos,playerinfo);
-		//Create OK message
-		message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
-		 /* writes a message that'll be sent to the client to check the dimensions 
- 		 of their window */
-  		sprintf(message, "OK %c", playerinfo->playerID + 65);
 
-  		// sends the OK message to the client
- 		 message_send(player, message);
-
+		/* writes a message that'll be sent to the client to check the dimensions 
+ 		of their window */
+  	sprintf(message, "OK %c", playerinfo->playerID + 65);
+  	// sends the OK message to the client
+ 		message_send(player, message);
 		free(pos);
   }
 
@@ -427,14 +432,15 @@ static void sendDisplays(gameInfo_t* gameinfo, addr_t addr, int goldCollected)
 		return; 
 	}
 
+	//Make space for the message
+	char msgBuffer[message_MaxBytes];
+
 	// Get Gold Score Remaining
 	int scoreLeft = gameInfo_getScoreRemaining(gameinfo);
 	//Loop through IDs for players
 	for (int i = 0; i < maxPlayers; i++) {
 		playerInfo_t* player = NULL; 
 		if ((player = gameInfo_getPlayerFromID(gameinfo, i)) != NULL) {
-			//Make space for the message
-			char msgBuffer[message_MaxBytes];
 			//Check if Spectator
 			if ((player->username) == NULL) {
 				//Create the header message for spectator
@@ -514,7 +520,7 @@ void endGame(gameInfo_t* gameinfo)
   }
 
   // allocates memory for the message that'll be sent to the user
-  message = mem_malloc_assert(sizeof(char) * (5 + 1 + strlen(scoreboard)), "endGame(): Mem message");
+  message = mem_malloc_assert(message_MaxBytes, "endGame(): Mem message");
 
   // constructs the quit message sent to the user
   sprintf(message, "QUIT %s", scoreboard);
@@ -536,13 +542,6 @@ void endGame(gameInfo_t* gameinfo)
 		fprintf(stderr, "%s\n", message);
 		#endif
     message_send(playerAddress, message);
-
-		// //If spectator
-		// if (i == 25) {
-		// 	gameInfo_removeSpectator(gameinfo);
-		// } else {
-		// 	gameInfo_removePlayer(gameinfo, player->address);
-		// }
   }
   mem_free(message);
 }

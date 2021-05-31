@@ -3,7 +3,7 @@
  *
  * see network.c for further information
  *
- * nunchuck_buccaneers, April 2021
+ * nunchuck_buccaneers, May 2021
  */
 
 #include <stdio.h>
@@ -87,28 +87,27 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
   args->gameinfo = NULL;
   args->addy = serverAddress;
   *(args->playerID) = '@';
+
+  // allocate memory for the message the client sends to the server
+  message = mem_malloc_assert(message_MaxBytes, "startNetworkClient(): Mem Message");
+
   // if name is NULL, the user joining is a spectator.
   if (name == NULL) {
-    // allocates memory for a "SPECTATE" message
-    message = mem_malloc_assert((sizeof(char) * 8) + 1, "startNetworkClient(): Mem Message");
     // constructs the "SPECTATE" message
     sprintf(message, "SPECTATE");
   } else {
-    // allocate space for a "PLAY" message
-    message = mem_malloc_assert((sizeof(char) * (5 + strlen(name))) + 1, "startNetworkClient(): Mem Message");
     // constructs the "PLAY" message with the user name included
     sprintf(message, "PLAY %s", name);
   }
-  message_init(errorFile);
+
   // initalizes the message server
-  /*
-  if ((*port = message_init(errorFile)) == 0) {
+  if (message_init(errorFile) == 0) {
     // error occurred while initalizing the client's connection
     fprintf(stderr, "error: issue encountered while initializing the"
                        " client's connection\n");
     exit(3);
   }
-  */
+
   //Convert port to string
   char portStr[10];
   sprintf(portStr, "%d", *port);
@@ -144,16 +143,16 @@ tokenizeMessage(char* message)
   char* rest = message;       // used to split up words (goes to end of word)
   int i = 0;
 
-  // allocates space in memory for the array
+  // allocates memory for the array (tokens array has a max of 4 indices)
   tokens = mem_malloc_assert(4 * sizeof(char*), "error: issue "
               "encountered while allocating memory for the array.\n");
   
-while (word[0] != '\0' ) {
-  rest = word;
   /* this loop is used to read the string and break it into its individual
   words. It separates words by spaces and also looks out for null characters.
   To separate the words from one another, it inserts null characters at the
-  end of a word. Borrowed this from Alan Moss' Querier */
+  end of a word. Borrowed some of the syntax from Alan Moss' Querier */
+  while (word[0] != '\0' ) {
+    rest = word;
     // brings rest to the same spot as word
     while (!isspace(*rest) && *rest != '\0') {
       rest++;
@@ -182,7 +181,6 @@ while (word[0] != '\0' ) {
     // go forward a character
     word++;
     
-    
     /* stops parsing the string if the first word parsed is "QUIT". The rest 
     of the string just goes into the 2nd slot in the array (1st). */
     if ((strcmp(tokens[0], "QUIT")) == 0) {
@@ -192,12 +190,6 @@ while (word[0] != '\0' ) {
     /* stops parsing the string if the first word parsed is "PLAY". The rest of 
     the string just goes into the 2nd slot in the array (1st). */
     if ((strcmp(tokens[0], "PLAY")) == 0) {
-      tokens[1] = word;
-      return tokens;
-    }
-    /* stops parsing the string if the first word parsed is "ERROR". The rest of 
-    the string just goes into the 2nd slot in the array (1st). */
-    if ((strcmp(tokens[0], "ERROR")) == 0) {
       tokens[1] = word;
       return tokens;
     }
@@ -218,7 +210,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
   playerID = argumentStruct->playerID;
 
   // breaks a part the message into its individual parts
-  char* copiedMessage = mem_malloc_assert(sizeof(char) * (strlen(message) + 1), "handleMessage(): Mem message Copy\n");
+  char* copiedMessage = mem_malloc_assert(message_MaxBytes, "handleMessage(): Mem message Copy\n");
   strcpy(copiedMessage, message);
   tokens = tokenizeMessage(copiedMessage);
   // look at the first (0th) slot in each array to see what the command is
@@ -342,11 +334,12 @@ handleInput(void* arg) {
     char array[] = {'h', 'l', 'k', 'j', 'y', 'u', 'b', 'n', 'H', 'L', 'K',
                     'J', 'Y', 'U', 'B', 'N', 'Q'};
     int arrayItems = 17;              // number of items in the above array
+    int maxLengthMsg = 6;        // the max length of a key press msg
     char* message;
     loopArgs_t* args = arg;
     addr_t* address = args->addy;
 
-    message = mem_malloc_assert((sizeof(char) * 6) + 1, "handleInput(): mem message");
+    message = mem_malloc_assert(maxLengthMsg + 1, "handleInput(): mem message");
     if (message == NULL) {
       fprintf(stderr, "error: issue encountered while allocating memory for"
       " the message that's sent to the server.\n");
