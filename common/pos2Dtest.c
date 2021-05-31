@@ -22,7 +22,7 @@ main(int argc, char* argv[])
         printf("pos2D_%d: %d, %d\n", i, pos2D_getX(pos), pos2D_getY(pos));
         pos2D_delete(pos);
     }
-
+    /*
     printf("\n");
     printf("Interactive terminal mode: \n");
     printf("Use commands <n> and <s> to create new pos2D or set pos2D values\n");
@@ -55,6 +55,6 @@ main(int argc, char* argv[])
         mem_free(line);
     }
     pos2D_delete(pos);
-
+    */
     return 0; // successful run
 }
