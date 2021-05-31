@@ -1,0 +1,1033 @@
+make clean
+make[1]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer'
+rm -rf *.dSYM  # MacOS debugger info
+rm -f *~ *.o
+rm -f server
+rm -f client
+rm -rf client
+make -C common clean
+make[2]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+rm -rf *.dSYM
+rm -rf  *.o
+rm -rf gridtest
+rm -rf visibilitytest
+rm -rf maptest
+rm -rf pos2Dtest
+rm -rf common.a
+rm -rf gameInfotest
+make[2]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+make -C support clean
+make[2]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/support'
+rm -f core
+rm -rf *~ *.o *.gch *.dSYM
+rm -f *.log
+rm -f support.a
+rm -f messagetest
+make[2]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/support'
+rm -rf networktest
+rm -rf servertest
+rm -rf vgcore.*
+rm -rf core
+make[1]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer'
+make
+make[1]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer'
+make -C support
+make[2]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/support'
+gcc -Wall -pedantic -std=c11 -ggdb   -c -o message.o message.c
+gcc -Wall -pedantic -std=c11 -ggdb   -c -o log.o log.c
+ar cr support.a message.o log.o
+gcc -Wall -pedantic -std=c11 -ggdb -DUNIT_TEST message.c log.o -o messagetest
+make[2]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/support'
+make -C common
+make[2]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o grid.o grid.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o pos2D.o pos2D.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o mem.o mem.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o visibility.o visibility.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o file.o file.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o gameInfo.o gameInfo.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o map.o map.c
+ar cr common.a grid.o pos2D.o mem.o visibility.o file.o gameInfo.o map.o
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o gridtest.o gridtest.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support grid.o pos2D.o mem.o visibility.o file.o gameInfo.o map.o ../support/support.a gridtest.o  -lm -o gridtest
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o visibilitytest.o visibilitytest.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support grid.o pos2D.o mem.o visibility.o file.o gameInfo.o map.o ../support/support.a visibilitytest.o  -lm -o visibilitytest
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o maptest.o maptest.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support grid.o pos2D.o mem.o visibility.o file.o gameInfo.o map.o ../support/support.a maptest.o  -lm -o maptest
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o gameInfoTest.o gameInfoTest.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support grid.o pos2D.o mem.o visibility.o file.o gameInfo.o map.o ../support/support.a gameInfoTest.o  -lm -o gameInfotest
+make[2]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+make server
+make[2]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer'
+gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common   -c -o server.o server.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common   -c -o network.o network.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common   -c -o serverCmds.o serverCmds.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common   -c -o clientCmds.o clientCmds.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common server.o network.o serverCmds.o clientCmds.o common/common.a support/support.a -lm -lncurses -o server
+make[2]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer'
+make client
+make[2]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer'
+gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common   -c -o client.o client.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I./support -I./common client.o network.o clientCmds.o serverCmds.o common/common.a support/support.a -lm -lncurses -o client
+make[2]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer'
+make[1]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer'
+make test-grid -C common
+make[1]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+valgrind --leak-check=full --show-leak-kinds=all ./gridtest
+==40267== Memcheck, a memory error detector
+==40267== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==40267== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==40267== Command: ./gridtest
+==40267== 
+grid_new(): null string passed
+grid_setPos(): NULL pointer 'grid' passed
+grid_getWidthheight(): NULL pointer passed
+grid_getPos(): passed NULL 'grid'
+grid_getPos(): passed NULL 'pos'
+grid_getPos(): x coordinate 12  out of range. The width is 12
+grid_getPos(): y coordinate 6  out of range. The height is 6
+grid_setPos(): NULL pointer 'grid' passed
+grid_setPos(): NULL pointer 'pos' passed
+grid_setPos(): NULL (\0) 'value' passed
+grid_getPos(): x coordinate 12  out of range. The width is 12
+grid_getPos(): y coordinate 6  out of range. The  height is 6
+grid_delete(): null pointer 'grid' passed
+_______ grid_new() _______
+Null input: 
+
+Proper input 'small.txt': 
+test passed
+
+_______ grid_toString() _______
+Null input: 
+
+Proper function: 
+test passed
+
+_______ grid_getWidthheight() _______
+Null input: 
+
+Proper function: 
+test passed
+
+_______ grid_getPos() _______
+Null grid input:
+
+Null pos input:
+
+pos out of scope in x:
+
+pos out of scope in y:
+
+call on wall corner:
+test passed
+
+call on verticle wall:
+test passed
+
+call on wall corner:
+test passed
+
+call on open room slot:
+test passed
+
+call on empty slot:
+test passed
+
+_______ grid_setPos() _______
+Null grid input:
+test failed <<<<<<<
+
+Null pos input:
+test failed <<<<<<<
+
+Null '\0' charicter input:
+test failed <<<<<<<
+
+pos out of scope in x:
+
+pos out of scope in y:
+
+properly functioning:
+test passed
+_______ grid_delete() _______
+NULL grid passed:
+
+delete full grid:
+==40267== 
+==40267== HEAP SUMMARY:
+==40267==     in use at exit: 0 bytes in 0 blocks
+==40267==   total heap usage: 17 allocs, 17 frees, 8,470 bytes allocated
+==40267== 
+==40267== All heap blocks were freed -- no leaks are possible
+==40267== 
+==40267== For counts of detected and suppressed errors, rerun with: -v
+==40267== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+make[1]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+make test-visibility -C common
+make[1]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+valgrind --leak-check=full --show-leak-kinds=all ./visibilitytest
+==40269== Memcheck, a memory error detector
+==40269== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==40269== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==40269== Command: ./visibilitytest
+==40269== 
+NULL positions
+visibility_getVisibility: Null args passed
+NULL grid
+visibility_getVisibility: Null args passed
+Out of Bounds pos
+visibility_getVisibility: Start position out of bounds
+Open Floor Test
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO+---------------------------------+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO|.......@.........................|OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO|.................................|OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO|......+---------------+..........|OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO|......OOOOOOOOOOOOOOOOOOOOOOOO...#OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO|.....OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO|.....OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO|....OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO+----OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+Corridor Exit Test
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO+---------------------------------OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOO................................OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOO.....................OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOO+..........| OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOO|..........@#OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOO|..........| OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOO+..........OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOO................OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOO---------------------OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+Corridor Test
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO#@#OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+Another Open Floor Test (Cause I like them)
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO+--------#--+OOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO|...........|OOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO#...........|OOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO|......@....|OOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO|...........|OOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO+-----------+OOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+Middle of nowhere test
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   OOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO @ OOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   OOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+Visibility Test
+==40269== 
+==40269== HEAP SUMMARY:
+==40269==     in use at exit: 0 bytes in 0 blocks
+==40269==   total heap usage: 115,709 allocs, 115,709 frees, 9,347,073 bytes allocated
+==40269== 
+==40269== All heap blocks were freed -- no leaks are possible
+==40269== 
+==40269== For counts of detected and suppressed errors, rerun with: -v
+==40269== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+make[1]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+make test-map -C common
+make[1]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+valgrind --leak-check=full --show-leak-kinds=all ./maptest
+==40273== Memcheck, a memory error detector
+==40273== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==40273== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==40273== Command: ./maptest
+==40273== 
+map_new(): NULL 'mapFile' passed
+map_new(): could not open not_a_file_path for writing
+map_getBaeGrid(): NULL passed to 'map'
+map_setPlayerPos(): NULL pointer 'map'
+map_setPlayerPos(): NULL pointer 'pos'
+map_setPlayerPos(): NULL pointer 'player'
+map_clearSpot(): NULL 'map' passed
+map_clearSpot(): NULL 'pos' passed
+grid_getPos(): x coordinate 20  out of range. The width is 14
+map_clearSpot(): grid_getPos returned null
+map_randomEmptySquare(): NULL 'map' passed
+map_putOneGold(): NULL 'map' passed
+map_getWidthheight(): NULL 'map' passed
+map_getGamePos(): HULL 'map' passedgrid_getPos(): passed NULL 'pos'
+map_getVisibleMap(): passed NULL pointer 'map'
+map_getVisibleMap(): passed NULL pointer 'sightGrid'
+map_delete(): NULL 'map' passed
+_________ map_new() __________
+NULL input: 
+
+invalid mapFile path: 
+
+properly functioning: 
+test passed
+
+__________ map_getBaseGrid() __________
+NULL input:
+
+properly functioning: 
+  +----------+
+  |..........|
+  |..........|
+  |..........|
+  +----------+
+
+
+__________ map_setPlayerPos() __________
+NULL 'map' input:
+
+NULL 'pos' input:
+
+NULL 'player' input:
+
+NULL player-ID input:
+test failed <<<<<<<<<<<
+
+Standard functioning:
+No player:
+  +----------+
+  |..A.......|
+  |..........|
+  |..........|
+  +----------+
+
+Player at 5,1:
+  +----------+
+  |..‚.......|
+  |..........|
+  |..........|
+  +----------+
+
+Player at 5,2:
+  +----------+
+  |..........|
+  |..‚.......|
+  |..........|
+  +----------+
+
+Test that it doesn't delete other players when swapping:
+Player A at 5,2. Player B at 5,3:
+  +----------+
+  |..........|
+  |..‚.......|
+  |..ƒ.......|
+  +----------+
+
+
+__________ map_clearSpot() __________
+NULL map pointer passed:
+
+NULL pos pointer passed:
+
+pos out of bounds passed:
+
+Proper function: Player A at 5,2. No player at 5,3
+  +----------+
+  |..........|
+  |..‚.......|
+  |..........|
+  +----------+
+
+
+__________ map_randomEmptySquare() __________
+Null pointer passed:
+Properly Functioning:
+These should look like random coordiantes with 2 < x < 14, 0 < y <  4:
+Note: a 'test failed' message will apear if a coordiante set doesn't meet criteria
+9, 2
+4, 3
+4, 3
+4, 1
+11, 2
+10, 3
+10, 3
+5, 1
+4, 1
+10, 1
+10, 1
+10, 2
+3, 2
+4, 3
+8, 1
+8, 1
+12, 3
+4, 3
+7, 3
+12, 3
+test passed
+
+__________ map_putOneGold() __________
+Null pointer passed:
+
+Properly Functioning:
+No gold:
+  +----------+
+  |..........|
+  |..‚.......|
+  |..........|
+  +----------+
+
+one gold:
+  +----------+
+  |*.........|
+  |..‚.......|
+  |..........|
+  +----------+
+
+two gold:
+  +----------+
+  |*.........|
+  |*.‚.......|
+  |..........|
+  +----------+
+
+three gold:
+  +----------+
+  |*.........|
+  |*.‚.......|
+  |....*.....|
+  +----------+
+
+
+__________ map_getWidthheight() __________
+Null pointer passed:
+
+Properly Functioning:
+test passed
+
+__________ map_getGamePos() __________
+NULL'map'  pointer passed:
+
+NULL 'pos' pointer passed:
+
+Properly functioning:
+test 1 passed
+test 2 passed
+test 4 failed <<<<<<<<<<<<<<
+test 3 passed
+
+__________ map_getVisibleMap() __________
+NULL 'map' input:
+
+NULL 'sightGrid' input:
+
+each map displayed previously in the test has used map_getVisibleMap(). 
+We just want to test getting the baseGrid, and getting a mix of grids
+
+get the basegrid (all 1s):
+  +----------+
+  |..........|
+  |..........|
+  |..........|
+  +----------+
+
+get a mixegrid (mix of 0,1,2):
+  +---  -     
+   ...  ..    
+  |*.‚  . .   
+   ...   .    
+   ---  -     
+
+__________ map_delete() __________
+NULL 'map' input:
+
+See valgrind to see if delete is succesful:
+
+==40273== 
+==40273== HEAP SUMMARY:
+==40273==     in use at exit: 24 bytes in 3 blocks
+==40273==   total heap usage: 213 allocs, 210 frees, 26,469 bytes allocated
+==40273== 
+==40273== 8 bytes in 1 blocks are definitely lost in loss record 1 of 3
+==40273==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40273==    by 0x109A66: mem_malloc_assert (mem.c:42)
+==40273==    by 0x1098B0: pos2D_new (pos2D.c:33)
+==40273==    by 0x10D473: main (maptest.c:86)
+==40273== 
+==40273== 8 bytes in 1 blocks are definitely lost in loss record 2 of 3
+==40273==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40273==    by 0x109A66: mem_malloc_assert (mem.c:42)
+==40273==    by 0x1098B0: pos2D_new (pos2D.c:33)
+==40273==    by 0x10D486: main (maptest.c:87)
+==40273== 
+==40273== 8 bytes in 1 blocks are definitely lost in loss record 3 of 3
+==40273==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40273==    by 0x109A66: mem_malloc_assert (mem.c:42)
+==40273==    by 0x1098B0: pos2D_new (pos2D.c:33)
+==40273==    by 0x10D499: main (maptest.c:88)
+==40273== 
+==40273== LEAK SUMMARY:
+==40273==    definitely lost: 24 bytes in 3 blocks
+==40273==    indirectly lost: 0 bytes in 0 blocks
+==40273==      possibly lost: 0 bytes in 0 blocks
+==40273==    still reachable: 0 bytes in 0 blocks
+==40273==         suppressed: 0 bytes in 0 blocks
+==40273== 
+==40273== For counts of detected and suppressed errors, rerun with: -v
+==40273== ERROR SUMMARY: 3 errors from 3 contexts (suppressed: 0 from 0)
+make[1]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+make test-gameInfotest -C common
+make[1]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+valgrind --leak-check=full --show-leak-kinds=all ./gameInfotest
+==40303== Memcheck, a memory error detector
+==40303== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==40303== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==40303== Command: ./gameInfotest
+==40303== 
+******************* ADD PLAYER/GET PLAYER TESTING *******************
+testplayer1 added!
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000002222222222222222222222222222000000000000000000000
+000000000002222222222222222222222222222000000000000000000000
+000000000002222222222222222222222222222000000000000000000000
+000000000002200000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+           |....+------------------#--+                     
+           |..........................|                     
+           +----+..+------+--------+..|                     
+           |.                                               
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+
+testplayer2 added!
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000002222222222222222222222222222000000000000000000000
+000000000000002222222222222222222222222000000000000000000000
+000000000000002222222222222222222222222000000000000000000000
+000000000000002222222222222000000022222000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+           |...+----------+------+..+-+                     
+              +.......................|                     
+              #...........+...........+                     
+              +-----------+       --+#+                     
+                                                            
+
+testplayer3 added!
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000002000000000000000000000
+000000000000000000000000002222222222222000000000000000000000
+000000000000000000000000002222222222222000000000000000000000
+000000000000000000000000002222222222222000000000000000000000
+000000000000000000000000000000000022222000000000000000000000
+000000000000000000000000000000000022222000000000000000000000
+000000000000000000000000000000000022222000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                      |                     
+                          +--------+..|                     
+                          |...........|                     
+                          +------+..+-+                     
+                                  ....|                     
+                                  ....+                     
+                                  --+#+                     
+                                                            
+
+******************* ADD SPECTATOR/GET SPECTATOR TESTING *******************
+(null) added!
+******************** SCORE TESTING **********************
+GOLD remaining: 500
+testplayer1 picked up 64, score: 64
+
+GOLD remaining: 436
+testplayer2 picked up 47, score: 47
+
+GOLD remaining: 389
+testplayer3 picked up 50, score: 50
+
+GOLD remaining: 339
+testplayer3 picked up 41, score: 91
+
+GOLD remaining: 298
+testplayer2 picked up 42, score: 89
+
+GOLD remaining: 256
+testplayer3 picked up 48, score: 139
+
+GOLD remaining: 208
+testplayer3 picked up 53, score: 192
+
+GOLD remaining: 155
+testplayer2 picked up 62, score: 151
+
+GOLD remaining: 93
+testplayer1 picked up 51, score: 115
+
+GOLD remaining: 42
+testplayer3 picked up 42, score: 234
+
+GOLD remaining: 0
+testplayer3 removed!
+*********************** SCOREBOARD TESTING ********************
+GAME OVER: 
+A 	234 	testplayer3
+B 	151 	testplayer2
+A 	115 	testplayer1
+*********************** MAP TESTING *************************
+####+----------------------#------------------------------+ 
+   #......................................................| 
+   +------------------------------------#---------------+.| 
+##############################################          |.| 
+#          +----+                  #         ############.##
+##         |....|                  #                    +-+ 
+ #         |....+------------------#--+                     
+ #         |..........................|                     
+ #         +----+..+------+--------+..|                     
+ #         |..............|...........|                     
+##         |...+----------+------+..+-+                     
+#          +#-+.......................|                     
+#           ###...........+...........+                     
+#           # +-----------+---------+#+                     
+######################################                      
+                                                            
+                                                            
+                                                            
+                                                            
+           +----+                                           
+           |....|                                           
+           |@...+                                           
+           |..........................|                     
+           +----+..+------+--------+..|                     
+                   ....   |...........|                     
+                     -----+------+..+-+                     
+                                  ....|                     
+                                  ....+                     
+                                  --+#+                     
+                                                            
+
+player1 updated!
+   #+----------------------#------------------------------+ 
+   #............@.........................................| 
+   +------------------------------------#---------------+.| 
+                                                            
+                                                            
+                                                            
+           |....+------------------#--+                     
+           |..........................|                     
+           +----+..+------+--------+..|                     
+           |.                                               
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+
+player2 updated!
+SPECTATOR REMOVED
+GAMEINFO DELETED
+Test Passed!
+==40303== 
+==40303== HEAP SUMMARY:
+==40303==     in use at exit: 12,178 bytes in 24 blocks
+==40303==   total heap usage: 102,868 allocs, 102,844 frees, 1,342,108 bytes allocated
+==40303== 
+==40303== 8 bytes in 1 blocks are definitely lost in loss record 1 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109900: pos2D_new (pos2D.c:33)
+==40303==    by 0x10C354: map_randomEmptySquare (map.c:270)
+==40303==    by 0x10D324: main (gameInfoTest.c:30)
+==40303== 
+==40303== 8 bytes in 1 blocks are definitely lost in loss record 2 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109900: pos2D_new (pos2D.c:33)
+==40303==    by 0x10C354: map_randomEmptySquare (map.c:270)
+==40303==    by 0x10D414: main (gameInfoTest.c:40)
+==40303== 
+==40303== 8 bytes in 1 blocks are definitely lost in loss record 3 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109900: pos2D_new (pos2D.c:33)
+==40303==    by 0x10C354: map_randomEmptySquare (map.c:270)
+==40303==    by 0x10D504: main (gameInfoTest.c:50)
+==40303== 
+==40303== 8 bytes in 1 blocks are definitely lost in loss record 4 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109900: pos2D_new (pos2D.c:33)
+==40303==    by 0x10C354: map_randomEmptySquare (map.c:270)
+==40303==    by 0x10D901: main (gameInfoTest.c:101)
+==40303== 
+==40303== 8 bytes in 1 blocks are definitely lost in loss record 5 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109900: pos2D_new (pos2D.c:33)
+==40303==    by 0x10C354: map_randomEmptySquare (map.c:270)
+==40303==    by 0x10D94F: main (gameInfoTest.c:104)
+==40303== 
+==40303== 150 bytes in 1 blocks are definitely lost in loss record 6 of 24
+==40303==    at 0x4C33B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109B40: mem_calloc_assert (mem.c:65)
+==40303==    by 0x10B452: gameInfo_createScoreBoard (gameInfo.c:424)
+==40303==    by 0x10D887: main (gameInfoTest.c:94)
+==40303== 
+==40303== 916 bytes in 1 blocks are indirectly lost in loss record 7 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x10933C: grid_new (grid.c:40)
+==40303==    by 0x10BF37: map_getVisibleMap (map.c:153)
+==40303==    by 0x10D3C6: main (gameInfoTest.c:36)
+==40303== 
+==40303== 916 bytes in 1 blocks are indirectly lost in loss record 8 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x10933C: grid_new (grid.c:40)
+==40303==    by 0x10BF37: map_getVisibleMap (map.c:153)
+==40303==    by 0x10D4B6: main (gameInfoTest.c:46)
+==40303== 
+==40303== 916 bytes in 1 blocks are indirectly lost in loss record 9 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x10933C: grid_new (grid.c:40)
+==40303==    by 0x10BF37: map_getVisibleMap (map.c:153)
+==40303==    by 0x10D5A6: main (gameInfoTest.c:56)
+==40303== 
+==40303== 916 bytes in 1 blocks are indirectly lost in loss record 10 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x10933C: grid_new (grid.c:40)
+==40303==    by 0x10BF37: map_getVisibleMap (map.c:153)
+==40303==    by 0x10D9C7: main (gameInfoTest.c:108)
+==40303== 
+==40303== 916 bytes in 1 blocks are indirectly lost in loss record 11 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x10933C: grid_new (grid.c:40)
+==40303==    by 0x10BF37: map_getVisibleMap (map.c:153)
+==40303==    by 0x10DA24: main (gameInfoTest.c:112)
+==40303== 
+==40303== 916 bytes in 1 blocks are definitely lost in loss record 12 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109805: grid_toString (grid.c:196)
+==40303==    by 0x10D39A: main (gameInfoTest.c:35)
+==40303== 
+==40303== 916 bytes in 1 blocks are definitely lost in loss record 13 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109805: grid_toString (grid.c:196)
+==40303==    by 0x10D3CE: main (gameInfoTest.c:36)
+==40303== 
+==40303== 916 bytes in 1 blocks are definitely lost in loss record 14 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109805: grid_toString (grid.c:196)
+==40303==    by 0x10D48A: main (gameInfoTest.c:45)
+==40303== 
+==40303== 916 bytes in 1 blocks are definitely lost in loss record 15 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109805: grid_toString (grid.c:196)
+==40303==    by 0x10D4BE: main (gameInfoTest.c:46)
+==40303== 
+==40303== 916 bytes in 1 blocks are definitely lost in loss record 16 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109805: grid_toString (grid.c:196)
+==40303==    by 0x10D57A: main (gameInfoTest.c:55)
+==40303== 
+==40303== 916 bytes in 1 blocks are definitely lost in loss record 17 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109805: grid_toString (grid.c:196)
+==40303==    by 0x10D5AE: main (gameInfoTest.c:56)
+==40303== 
+==40303== 916 bytes in 1 blocks are definitely lost in loss record 18 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109805: grid_toString (grid.c:196)
+==40303==    by 0x10D9CF: main (gameInfoTest.c:108)
+==40303== 
+==40303== 916 bytes in 1 blocks are definitely lost in loss record 19 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x109805: grid_toString (grid.c:196)
+==40303==    by 0x10DA2C: main (gameInfoTest.c:112)
+==40303== 
+==40303== 932 (16 direct, 916 indirect) bytes in 1 blocks are definitely lost in loss record 20 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x1093B7: grid_new (grid.c:61)
+==40303==    by 0x10BF37: map_getVisibleMap (map.c:153)
+==40303==    by 0x10D3C6: main (gameInfoTest.c:36)
+==40303== 
+==40303== 932 (16 direct, 916 indirect) bytes in 1 blocks are definitely lost in loss record 21 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x1093B7: grid_new (grid.c:61)
+==40303==    by 0x10BF37: map_getVisibleMap (map.c:153)
+==40303==    by 0x10D4B6: main (gameInfoTest.c:46)
+==40303== 
+==40303== 932 (16 direct, 916 indirect) bytes in 1 blocks are definitely lost in loss record 22 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x1093B7: grid_new (grid.c:61)
+==40303==    by 0x10BF37: map_getVisibleMap (map.c:153)
+==40303==    by 0x10D5A6: main (gameInfoTest.c:56)
+==40303== 
+==40303== 932 (16 direct, 916 indirect) bytes in 1 blocks are definitely lost in loss record 23 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x1093B7: grid_new (grid.c:61)
+==40303==    by 0x10BF37: map_getVisibleMap (map.c:153)
+==40303==    by 0x10D9C7: main (gameInfoTest.c:108)
+==40303== 
+==40303== 932 (16 direct, 916 indirect) bytes in 1 blocks are definitely lost in loss record 24 of 24
+==40303==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==40303==    by 0x109AB6: mem_malloc_assert (mem.c:42)
+==40303==    by 0x1093B7: grid_new (grid.c:61)
+==40303==    by 0x10BF37: map_getVisibleMap (map.c:153)
+==40303==    by 0x10DA24: main (gameInfoTest.c:112)
+==40303== 
+==40303== LEAK SUMMARY:
+==40303==    definitely lost: 7,598 bytes in 19 blocks
+==40303==    indirectly lost: 4,580 bytes in 5 blocks
+==40303==      possibly lost: 0 bytes in 0 blocks
+==40303==    still reachable: 0 bytes in 0 blocks
+==40303==         suppressed: 0 bytes in 0 blocks
+==40303== 
+==40303== For counts of detected and suppressed errors, rerun with: -v
+==40303== ERROR SUMMARY: 19 errors from 19 contexts (suppressed: 0 from 0)
+make[1]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+make test-pos2Dtest -C common
+make[1]: Entering directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support   -c -o pos2Dtest.o pos2Dtest.c
+gcc -Wall -pedantic -std=c11 -ggdb  -I../support grid.o pos2D.o mem.o visibility.o file.o gameInfo.o map.o ../support/support.a pos2Dtest.o  -lm -o pos2Dtest
+valgrind --leak-check=full --show-leak-kinds=all ./pos2Dtest
+==40324== Memcheck, a memory error detector
+==40324== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==40324== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==40324== Command: ./pos2Dtest
+==40324== 
+pos2D_0: 83, 86
+pos2D_1: 77, 15
+pos2D_2: 93, 35
+pos2D_3: 86, 92
+pos2D_4: 49, 21
+pos2D_5: 62, 27
+pos2D_6: 90, 59
+pos2D_7: 63, 26
+pos2D_8: 40, 26
+pos2D_9: 72, 36
+pos2D_10: 11, 68
+pos2D_11: 67, 29
+pos2D_12: 82, 30
+pos2D_13: 62, 23
+pos2D_14: 67, 35
+pos2D_15: 29, 2
+pos2D_16: 22, 58
+pos2D_17: 69, 67
+pos2D_18: 93, 56
+pos2D_19: 11, 42
+pos2D_20: 29, 73
+pos2D_21: 21, 19
+pos2D_22: 84, 37
+pos2D_23: 98, 24
+pos2D_24: 15, 70
+pos2D_25: 13, 26
+pos2D_26: 91, 80
+pos2D_27: 56, 73
+pos2D_28: 62, 70
+pos2D_29: 96, 81
+pos2D_30: 5, 25
+pos2D_31: 84, 27
+pos2D_32: 36, 5
+pos2D_33: 46, 29
+pos2D_34: 13, 57
+pos2D_35: 24, 95
+pos2D_36: 82, 45
+pos2D_37: 14, 67
+pos2D_38: 34, 64
+pos2D_39: 43, 50
+pos2D_40: 87, 8
+pos2D_41: 76, 78
+pos2D_42: 88, 84
+pos2D_43: 3, 51
+pos2D_44: 54, 99
+pos2D_45: 32, 60
+pos2D_46: 76, 68
+pos2D_47: 39, 12
+pos2D_48: 26, 86
+pos2D_49: 94, 39
+pos2D_50: 95, 70
+pos2D_51: 34, 78
+pos2D_52: 67, 1
+pos2D_53: 97, 2
+pos2D_54: 17, 92
+pos2D_55: 52, 56
+pos2D_56: 1, 80
+pos2D_57: 86, 41
+pos2D_58: 65, 89
+pos2D_59: 44, 19
+pos2D_60: 40, 29
+pos2D_61: 31, 17
+pos2D_62: 97, 71
+pos2D_63: 81, 75
+pos2D_64: 9, 27
+pos2D_65: 67, 56
+pos2D_66: 97, 53
+pos2D_67: 86, 65
+pos2D_68: 6, 83
+pos2D_69: 19, 24
+pos2D_70: 28, 71
+pos2D_71: 32, 29
+pos2D_72: 3, 19
+pos2D_73: 70, 68
+pos2D_74: 8, 15
+pos2D_75: 40, 49
+pos2D_76: 96, 23
+pos2D_77: 18, 45
+pos2D_78: 46, 51
+pos2D_79: 21, 55
+pos2D_80: 79, 88
+pos2D_81: 64, 28
+pos2D_82: 41, 50
+pos2D_83: 93, 0
+pos2D_84: 34, 64
+pos2D_85: 24, 14
+pos2D_86: 87, 56
+pos2D_87: 43, 91
+pos2D_88: 27, 65
+pos2D_89: 59, 36
+pos2D_90: 32, 51
+pos2D_91: 37, 28
+pos2D_92: 75, 7
+pos2D_93: 74, 21
+pos2D_94: 58, 95
+pos2D_95: 29, 37
+pos2D_96: 35, 93
+pos2D_97: 18, 28
+pos2D_98: 43, 11
+pos2D_99: 28, 29
+==40324== 
+==40324== HEAP SUMMARY:
+==40324==     in use at exit: 0 bytes in 0 blocks
+==40324==   total heap usage: 101 allocs, 101 frees, 8,992 bytes allocated
+==40324== 
+==40324== All heap blocks were freed -- no leaks are possible
+==40324== 
+==40324== For counts of detected and suppressed errors, rerun with: -v
+==40324== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+make[1]: Leaving directory '/thayerfs/home/f004ghq/cs50-dev/nuggets-nunchuck-buccaneer/common'
