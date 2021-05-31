@@ -68,9 +68,8 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
     fprintf(stderr, "error: a fatal error occurred while looping.\n");
     exit(2);
   }
-  free(args->playerID);
-  free(args);
   message_done();
+  free(args);
 }
 
 /**************** startNetworkClient() ****************/
