@@ -11,7 +11,7 @@
 
 
 const int maxNameLength = 50;   		// max number of chars in playerName
-const int maxPlayers = 3;      		// maximum number of players
+const int maxPlayers = 26;      		// maximum number of players
 const int goldTotal = 250;      		// amount of gold in the game
 const int goldMinNumPiles = 10; 		// minimum number of gold piles
 const int goldMaxNumPiles = 30; 		// maximum number of gold piles
@@ -283,12 +283,12 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		// add the user as a player
 		fprintf(stderr,"JOIN USER: %s\n", playerName);
 		// Check that not at max players
-		/*
-		if(gameInfo_getActivePlayers(gameinfo) >= maxPlayers){
+		if(gameInfo_getNumPlayers(gameinfo) >= maxPlayers){
 			fprintf(stderr, "joinUser: Max Players Hit");
 			message_send(player, "QUIT Already at Max Players");
+			free(message);
+			return;
 		}
-		*/
 		// get the map
 		if ((map = gameInfo_getMap(gameinfo)) == NULL) {
 	  		fprintf(stderr, "error: gameinfo provided is NULL.\n");
@@ -329,8 +329,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
  		 message_send(player, message);
 
 		free(pos);
-  }
-
+  	}
   // send the updated gameinfo to all clients.
   sendDisplays(gameinfo, message_noAddr(), 0);
   free(message);
@@ -390,6 +389,12 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 		message_send(*(playerinfo->address), msgBuffer);
 		// player is removed from gameinfo
 		gameInfo_removePlayer(gameinfo, playerP);
+		// checks to see if the last player has left the server
+		if (gameInfo_getActivePlayers(gameinfo) == 0) {
+			printf("Server Ended: Active Players All Gone\n");
+			endGame(gameinfo);
+			return true;
+		}
   } else {
 		char msgBuffer[message_MaxBytes];
 		sprintf(msgBuffer, "QUIT Thanks for Watching!");
@@ -407,13 +412,6 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
   #ifdef TESTING
   fprintf(stderr, "PLAYER COUNT - > %d\n", gameInfo_getActivePlayers(gameinfo));
 	#endif
-
-	// checks to see if the last player has left the server
-	if (gameInfo_getActivePlayers(gameinfo) == 0) {
-		printf("Server Ended: Active Players All Gone\n");
-		endGame(gameinfo);
-		return true;
-	}
 	return false;
 }
 

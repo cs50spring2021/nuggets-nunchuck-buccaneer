@@ -26,3 +26,5 @@ Assuming Client and Server are not ctrl Cd
 
 Spec asks for ensure dimensions to ensure large enough for the grid but we instead check that the num of cols is both enough
 for the grid and the header messages
+
+Spectator is not counted as an active player so it won't keep the server alive if active players leave
