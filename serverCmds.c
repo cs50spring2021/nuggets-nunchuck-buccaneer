@@ -287,8 +287,12 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		
 		/* replace any character for which isgraph() and isblank() are both false
 		with an underscore */
+		/* use this to check for spaces as well */
 		for (int i = 0; i < strlen(playerName); i++) {
 			if (isgraph(playerName[i]) == 0 && isblank(playerName[i]) != 0) {
+				playerName[i] = '_';
+			}
+			if (isspace(playerName[i]) == 0) {
 				playerName[i] = '_';
 			}
 		}
@@ -303,7 +307,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   		sprintf(message, "OK %c", playerinfo->playerID + 65);
 
   		// sends the OK message to the client
- 		 message_send(player, message);
+ 		message_send(player, message);
 
 		free(pos);
   }
