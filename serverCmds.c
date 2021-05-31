@@ -403,6 +403,7 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 	// checks to see if the last player has left the server
 	if (gameInfo_getNumPlayers(gameinfo) == 0) {
 		printf("Server Ended: Active Players All Gone\n");
+		endGame(gameinfo);
 		return true;
 	}
 	return false;
@@ -538,13 +539,6 @@ void endGame(gameInfo_t* gameinfo)
 		fprintf(stderr, "%s\n", message);
 		#endif
     message_send(playerAddress, message);
-
-		// //If spectator
-		// if (i == 25) {
-		// 	gameInfo_removeSpectator(gameinfo);
-		// } else {
-		// 	gameInfo_removePlayer(gameinfo, player->address);
-		// }
   }
   mem_free(message);
 }
