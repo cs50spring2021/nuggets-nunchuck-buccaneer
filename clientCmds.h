@@ -24,3 +24,5 @@ void displayAction(const char* message);
 void ensureDimensions(pos2D_t* display_hW);
 void quitClient(char* explanation);
 void clearHeader(void);
+void clearAction(void);
+void clearDisplay(void);

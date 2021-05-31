@@ -1,0 +1,26 @@
+CLIENT TEST
+
+Basic Ensure Dimensions Test
+
+Basic Header Test
+
+Basic Action Test
+
+NULL Action Test
+displayAction(): NULL 'message' passed
+
+Second Basic Ensure Test
+
+Display Header Test 2
+
+Basic Display Test
+
+Basic Third Ensure Test
+
+Spectator Header Test 2
+
+Basic Change Display Test
+
+NULL Display Test
+
+QuitClient Test

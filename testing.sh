@@ -4,7 +4,7 @@
 #
 # John "James" Utley, 5/23/2021
 #
-# TESTING
+# TESTING - Just doing Edge Cases
 #
 # Too few args
 ./server 1
@@ -27,8 +27,11 @@
 # Unreadable Map Test
 ./server maps/unreadable.txt 23235
 #
-# Standard Test, No Seed
-./server maps/hole.txt
+# Client Too Few Args
+./client
 #
-# Standard Test
-./server maps/hole.txt 23235
+# Client Too Many Args
+./client host 324 name what
+#
+# Client Invalid Port
+./client host 3a24 name 

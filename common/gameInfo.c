@@ -46,7 +46,7 @@ gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUsers)
     }
 
     gameInfo_t* gameInfo = mem_malloc_assert(sizeof(gameInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
-    gameInfo->players = mem_calloc_assert(maxUsers, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
+    gameInfo->players = mem_calloc_assert(maxUsers + 1, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
     gameInfo->removedPlayers = mem_calloc_assert(maxUsers, sizeof(playerInfo_t), "gameInfo_newGameInfo: memory allocation error\n");
     gameInfo->goldPiles = piles;
     gameInfo->goldScore = score;
@@ -81,16 +81,8 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
     player->username = usernameCpy;
     player->sightGrid = NULL;
 
-    // handle for number of players
-    if (info->numPlayers < (info->maxPlayers) - 1) {
-        // set playerID
-        player->playerID = info->numPlayers;
-    }
-    else {
-        mem_free(player);
-        pos2D_delete(pos);
-        return false;
-    }
+    // set playerID
+    player->playerID = info->numPlayers;
 
     // create the players initial sightGrid
     char* mapString = grid_toString(map_getBaseGrid(gameInfo_getMap(info)));
@@ -158,7 +150,7 @@ gameInfo_addSpectator(gameInfo_t* info, const addr_t* address)
     playerInfo_t* spectator = mem_malloc_assert(sizeof(playerInfo_t), "memory allocation error\n");
     spectator->pos = NULL;
     spectator->score = -1;
-    spectator->playerID = (info->maxPlayers) - 1;
+    spectator->playerID = (info->maxPlayers);
     spectator->address = address;
     spectator->username = NULL;
 
@@ -184,7 +176,7 @@ gameInfo_addSpectator(gameInfo_t* info, const addr_t* address)
     // check to see if there is already a spectator
     playerInfo_t* oldSpectator = gameInfo_getSpectator(info);
     if(oldSpectator != NULL){
-        char msgBuffer[81];
+        char msgBuffer[message_MaxBytes];
 		sprintf(msgBuffer, "QUIT You have been replaced by a new spectator.");
         #ifdef TESTING
         fprintf(stderr, "%s\n", msgBuffer);
@@ -192,7 +184,7 @@ gameInfo_addSpectator(gameInfo_t* info, const addr_t* address)
         message_send(*(oldSpectator->address), msgBuffer);
         gameInfo_removeSpectator(info);
     }
-    (info->players)[(info->maxPlayers) - 1] = spectator;
+    (info->players)[(info->maxPlayers)] = spectator;
 }
 
 /****************** gameInfo_removePlayer *****************/
@@ -265,7 +257,7 @@ gameInfo_removeSpectator(gameInfo_t* info)
         playerInfo_t* spectator = gameInfo_getSpectator(info);
         grid_delete(spectator->sightGrid);
         mem_free(spectator);
-        (info->players)[(info->maxPlayers) - 1] = NULL;
+        (info->players)[(info->maxPlayers)] = NULL;
     }
 }
 
@@ -282,9 +274,8 @@ gameInfo_getPlayer(gameInfo_t* info, const addr_t* address)
 
     // return player info for given address
     int i = 0;
-    while (i < info->maxPlayers) {
+    while (i < info->maxPlayers + 1) {
         if((info->players)[i] != NULL){
-            fprintf(stderr, "RAN\n");
             #ifndef TESTING
             if (message_eqAddr(*address, *((info->players)[i]->address))) {
             #endif
@@ -312,7 +303,7 @@ gameInfo_getSpectator(gameInfo_t* info)
         return NULL;
     }
 
-    return (info->players)[(info->maxPlayers) - 1];
+    return (info->players)[(info->maxPlayers)];
 }
 
 /******************* gameInfo_getPlayerFromID *******************/
@@ -327,8 +318,8 @@ gameInfo_getPlayerFromID(gameInfo_t* info, int playerID)
     }
 
     // search the players array and find the player with the given playerID
-    for(int i = 0; i < info->maxPlayers; i++){
-        if((info->players)[i] != NULL){
+    for (int i = 0; i < info->maxPlayers + 1; i++){
+        if ((info->players)[i] != NULL){
             if (playerID == (info->players)[i]->playerID) {
                 playerInfo_t* player = (info->players)[i];
                 return player;
@@ -405,6 +396,7 @@ gameInfo_createScoreBoard(gameInfo_t* info)
         fprintf(stderr, "gameInfo_createScoreBoard: NULL gameInfo pointer\n");
         return NULL;
     }
+    int charsEachLine = 50;     // characters on each line
 
     /*
      * create scoreboard for the game:
@@ -413,7 +405,7 @@ gameInfo_createScoreBoard(gameInfo_t* info)
      */
     int addedPlayers = 0;
     playerInfo_t* scoreboard[info->numPlayers];
-    for (int i = 0; i < info->maxPlayers; i++) {
+    for (int i = 0; i < info->maxPlayers + 1; i++) {
         if (info->players[i] != NULL){
             if (info->players[i]->username != NULL){
                 scoreboard[addedPlayers] = info->players[i];
@@ -430,12 +422,12 @@ gameInfo_createScoreBoard(gameInfo_t* info)
 
     // sort and create a string
     sortFunc(scoreboard, info->numPlayers);
-    char* scoreboardLine = mem_calloc_assert(info->numPlayers, 50, "memory allocation error\n"); // 50 chars for each line
+    char* scoreboardLine = mem_calloc_assert(info->numPlayers, charsEachLine, "memory allocation error\n"); // 50 chars for each line
 
     // print out players in decreasing order to a string
     sprintf(scoreboardLine, "GAME OVER: \n");
     for (int i = 0; i < info->numPlayers; i++) {
-        char* playerLine = mem_malloc_assert(50, "memory allocation error\n");
+        char* playerLine = mem_malloc_assert(charsEachLine, "memory allocation error\n");
         sprintf(playerLine, "%c \t%d \t%s\n", scoreboard[i]->playerID+65, scoreboard[i]->score, scoreboard[i]->username);
         strcat(scoreboardLine, playerLine);
         mem_free(playerLine);
@@ -485,6 +477,20 @@ gameInfo_getNumPlayers(gameInfo_t* info)
     }
 
     return info->numPlayers;
+}
+
+/**************** gameInfo_getActivePlayers *****************/
+/* see gameInfo.h for description */
+int 
+gameInfo_getActivePlayers(gameInfo_t* info)
+{
+    // arg checking
+    if (info == NULL) {
+        fprintf(stderr, "gameInfo_getActivePlayers: NULL gameInfo pointer\n");
+        return -1;
+    }
+
+    return (info->numPlayers - info->inactivePlayers);
 }
 
 /******************* gameInfo_getGoldPiles *******************/
