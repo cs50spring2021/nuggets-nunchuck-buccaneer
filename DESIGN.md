@@ -42,20 +42,24 @@ We anticipate the following modules or functions:
 *server* runs the server and parses and receives Messages from Clients, sends relevant visible maps for all players. Handles all the GameLogic and initializes the map.
 1. *main*, parses args, Seeds randomness initializes Game, start networkServer(MessageLoop)
 2. *initializeGame*, placeGold, make Map
-3. *movePlayer*, gets a direction and a player and does a move for that player and collects gold, true on all gold collected
-4. *joinUser*, adds a player, calls ensureDimensions on player, and places them on the map also can add a user as a spectator if name is NULL
-6. *leaveUser*, gets a player and removes them from the game
-7. *sendDisplays*, send visible map (get it via getVisibleMap) and the relevant information that's displayed at the top of the screen. To all players.
-8. *endGame*, disconnect everyone, give them Scoreboards
 
-#### PLAYER MODULE
-*player* sends keystrokes and join msg; Displays the visible map for players and the end game screen
+#### SERVERCMDS MODULE
+1. *movePlayer*, gets a direction and a player and does a move for that player and collects gold, true on all gold collected
+2. *joinUser*, adds a player, calls ensureDimensions on player, and places them on the map also can add a user as a spectator if name is NULL
+3. *leaveUser*, gets a player and removes them from the game
+4. *sendDisplays*, (Static) send visible map (get it via getVisibleMap) and the relevant information that's displayed at the top of the screen. To all players.
+5. *endGame*, (Static) disconnect everyone, give them Scoreboards
+
+#### CLIENT MODULE
+*client* sends keystrokes and join msg; Displays the visible map for players and the end game screen
 1. *Main* Parses args, connects to the server, Start N Curses, start NetworkPlayer(MessageLoop)
-2. *Display* Display what the server sends to the client
-3. *DisplayHeader* Displays the string on the top of the screen, which provides relevant game information to the client.
-4. *DisplayAction* A static function that writes an action message on the viewer given a char*
-5. *EnsureDimensions* Called by join server and loops on player until they have the right dimensions
-6. *QuitClient* Called if server finishes or player quits, called from server, returns true. Upon receiving a QUIT message the client shall exit curses, print the explanation followed by a newline, and exit.
+
+#### CLIENTCMDS
+1. *Display* Display what the server sends to the client
+2. *DisplayHeader* Displays the string on the top of the screen, which provides relevant game information to the client.
+3. *DisplayAction* Writes an action message on the viewer given a char*
+4. *EnsureDimensions* Called by join server and loops on player until they have the right dimensions
+5. *QuitClient* Called if server finishes or player quits, called from server, returns true. Upon receiving a QUIT message the client shall exit curses, print the explanation followed by a newline, and exit.
 
 
 And some helper modules that provide data structures:
@@ -79,6 +83,16 @@ start network server
     get messages - parse them
     call appropriate functions on server
 ```
+
+InitializeGame
+```
+read the map file
+create two grid for that map
+create the map struct
+place gold in map
+```
+
+### ServerCmds will run as follows
 
 MovePlayer
 
@@ -111,13 +125,6 @@ if replaced another player
 return true
 ```
 
-InitializeGame
-```
-read the map file
-create two grid for that map
-create the map struct
-place gold in map
-```
 JoinPlayer
 ```
 if player terminal size is not big enough,
@@ -161,7 +168,7 @@ send a quit message to all of the players
 close down the server
 ```
 
-### The player will run as follows:
+### The client will run as follows:
 ```
 parse the command line args, validate parameters
 connect to the server and send it an initialization message
@@ -173,16 +180,45 @@ try to call JoinPlayer on server
 quit when the user presses “q” or when a quit message is received from the server
 ```
 
+### ClientCmds will run as Follows
+
 Display
 ```
+Clear out the old N curses display
 take a string
-print it with nCurses use addch(c) maybe wprintf() and move cursor
+print it with nCurses use addch(c) and move cursor
+through the entire display to print each given character
 ```
-JoinFail
+DisplayHeader
 ```
-loop till terminal resized to size
-try to join again
-```	
+Construct a header message
+Spectator: for a spectator
+Player A has p nuggets otherwise
+Call display action if we received gold
+print out the decided on header to the top in ncurses
+```
+
+DisplayAction
+```
+Check args
+get the string
+move to top right 
+and print the string backwards
+```
+
+ensureDimensions
+```
+Get the dimensions
+loop until the screen is large enough for it
+print message asking to fix screen
+```
+
+quitClient
+```
+exit curses with endwin()
+print the explanation passed in the quit message
+exit main with zero;
+```
 ## Major data structures
 
 Helper modules provide all the data structures we need:
@@ -219,4 +255,4 @@ General Responsibilities
 James: Visibility Module & Testing, Server Main, Move, displayHeader, leaveUser, & Server Testing
 Will: Grid Module & Testing, Map Module & Testing, Various Functions in Player.c, Player EnsureDimensions
 Spencer: GameInfo Module & Testing, Pos2D module, server endGame, Player Testing
-Alan: Network Module & Testing, Server join User, display, display action
+Alan: Network Module & Testing, Server join User, server leave User, server endGame, display, display action

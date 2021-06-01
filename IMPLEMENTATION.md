@@ -26,7 +26,7 @@ Throughout the entire project we also frequently use a helper pos2D struct that 
 
 ## Control flow
 
-The Nuggets Game is implemented in two main files `server.c` and `player.c`. The game also uses several helper modules to support it.
+The Nuggets Game is implemented in two main files `server.c` and `player.c`. Most of the Game logic is contained within `ServerCmds` and `ClientCmds` The game also uses several helper modules to support it.
 
 ## Server
 ### main
@@ -64,6 +64,8 @@ Psuedocode:
     * Add gold piles to the map
     * return the gameInfo
 ```
+
+## ServerCmds
 
 ### movePlayer
 Psuedocode: 
@@ -123,10 +125,9 @@ Psuedocode:
     * Check if name is NULL for spectator
         * Call gameInfo add spectator
     * Else
+        * call gameInfo_getMap()
+        * call map_randomEmptySquare()
         * Call gameinfo add player
-        * Map getRandomEmptySquare
-        * Map Set player pos to that square
-        * Update GameInfo pos for that player
     * SendDisplays to all players
 ```
 
@@ -163,9 +164,11 @@ Psuedocode:
 Psuedocode: 
 ```c
     * Check args
-    * use gameInfo to get a scoreboard string
+    * use gameInfo to get the string representation of the scoreboard
+    
+    * construct a "QUIT" message to send to the user
     * for each player
-        * Call quit client on the player with the scoreboard
+        * Call quit client on the player, providing scoreboard
 ```
 
 ## Client
@@ -177,6 +180,9 @@ Psuedocode:
     * call initscr(), initalizing ncurses screen
     * call startNetworkClient(), to initalize the client connection
 ```
+
+## ClientCmds
+
 ### display
 Psuedocode: 
 ```c
@@ -206,7 +212,7 @@ Psuedocode:
     * else
         * Construct a header message "Spectator: r nuggets unclaimed."
     * If n is not 0
-        * Call display action with "GOLD received: n" 
+        * Call display action with "GOLD received: n"
     * reset cursor to top left corner of the screen
     * create x and y int to represent cursor pos
     * For each char in the header message
@@ -245,6 +251,8 @@ Psuedocode:
     * print the explanation passed in the quit message
     * exit main with zero;
 ```
+
+## Other Modules
 
 ### pos2D
 Psuedocode: 
@@ -346,6 +354,12 @@ map_setPlayerPos:
     * else if the character at the old player pos is the players ID char, set it back to the baseGrid character
     * else if the character at the old player pos is NOT the players ID char, leave it be
     * return;
+map_clearSpot:
+    * check args
+    * get the char at the given pos in baseGrid
+    * if the char returned is NULL, return
+    * set the pos in gameGrid to the char from baseGrid
+    * return;
 map_randomEmptySquare:
     * check args
     * take the modulus of a random large integer with the length of the gameString
@@ -412,11 +426,14 @@ checkLineVerticles - helper for visibility checks if intersects verticle walls:
 gameInfo_newGameInfo:
     * check args
     * allocate memory for the gameInfo struct
-    * allocate memory for 26 playerInfo's in players array
+    * allocate memory for MaxPlayers playerInfo's in players array
+    * allocate memory for MaxPlayers playerInfo's in removedPlayers array
     * set goldPiles to number of piles passed in
     * set goldScore to the passed in score
     * set numPlayers to 0
+    * set inactivePlayers to 0
     * set map to a new map with the passed in mapfile
+    * set maxPlayers to MaxPlayers passed in
     
 gameInfo_addPlayer:
     * check args
@@ -440,7 +457,7 @@ gameInfo_addPlayer:
 gameInfo_addSpectator:
     * check args
     * allocate memory and set parameterized values to their corresponding attributes
-    * set the position to NULL, score to -1, ID to 25, and username to "spectator"
+    * set the position to NULL, score to -1, ID to 25, and username to NULL
     * grab the mapString from the base grid and allocate memory for a string to hold the basegrid string
     * step through each char in the mapString:
         * if the spot is a '\n', set that value to '\n' in the sightGrid string
@@ -452,14 +469,29 @@ gameInfo_addSpectator:
         
 gameInfo_removePlayer:
     * check args
+    * move the player from the players array to removedPlayers array
+    * note: do NOT change numPlayers, as we only accept *MaxPlayers* total
+    * increment number of inactive players in the game
+    
+gameInfo_deletePlayer:
+    * check args
     * grab the player to remove
     * set the players spot in the players array to NULL, decrement the number of players, freeing the player stored in memory along with any other necessary memory
+    
+gameInfo_removeSpectator:
+    * check args
+    * free the spectator and all of its attributes from memory
+    * set the spectator's value in the players array to NULL
 
 gameInfo_getPlayer:
     * check args
     * go through the number of players in players:
         * if the address of a player matches the address passed in, return that player
     * if no player was found return NULL
+    
+gameInfo_getSpectator:
+    * check args
+    * return the last member of the players array (NULL if no spectator)
 
 gameInfo_getPlayerFromID:
     * check args
@@ -469,7 +501,7 @@ gameInfo_getPlayerFromID:
 
 gameInfo_pickupGold:
     * check args
-    * grab a random amount of gold left
+    * grab a random amount of gold left, unless 1 pile left (use that pile's amount)
     * grab the player w passed in address, incrementing their score by the amount of gold found
     * decrement gold piles and amt of gold left
     * return the amount of gold picked up
@@ -477,10 +509,22 @@ gameInfo_pickupGold:
 gameInfo_createScoreBoard:
     * add each player to the scoreboard list and sort the list by score (highest to lowest)
     * print each players score out to the scoreboard line char* and return the scoreboard line
+    
+gameInfo_getScoreRemaining:
+    * check args
+    * return the score remaining stored in gameInfo
 
 gameInfo_getMap:
     * check args
     * return the map held in gameInfo
+    
+gameInfo_getNumPlayers:
+    * check args
+    * return the number of players held in gameInfo
+
+gameInfo_getActivePlayers:
+    * Check args
+    * return num players - inactive players
 
 gameInfo_updateSightGrid:
     * check args
@@ -494,15 +538,13 @@ gameInfo_updateSightGrid:
 gameInfo_getGoldPiles:
     * check args
     * return goldPiles held in gameInfo
-    
-gameInfo_getScoreRemaining:
-    * check args
-    * return goldScore left in gameInfo
 
 gameInfo_delete:
     * check args
     * delete all of the players in the players array
     * delete the spectator and players array
+    * delete all of the players in the removedPlayers array
+    * delete the removedPlayers array
     * free the map, and, finally, the gameInfo struct
 ```
 
@@ -522,22 +564,10 @@ startNetworkClient:
     * call message_loop, starting the loop which checks for messages from the server
     * call message_done;
     * free the message and server address from memory
-numWords:
-    * initalize int variables numWords and i
-    * while loop that runs until the character it reads is a null character.
-        * if the next character is not a null char
-            * if the current and next char combine to make a new line char (\n)
-                * increment i by 2
-                * increment numWords by 1
-                * continue
-        * increment number of words by 1
-        * while loops that runs until a space or a null character is encountered
-            * increment i by 1
-    return numWords
 tokenizeMessage:
     * initalize variables needed (specifically set word and rest to the first character in the message)
     * allocate memory for an array that will hold the tokens
-    * while loop that runs (numWords) amount of times.
+    * while loop that runs until a null (terminating) character is encountered
        * set rest equal to word
        * while rest is not a space and is not a null character
             * if the char (rest + 1) is a null char
@@ -591,11 +621,6 @@ handleMessage:
         * return false
     * print an error message indicating that the message was malformatted
     * return false
-handleTimeout:
-    * if arg is not null
-        * quitClient
-        * return true
-    * return false
 handleInput:
     * initalize a character array with all the possible valid keystroke input (18 characters)
     * initalize the other variables
@@ -620,19 +645,31 @@ Detailed descriptions of each function's interface is provided as a paragraph co
 int main(const int argc, char *argv[]);
 static void parseArgs(const int argc, char *argv[], char** mapFilePath, int* seed);
 static gameInfo_t* initializeGame(char* mapFile);
+```
+
+### ServerCmds
+Detailed descriptions of each function's interface is provided as a paragraph comment prior to each function's prototype in `serverCmds.h` and is not repeated here.
+
+```c
 bool movePlayer(gameInfo_t* gameinfo, addr_t* player, char input);
 static bool shortMove(gameInfo_t* gameinfo, addr_t* player, char* dir, int* goldCollected);
 static pos2D_t* dirToMovement(pos2D_t* start, char dir){
 void joinUser(gameInfo_t* gameinfo, addr_t* player, char* playerName);
-bool leavePlayer(gameInfo_t* gameinfo, addr_t* Player);
+bool leaveUser(gameInfo_t* gameinfo, addr_t* player);
 void sendDisplays(gameInfo_t* gameinfo, addr_t* Player, int goldCollected);
 void endGame(gameInfo_t* gameinfo);
 ```
 
-### Player
-Detailed descriptions of each function's interface is provided as a paragraph comment prior to each function's implementation in `player.h` and is not repeated here.
+### Client
+Detailed descriptions of each function's interface is provided as a paragraph comment prior to each function's implementation in `client.c` and is not repeated here.
 ```c
 int main(const int argc, char* argv[]);
+```
+
+### ClientCmds
+Detailed descriptions of each function's interface is provided as a paragraph comment prior to each function's prototype in `clientCmds.h` and is not repeated here.
+
+```c
 void display(const char* grid);
 void displayHeader(int goldCollected, int goldInPurse, int goldRemaining);
 void displayAction(char* action);
@@ -647,10 +684,8 @@ Detailed descriptions of each function's interface is provided as a paragraph co
 ```c
 void startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile);
 startNetworkClient(char* serverHost, char* port, FILE* errorFile, char* name);
-int numWords(char* message);
 char** tokenizeMessage(const char* message);
 bool handleMessage(void* arg, const addr_t from, const char* message);
-bool handleTimeout(void* arg);
 bool handleInput(void* arg);
 bool str2int(const char string[], int* number);
 ```
@@ -710,38 +745,45 @@ void map_clearSpot(map_t* map, pos2D_t* pos);
 - grid_t* gameState
 
 ### gameInfo
+Detailed descriptions of each function's interface is provided as a paragraph comment prior to each function's implementation in `gameInfo.h` and is not repeated here.
 ```c
-gameInfo_t* gameInfo_newGameInfo(int piles, int score, char* mapFile);
-bool gameInfo_addPlayer(gameInfo_t* info, addr_t* player, pos2D_t* pos);
-void gameInfo_addSpectator(gameInfo_t* info, addr_t* player);
-void gameInfo_removePlayer(gameInfo_t* info, addr_t* player);
-playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, addr_t* player);
-playerInfo_t* gameInfo_getPlayerFromID(gameInfo_t* info, int ID);
-int gameInfo_pickupGold(gameInfo_t* info, addr_t* player);
+gameInfo_t* gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUsers);
+playerInfo_t* gameInfo_addPlayer(gameInfo_t* info, addr_t* address, pos2D_t* pos, char* username);
+void gameInfo_addSpectator(gameInfo_t* info, addr_t* address);
+void gameInfo_removePlayer(gameInfo_t* info, addr_t* address);
+void gameInfo_deletePlayer(gameInfo_t* info, addr_t* address);
+void gameInfo_removeSpectator(gameInfo_t* info);
+playerInfo_t* gameInfo_getPlayer(gameInfo_t* info, addr_t* address);
+playerInfo_t* gameInfo_getSpectator(gameInfo_t* info);
+playerInfo_t* gameInfo_getPlayerFromID(gameInfo_t* info, int playerID);
+int gameInfo_pickupGold(gameInfo_t* info, addr_t* address);
 char* gameInfo_createScoreBoard(gameInfo_t* info);
 int gameInfo_getScoreRemaining(gameInfo_t* info);
-void gameInfo_updateSightGrid(gameInfo_t* info, addr_t* player);
 map_t* gameInfo_getMap(gameInfo_t* info);
+int gameInfo_getNumPlayers(gameInfo_t* info);
+int gameInfo_getActivePlayers(gameInfo_t* info);
+bool gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address);
 int gameInfo_getGoldPiles(gameInfo_t* info);
-int gameInfo_getScoreRemaining(gameInfo_t* info);
-void gameInfo_delete(gameInfo_t* info)
+void gameInfo_delete(gameInfo_t* info);
 ```
 
 ##### Struct gameInfo:
- - playerInfo_t** players
- - int goldPiles;
- - int goldScore;
- - int numPlayers;
- - map_t* map;
- - int seed
+- playerInfo_t** players;
+- playerInfo_t** removedPlayers;
+- int goldPiles;
+- int goldScore;
+- int numPlayers;
+- int inactivePlayers;
+- map_t* map;
+- int maxPlayers;
  
 ##### Struct playerInfo:
-- grid_t* sightGrid
-- pos2D_t* pos - (x,y) location
-- int score
-- int playerID
-- addr_t* address
-- char* username
+- grid_t* sightGrid;
+- pos2D_t* pos;
+- int score;
+- int playerID;
+- addr_t* address;
+- char* username;
 
 
 The player will run as follows
