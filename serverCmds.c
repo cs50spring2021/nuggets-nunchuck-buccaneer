@@ -451,14 +451,7 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
   #ifdef TESTING
   fprintf(stderr, "PLAYER COUNT - > %d\n", gameInfo_getActivePlayers(gameinfo));
   #endif
-	// checks to see if the last player has left the server
-	if (gameInfo_getActivePlayers(gameinfo) == 0) {
-		printf("Server Ended: Active Players All Gone\n");
-		endGame(gameinfo);
-        mem_free(playerP);
-		return true;
-	}
-    mem_free(playerP);
+	mem_free(playerP);
 	return false;
 }
 
