@@ -230,7 +230,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
       fprintf(stderr, "ERROR: player name must be provided\n");
       //Check if player is not a server
       if(playerID != '$'){
-        displayAction("Received a Malformed Message");
+        displayAction("Malformed Message");
       }
       mem_free(copiedMessage);
       mem_free(tokens);
@@ -265,7 +265,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     if (numSlots(tokens) != 3) {
       fprintf(stderr, "ERROR: invalid number of args passed in\n");
       if(playerID != '$'){
-        displayAction("Received a Malformed Message");
+        displayAction("Malformed Message");
       }
       mem_free(copiedMessage);
       mem_free(tokens);
@@ -276,7 +276,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     if (!str2int(tokens[1], &nrows) || !str2int(tokens[2], &ncols)) {
       fprintf(stderr, "ERROR: non-integer value passed for\n");
       if(playerID != '$'){
-        displayAction("Received a Malformed Message");
+        displayAction("Malformed Message");
       }
       mem_free(copiedMessage);
       mem_free(tokens);
@@ -289,7 +289,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     if (nrows < 0 || ncols < 0) {
       fprintf(stderr, "ERROR: negative value(s) passed for dimensions\n");
       if(playerID != '$'){
-        displayAction("Received a Malformed Message");
+        displayAction("Malformed Message");
       }
       mem_free(copiedMessage);
       mem_free(tokens);
@@ -327,7 +327,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     if (numSlots(tokens) != 2) {
       fprintf(stderr, "ERROR: invalid number of arguments passed\n");
       if(playerID != '$'){
-        displayAction("Received a Malformed Message");
+        displayAction("Malformed Message");
       }
       mem_free(copiedMessage);
       mem_free(tokens);
@@ -350,7 +350,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
       if (!valid) {
         fprintf(stderr, "ERROR: invalid keystroke passed\n");
         if(playerID != '$'){
-          displayAction("Received a Malformed Message");
+          displayAction("Malformed Message");
         }
         mem_free(copiedMessage);
         mem_free(tokens);
@@ -382,7 +382,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     if (numSlots(tokens) != 4) {
       fprintf(stderr, "ERROR: invalid number of arguments passed\n");
       if(playerID != '$'){
-        displayAction("Received a Malformed Message");
+        displayAction("Malformed Message");
       }
       mem_free(copiedMessage);
       mem_free(tokens);
@@ -394,7 +394,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
                                       !str2int(tokens[3], &r)) {
       fprintf(stderr, "ERROR: non-Integer values input\n");
       if(playerID != '$'){
-        displayAction("Received a Malformed Message");
+        displayAction("alformed Message");
       }
       mem_free(copiedMessage);
       mem_free(tokens);
@@ -412,7 +412,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
   // the message received was malformatted
   fprintf(stderr, "ERROR: msg received was malformatted, ignoring the msg.\n");
   if(playerID != '$'){
-    displayAction("Received a Malformed Message");
+    displayAction("Malformed Message");
   }
   mem_free(copiedMessage);
   mem_free(tokens);
