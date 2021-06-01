@@ -58,9 +58,8 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
   printf("Ready to Play, waiting at port %d\n", port);
   //Create args struct for loop
   loopArgs_t* args = mem_malloc_assert(sizeof(loopArgs_t), "startNetworkServer(): Mem Error for args");
-  args->playerID = mem_malloc_assert(sizeof(char), "startNetworkServer(): Mem error id");
   args->gameinfo = gameInfo;
-  *(args->playerID) = '@';
+  args->playerID = "@";
   /* responsible for the bulk of server communication, handles input messages,
    looping until an error occurs or is told by the handler to terminate. */
   if (!message_loop(args, 0, NULL, handleInput, handleMessage)) {
@@ -69,7 +68,7 @@ startNetworkServer(gameInfo_t* gameInfo, FILE* errorFile)
     exit(2);
   }
   message_done();
-  free(args);
+  mem_free(args);
 }
 
 /**************** startNetworkClient() ****************/
@@ -214,11 +213,10 @@ bool
 handleMessage(void* arg, const addr_t from, const char* message)
 {
   gameInfo_t* gameinfo;
-  char* playerID;
+
   char** tokens;
   loopArgs_t* argumentStruct = arg;
   gameinfo = argumentStruct->gameinfo;
-  playerID = argumentStruct->playerID;
 
   // breaks a part the message into its individual parts
   char* copiedMessage = mem_malloc_assert(message_MaxBytes, "handleMessage(): Mem message Copy\n");
@@ -304,6 +302,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
 
   if ((strcmp(tokens[0], "OK")) == 0) {
     // the server was successfully added to the game, do nothing
+    mem_free(argumentStruct->playerID);
     *(argumentStruct->playerID) = *(tokens[1]);
     mem_free(copiedMessage);
     mem_free(tokens);
@@ -380,7 +379,7 @@ handleMessage(void* arg, const addr_t from, const char* message)
     // str2int(tokens[2], &p);
     // str2int(tokens[3], &r);
 
-    displayHeader(n, p, r, *playerID);
+    displayHeader(n, p, r, *(argumentStruct->playerID));
     mem_free(copiedMessage);
     mem_free(tokens);
     return false;

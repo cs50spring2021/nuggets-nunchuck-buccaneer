@@ -1,3 +1,4 @@
+
 /* 
  * serverCmds.c - Handles the server-side functions of the game
  *
@@ -19,7 +20,7 @@
 
 
 static const int maxNameLength = 50;   		// max number of chars in playerName
-static const int maxPlayers = 2;      		// maximum number of players
+static const int maxPlayers = 26;      		// maximum number of players
 static const int goldTotal = 250;      		// amount of gold in the game
 static const int goldMinNumPiles = 10; 		// minimum number of gold piles
 static const int goldMaxNumPiles = 30; 		// maximum number of gold piles
@@ -78,12 +79,14 @@ bool movePlayer(gameInfo_t* gameinfo, addr_t addr, char input){
 	}
 
 	// grab address pointer
-	const addr_t* addrP = &addr;
+    addr_t* addrP = mem_malloc_assert(sizeof(addr_t), "movePlayer: out of mem");
+	*(addrP) = addr;
 
 	//Check that it is not a spectator
 	playerInfo_t* player = gameInfo_getPlayer(gameinfo, addrP);
 	if (player->username == NULL) {
 		// exit without doing anything
+        free(addrP);
 		return false;
 	}
 	// Create var for goldCollected
@@ -104,8 +107,10 @@ bool movePlayer(gameInfo_t* gameinfo, addr_t addr, char input){
 	if (gameInfo_getGoldPiles(gameinfo) == 0) {
 		printf("Server Ended: Gold Piles All Gone\n");
 		endGame(gameinfo);
+        free(addrP);
 		return true;
 	}
+    free(addrP);
 	return false;
 }
 
@@ -129,7 +134,8 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldColl
 	}
 
 	// grab address pointer
-	const addr_t* addrP = &addr;
+    addr_t* addrP = mem_malloc_assert(sizeof(addr_t), "movePlayer: out of mem");
+	*(addrP) = addr;
 
 	//Find the pos we need to go to 
 	playerInfo_t* player = gameInfo_getPlayer(gameinfo, addrP);
@@ -138,6 +144,7 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldColl
 	pos2D_t* toPos = dirToMovement(player->pos, dir, mapWH);
 	//Check in Bounds
 	if(toPos == NULL){
+        mem_free(addrP);
 		return false;
 	}
 	pos2D_delete(mapWH);
@@ -145,6 +152,7 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldColl
 	//Check if wall or empty space
 	if (current == '+' || current == ' ') {
 		pos2D_delete(toPos);
+        mem_free(addrP);
 		return false;
 	}
 	//Check if gold
@@ -169,7 +177,8 @@ static bool shortMove(gameInfo_t* gameinfo, addr_t addr, char dir, int* goldColl
 	}
 	//Delete to Pos
 	pos2D_delete(toPos);
-	return true;
+    mem_free(addrP);
+    return true;
 }
 
 /******************* dirToMovement *********************
@@ -273,7 +282,7 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
   ncols = pos2D_getY(terminalSize);
   mem_free(terminalSize);
   addr_t* playerP = mem_malloc_assert(sizeof(addr_t), "MEM: Join AddressCpy");
-  *playerP = player;
+  *(playerP) = player;
   message = mem_malloc_assert(message_MaxBytes, "joinUser(): Mem Message");
 
   /* writes a message that'll be sent to the client to check the dimensions 
@@ -323,15 +332,16 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 			if (isgraph(playerName[i]) == 0 && isblank(playerName[i]) != 0) {
 				playerName[i] = '_';
 			}
-			if (isspace(playerName[i]) == 0) {
+			if (isspace(playerName[i]) != 0) {
 				playerName[i] = '_';
 			}
 		}
 
 		// add the new user to the game info
 		playerInfo_t* playerinfo = gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
-		map_setPlayerPos(map,pos,playerinfo);
+        map_setPlayerPos(map,pos,playerinfo);
 		//Create OK message
+        free(message);
 		message = mem_malloc_assert((sizeof(char) * 20) + 1, "joinUser(): Mem Message");
 		 /* writes a message that'll be sent to the client to check the dimensions 
  		 of their window */
@@ -339,17 +349,11 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 
   		// sends the OK message to the client
  		message_send(player, message);
-
-		/* writes a message that'll be sent to the client to check the dimensions 
- 		of their window */
-  	sprintf(message, "OK %c", playerinfo->playerID + 65);
-  	// sends the OK message to the client
- 		message_send(player, message);
 		free(pos);
   	}
   // send the updated gameinfo to all clients.
   sendDisplays(gameinfo, message_noAddr(), 0);
-  free(message);
+  mem_free(message);
   #ifdef TESTING
   fprintf(stderr, "PLAYER COUNT - > %d\n", gameInfo_getActivePlayers(gameinfo));
   #endif
@@ -378,7 +382,8 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
   map_t* map;
   playerInfo_t* playerinfo;
   pos2D_t* pos;
-  addr_t* playerP = &player;
+  addr_t* playerP = mem_malloc_assert(sizeof(addr_t), "leaveUser: out of mem");
+  *(playerP) = player;
 
   // get the map
   if ((map = gameInfo_getMap(gameinfo)) == NULL) {
@@ -410,6 +415,7 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 		if (gameInfo_getActivePlayers(gameinfo) == 0) {
 			printf("Server Ended: Active Players All Gone\n");
 			endGame(gameinfo);
+            mem_free(playerP);
 			return true;
 		}
   } else {
@@ -428,7 +434,15 @@ bool leaveUser(gameInfo_t* gameinfo, addr_t player)
 
   #ifdef TESTING
   fprintf(stderr, "PLAYER COUNT - > %d\n", gameInfo_getActivePlayers(gameinfo));
-	#endif
+  #endif
+	// checks to see if the last player has left the server
+	if (gameInfo_getActivePlayers(gameinfo) == 0) {
+		printf("Server Ended: Active Players All Gone\n");
+		endGame(gameinfo);
+        mem_free(playerP);
+		return true;
+	}
+    mem_free(playerP);
 	return false;
 }
 

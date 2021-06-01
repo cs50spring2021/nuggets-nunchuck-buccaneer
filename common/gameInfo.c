@@ -61,7 +61,7 @@ gameInfo_newGameInfo(int piles, int score, char* mapFile, int maxUsers)
 /******************* gameInfo_addPlayer *******************/
 /* see gameInfo.h for description */
 playerInfo_t*
-gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* username)
+gameInfo_addPlayer(gameInfo_t* info,  addr_t* address, pos2D_t* pos, char* username)
 {
     // arg checking
     if (info == NULL || pos == NULL || username == NULL) {
@@ -138,7 +138,7 @@ gameInfo_addPlayer(gameInfo_t* info, const addr_t* address, pos2D_t* pos, char* 
 /****************** gameInfo_addSpectator *****************/
 /* see gameInfo.h for description */
 void 
-gameInfo_addSpectator(gameInfo_t* info, const addr_t* address)
+gameInfo_addSpectator(gameInfo_t* info, addr_t* address)
 {
     // arg checking
     if (info == NULL) {
@@ -190,7 +190,7 @@ gameInfo_addSpectator(gameInfo_t* info, const addr_t* address)
 /****************** gameInfo_removePlayer *****************/
 /* see gameInfo.h for description */
 void 
-gameInfo_removePlayer(gameInfo_t* info, const addr_t* address)
+gameInfo_removePlayer(gameInfo_t* info, addr_t* address)
 {
     // arg checking
     if (info == NULL) {
@@ -216,7 +216,7 @@ gameInfo_removePlayer(gameInfo_t* info, const addr_t* address)
 /******************** gameInfo_deletePlayer ******************/
 /* see gameInfo.h for description */
 void 
-gameInfo_deletePlayer(gameInfo_t* info, const addr_t* address)
+gameInfo_deletePlayer(gameInfo_t* info, addr_t* address)
 {
     // arg checking
     if (info == NULL) {
@@ -236,6 +236,8 @@ gameInfo_deletePlayer(gameInfo_t* info, const addr_t* address)
         pos2D_delete(player->pos);
         mem_free(player->username);
     }
+    mem_free(player->address);
+    fprintf(stderr, "WE GOT TO DELTE");
     mem_free(player);
 
     info->players[playerID] = NULL;
@@ -257,14 +259,15 @@ gameInfo_removeSpectator(gameInfo_t* info)
         playerInfo_t* spectator = gameInfo_getSpectator(info);
         grid_delete(spectator->sightGrid);
         mem_free(spectator);
-        (info->players)[(info->maxPlayers)] = NULL;
+        mem_free(spectator->address);
+        (info->players)[(info->maxPlayers) - 1] = NULL;
     }
 }
 
 /******************* gameInfo_getPlayer *******************/
 /* see gameInfo.h for description */
 playerInfo_t* 
-gameInfo_getPlayer(gameInfo_t* info, const addr_t* address)
+gameInfo_getPlayer(gameInfo_t* info, addr_t* address)
 {
     // arg checking
     if (info == NULL) {
@@ -332,7 +335,7 @@ gameInfo_getPlayerFromID(gameInfo_t* info, int playerID)
 /****************** gameInfo_pickupGold *******************/
 /* see gameInfo.h for description */
 int
-gameInfo_pickupGold(gameInfo_t* info, const addr_t* address)
+gameInfo_pickupGold(gameInfo_t* info, addr_t* address)
 {
     // arg checking
     if (info == NULL) {
@@ -510,7 +513,7 @@ gameInfo_getGoldPiles(gameInfo_t* info)
 /**************** gameInfo_updateSightGrid ****************/
 /* see gameInfo.h for description */
 bool 
-gameInfo_updateSightGrid(gameInfo_t* info, const addr_t* address)
+gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
 {
     // arg checking
     if (info == NULL) {
@@ -554,10 +557,13 @@ gameInfo_updateSightGrid(gameInfo_t* info, const addr_t* address)
              *     if '2' and not visible, switch to '1'
              *     if visible, switch to '2'
              */
-            if (visibility_getVisibility(player->pos, otherPos, map_getBaseGrid(info->map)) && currSpot != '2') {
+            if (visibility_getVisibility(player->pos, otherPos, 
+                        map_getBaseGrid(info->map)) && currSpot != '2') {
                 grid_setPos(player->sightGrid, otherPos, '2');
             }
-            else if (!visibility_getVisibility(player->pos, otherPos, map_getBaseGrid(info->map)) && (currSpot == '2' || currSpot == '3')) {
+            else if (!visibility_getVisibility(player->pos, otherPos, 
+                        map_getBaseGrid(info->map)) && (currSpot == '2' || 
+                        currSpot == '3')) {
                 grid_setPos(player->sightGrid, otherPos, '1');
             }
             x++;
@@ -614,6 +620,7 @@ gameInfo_delete(gameInfo_t* info)
                 grid_delete(player->sightGrid);
                 pos2D_delete(player->pos);
                 mem_free(player->username);
+                mem_free(player->address);
                 mem_free(player);
                 info->removedPlayers[i] = NULL;
                 info->inactivePlayers--;
