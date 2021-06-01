@@ -579,6 +579,7 @@ void endGame(gameInfo_t* gameinfo)
     // grab the player address
 		if (player->address == NULL) {
 			fprintf(stderr, "Address is NULL");
+			continue;
 		}
     playerAddress = *(player->address);
     // send the quit message to the specific player

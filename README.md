@@ -16,10 +16,6 @@ See the [maps](maps/README.md) for some draft maps.
 
 ## Assumptions
 
-Assuming that player names don't have any spaces in them
-Specs say optionally including spaces but unclear whether player has the option or we as the designers have the option
-we assumed it was us that had the option.
-
 Assuming Client and Server are not ctrl Cd
 
 ## Spec Differ
@@ -32,6 +28,9 @@ Spectator is not counted as an active player so it won't keep the server alive i
 We don't submit our server.log and client.log instead just submitting our testing output
 
 We left memory leaks in testing files but not in the modules or the program itself
+
+The formatting (tabs/spaces) are messed up. When we edited these files on both vim and VSCode, the spacing
+got messed up so that tabs became 4 spaces, not 2.
 
 ## Testing
 
