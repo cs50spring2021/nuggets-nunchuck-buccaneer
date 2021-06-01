@@ -302,7 +302,6 @@ handleMessage(void* arg, const addr_t from, const char* message)
 
   if ((strcmp(tokens[0], "OK")) == 0) {
     // the server was successfully added to the game, do nothing
-    mem_free(argumentStruct->playerID);
     *(argumentStruct->playerID) = *(tokens[1]);
     mem_free(copiedMessage);
     mem_free(tokens);
