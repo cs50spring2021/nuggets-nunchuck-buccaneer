@@ -76,7 +76,7 @@ gameInfo_addPlayer(gameInfo_t* info,  addr_t* address, pos2D_t* pos, char* usern
     player->pos = pos2D_new(pos2D_getX(pos), pos2D_getY(pos));
     player->score = 0;
     player->address = address;
-    char* usernameCpy = mem_malloc_assert(sizeof(char) * (strlen(username) + 1), "Mem: Addplayer Copying Username");
+    char* usernameCpy = mem_malloc_assert(sizeof(char) * (strlen(username) + 1), "Mem: Addplayer Copying Username\n");
     strcpy(usernameCpy, username);
     player->username = usernameCpy;
     player->sightGrid = NULL;
@@ -237,7 +237,6 @@ gameInfo_deletePlayer(gameInfo_t* info, addr_t* address)
         mem_free(player->username);
     }
     mem_free(player->address);
-    fprintf(stderr, "WE GOT TO DELTE");
     mem_free(player);
 
     info->players[playerID] = NULL;
@@ -258,9 +257,9 @@ gameInfo_removeSpectator(gameInfo_t* info)
     if (gameInfo_getSpectator(info) != NULL) {
         playerInfo_t* spectator = gameInfo_getSpectator(info);
         grid_delete(spectator->sightGrid);
-        mem_free(spectator);
         mem_free(spectator->address);
-        (info->players)[(info->maxPlayers) - 1] = NULL;
+        mem_free(spectator);
+        (info->players)[(info->maxPlayers)] = NULL;
     }
 }
 
@@ -601,14 +600,14 @@ gameInfo_delete(gameInfo_t* info)
      */
 
     // free memory for all players and singular spectator
-    for (int i = 0; i < info->maxPlayers; i++) {
+    for (int i = 0; i < info->maxPlayers - 1; i++) {
         if(info->players[i] != NULL){
             if(info->players[i]->username != NULL){
                 gameInfo_deletePlayer(info, info->players[i]->address);
             }
         }
     }
-    gameInfo_removeSpectator(info);
+    if (gameInfo_getSpectator(info) != NULL) gameInfo_removeSpectator(info);
 
     for (int i = 0; i < info->inactivePlayers; i++) {
         if (info->removedPlayers[i] != NULL) {
