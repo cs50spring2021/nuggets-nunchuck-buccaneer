@@ -437,12 +437,19 @@ handleInput(void* arg) {
     }
     fprintf(stderr, "USERID: %c\n", *userID);
     if (*userID != '@') {
+      int knownKey = 0;     // tracks if we have found the key in array
       // loops over all of the valid keystrokes that can be inputted
       for (int i = 0; i < arrayItems; i++) {
         if (key == array[i]) {
           sprintf(message, "KEY %c", key);
           message_send(*address, message);
+          knownKey = 1;
         }
+      }
+      // if the key is ot in the known keys array
+      if (knownKey == 0) {
+        // tell the user that the keystroke was unknown
+        displayAction("unknown keystroke");
       }
     } else {
       /* userID is 25, which means the user is a spectator. The spectator is

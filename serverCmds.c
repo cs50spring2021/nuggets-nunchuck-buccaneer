@@ -270,20 +270,51 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
     return;
   }
 
-  char* message;
-  int nrows = 0; 
-  int ncols = 0;
-  pos2D_t* pos;
+    char* message;
+    int nrows = 0; 
+    int ncols = 0;
+    pos2D_t* pos;
 
-  // gets the rows by columns from the pos2D struct
-  map_t* map = gameInfo_getMap(gameinfo);
-  pos2D_t* terminalSize = map_getWidthheight(map);
-  nrows = pos2D_getX(terminalSize);
-  ncols = pos2D_getY(terminalSize);
-  mem_free(terminalSize);
-  addr_t* playerP = mem_malloc_assert(sizeof(addr_t), "MEM: Join AddressCpy");
-  *(playerP) = player;
-  message = mem_malloc_assert(message_MaxBytes, "joinUser(): Mem Message");
+    // gets the rows by columns from the pos2D struct
+    map_t* map = gameInfo_getMap(gameinfo);
+    pos2D_t* terminalSize = map_getWidthheight(map);
+    nrows = pos2D_getX(terminalSize);
+    ncols = pos2D_getY(terminalSize);
+    mem_free(terminalSize);
+    addr_t* playerP = mem_malloc_assert(sizeof(addr_t), "MEM: Join AddressCpy");
+    *(playerP) = player;
+    message = mem_malloc_assert(message_MaxBytes, "joinUser(): Mem Message");
+   
+    // ajust the players name if one is provided, check that it is not empty
+    //      by empty we mean, doesn't contain graphical charcters
+    int isValid = 0; 
+    if (playerName != NULL) {
+        if (strlen(playerName) > maxNameLength) {
+            /* truncates the playername if its longer than 50 characters to exactly
+            50 characters long. */
+            playerName[50] = '\0';
+        }
+        
+        /* replace any character for which isgraph() and isblank() are both false
+        with an underscore */
+        /* use this to check for spaces as well */
+        for (int i = 0; i < strlen(playerName); i++) {
+            if (isgraph(playerName[i]) == 0 && isblank(playerName[i]) != 0) {
+                playerName[i] = '_';
+            } else if (isspace(playerName[i]) != 0) {
+                playerName[i] = '_';
+            } else {
+                isValid = 1;
+            }
+        }
+    }
+    
+    // if they passed an invalid playername, quit them and return;
+    if (isValid == 0) {
+        sprintf(message, "QUIT Sorry - you must provide player's name.");
+        message_send(player, message);
+        return;
+    }
 
   /* writes a message that'll be sent to the client to check the dimensions 
   of their window */
@@ -308,35 +339,16 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
 		}
 		// get the map
 		if ((map = gameInfo_getMap(gameinfo)) == NULL) {
-	  	fprintf(stderr, "error: gameinfo provided is NULL.\n");
-      free(message);
-	  	exit(2);
+	  	    fprintf(stderr, "error: gameinfo provided is NULL.\n");
+            free(message);
+	  	    exit(2);
 		}
 		// generate a random position to place the new user in the map
 		if ((pos = map_randomEmptySquare(map)) == NULL) {
-	  	fprintf(stderr, "error: map provided is NULL.\n");
-      free(message);
-	  	exit(3);
-    }
-
-		if (strlen(playerName) > maxNameLength) {
-			/* truncates the playername if its longer than 50 characters to exactly
-			50 characters long. */
-			playerName[50] = '\0';
-		}
-		
-		/* replace any character for which isgraph() and isblank() are both false
-		with an underscore */
-		/* use this to check for spaces as well */
-		for (int i = 0; i < strlen(playerName); i++) {
-			if (isgraph(playerName[i]) == 0 && isblank(playerName[i]) != 0) {
-				playerName[i] = '_';
-			}
-			if (isspace(playerName[i]) != 0) {
-				playerName[i] = '_';
-			}
-		}
-
+	  	    fprintf(stderr, "error: map provided is NULL.\n");
+            free(message);
+	  	    exit(3);
+        }
 		// add the new user to the game info
 		playerInfo_t* playerinfo = gameInfo_addPlayer(gameinfo, playerP, pos, playerName);
         map_setPlayerPos(map,pos,playerinfo);
