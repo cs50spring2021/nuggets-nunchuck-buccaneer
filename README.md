@@ -15,8 +15,9 @@ See the [support library](support/README.md) for some useful modules.
 See the [maps](maps/README.md) for some draft maps.
 
 ## Assumptions
-
-Assuming Client and Server are not ctrl Cd
+- we assume that any map passed to the server has more open spaces than the max-goldpiles constant specified in server
+- we assume that there is always an open spot '.' in the current gameGrid when a new player joins
+- we assume that Client and Server exit normally, ie. are not ctrl C'd
 
 ## Spec Differ
 
