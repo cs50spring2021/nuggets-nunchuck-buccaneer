@@ -307,12 +307,16 @@ void joinUser(gameInfo_t* gameinfo, addr_t player, char* playerName)
                 isValid = 1;
             }
         }
+    } else {
+        isValid = 1;
     }
     
     // if they passed an invalid playername, quit them and return;
     if (isValid == 0) {
         sprintf(message, "QUIT Sorry - you must provide player's name.");
         message_send(player, message);
+        mem_free(message);
+        mem_free(playerP);
         return;
     }
 
