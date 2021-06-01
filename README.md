@@ -15,7 +15,6 @@ See the [support library](support/README.md) for some useful modules.
 See the [maps](maps/README.md) for some draft maps.
 
 ## Assumptions
-
 - we assume that any map passed to the server has more open spaces than the max-goldpiles constant specified in server
 - we assume that there is always an open spot '.' in the current gameGrid when a new player joins
 - we assume that Client and Server exit normally, ie. are not ctrl C'd
@@ -30,6 +29,9 @@ Spectator is not counted as an active player so it won't keep the server alive i
 We don't submit our server.log and client.log instead just submitting our testing output
 
 We left memory leaks in testing files but not in the modules or the program itself
+
+The formatting (tabs/spaces) are messed up. When we edited these files on both vim and VSCode, the spacing
+got messed up so that tabs became 4 spaces, not 2.
 
 ## Testing
 

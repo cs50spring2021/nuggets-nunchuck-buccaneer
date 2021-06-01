@@ -25,9 +25,9 @@
 /**************** local types ****************/
 
 typedef struct loopArgs {
-    gameInfo_t* gameinfo;
-    char* playerID;
-    addr_t* addy;
+  gameInfo_t* gameinfo;
+  char* playerID;
+  addr_t* addy;
 } loopArgs_t;
 
 /**************** global types ****************/
@@ -418,22 +418,6 @@ handleMessage(void* arg, const addr_t from, const char* message)
   mem_free(tokens);
   return false;
 }
-
-/**************** handleTimeout() ****************/
-/* see network.h for description 
-bool
-handleTimeout(void* arg)
-{
-  fprintf(stderr, "AHH");
-  if (arg != NULL) {
-    quitClient("");
-    return true;
-  }
-
-  // keep looping in message_loop
-  return false;
-}
-*/
 
 /**************** handleInput() ****************/
 /* see network.h for description */

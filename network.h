@@ -99,20 +99,6 @@ char** tokenizeMessage(char* message);
  */
 bool handleMessage(void* arg, const addr_t from, const char* message);
 
-/********************** handleTimeout() **********************/
-/*
- * handleTimeout - called when time passes without input or message.
- *
- * Inputs:
- *     * void* arg - anything we want to pass through, i.e., gameInfo
- *       struct --> allows access to gameInfo for either side if needed.
- * Output:
- *     * boolean:
- *          * true to terminate looping - game quit or game over.
- *          * false to keep looping.
- */
-bool handleTimeout(void* arg);
-
 /*********************** handleInput() ************************/
 /*
  * handleInput - should read once from stdin and process it.
