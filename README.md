@@ -8,6 +8,8 @@ Each player is randomly dropped into a room when joining the game.
 Players move about, collecting nuggets when they move onto a pile.
 When all gold nuggets are collected, the game ends and a summary is printed.
 
+> GRADER: names of team members?
+
 ## Materials provided
 
 See the [support library](support/README.md) for some useful modules.

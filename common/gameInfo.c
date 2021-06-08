@@ -23,6 +23,9 @@
 #include "gameInfo.h"
 
 /********************** global types **********************/
+/* 
+  STYLE: add a comment on each line to describe each member
+ */
 typedef struct gameInfo {
   playerInfo_t** players;
   playerInfo_t** removedPlayers;
@@ -103,6 +106,9 @@ gameInfo_addPlayer(gameInfo_t* info,  addr_t* address, pos2D_t* pos, char* usern
   // update the player's sightGrid based on position
   char* gridString = grid_toString(player->sightGrid);
 
+/* 
+  STYLE: this code is confusing
+ */
   // loop to set all non '\n' chars to 0, 1, or 2
   int height = 0;
   int i = 0;
@@ -154,6 +160,10 @@ gameInfo_addSpectator(gameInfo_t* info, addr_t* address)
   spectator->address = address;
   spectator->username = NULL;
 
+/* 
+  STYLE: the following code looks a lot like the code for the player;
+  factor out the common aspects and avoid repeating code.
+ */
   // create the spectator's initial sightGrid
   char* mapString = grid_toString(map_getBaseGrid(gameInfo_getMap(info)));
   char* sightGridString_init = mem_malloc_assert(strlen(mapString) + 1, "gameInfo_addSpectator: memory allocation error\n");
@@ -429,6 +439,15 @@ gameInfo_createScoreBoard(gameInfo_t* info)
   // print out players in decreasing order to a string
   sprintf(scoreboardLine, "GAME OVER: \n");
   for (int i = 0; i < info->numPlayers; i++) {
+/* 
+  STYLE: When you need a string variable of a fixed size, there is no
+  need for malloc.  Just declare a local string variable.  For
+  messages, there is no need for malloc.  Just declare char
+  message[message_MaxBytes].  ALSO: do not embed integer ASCII codes
+  into your code; let the compiler do the work.  Recall the hint about
+  translating numbers to letters, and letters to numbers:
+  https://github.com/cs50spring2021/nuggets-info#converting-from-letters-to-numbers-and-back
+ */
     char* playerLine = mem_malloc_assert(charsEachLine, "memory allocation error\n");
     sprintf(playerLine, "%c \t%d \t%s\n", scoreboard[i]->playerID+65, scoreboard[i]->score, scoreboard[i]->username);
     strcat(scoreboardLine, playerLine);
@@ -519,6 +538,14 @@ gameInfo_updateSightGrid(gameInfo_t* info, addr_t* address)
     fprintf(stderr, "gameInfo_updateSightGrid: NULL/invalid gameInfo pointer or address pointer\n");
     return false;
   }
+/* 
+  STYLE: the numbers 0,1,2 don't mean anything to me, as a reader;
+  your code is littered with numbers (like 0 and 1) and some numeric
+  characters (like '2') and I'm not sure what each means.  Since you
+  have some meaning for each, declare a named constant *once* and use
+  that name throughout, instead of the constants.  The code is more
+  readable and less fragile.
+ */
   /* 
    * update the player's sightGrid
    * 

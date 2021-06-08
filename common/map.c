@@ -121,6 +121,14 @@ grid_t* map_getVisibleMap(map_t* map, grid_t* sightGrid)
     char* outString = mem_malloc_assert(buffer, "map_getVisibleMap(): "
             "out of memeory\n");
 
+/* 
+  STYLE: the numbers 0,1,2 don't mean anything to me, as a reader;
+  your code is littered with numbers (like 0 and 1) and some numeric
+  characters (like '2') and I'm not sure what each means.  Since you
+  have some meaning for each, declare a named constant *once* and use
+  that name throughout, instead of the constants.  The code is more
+  readable and less fragile.
+ */
     // loop through the index of the gridStrings
     int i = 0;
     while (sightString[i] != '\0') {
@@ -184,6 +192,10 @@ void map_setPlayerPos(map_t* map, pos2D_t* pos, playerInfo_t* player)
         fprintf(stderr, "map_setPlayerPos(): NULL pointer 'player'\n");
         return;
     }
+/* 
+  STYLE:   Recall the hint about translating numbers to letters, and letters to numbers:
+  https://github.com/cs50spring2021/nuggets-info#converting-from-letters-to-numbers-and-back
+ */
     char ID = (player->playerID) + 65;
     // Check for NULL pointers in player->ID
     if (ID == '\0') {

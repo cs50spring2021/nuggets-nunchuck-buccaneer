@@ -54,6 +54,9 @@ main(const int argc, char *argv[])
     exit(1);
   }
 
+/* 
+  STYLE: nope. you can let message_setAddr do that.
+ */
   // NOTE: Do we need to check that hostname and port are valid?
   char* hostname = argv[1]; 
   char* port = argv[2];

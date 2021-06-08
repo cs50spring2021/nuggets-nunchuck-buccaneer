@@ -111,6 +111,11 @@ static bool checkLineVerticles(bool flipPosXY, pos2D_t* start, pos2D_t* end, gri
     } else {
         xDiff--;
     }
+/* 
+  STYLE: isn't the following expression the same as saying
+    while (xDiff != changeX) ?
+  that is far more readable.
+ */
     //loop towards end x from start x until 1 away from end
     while(abs(xDiff - changeX) >= 1){
         //Find the Y of the line for that x

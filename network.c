@@ -2,6 +2,7 @@
  * network.c - CS50 'network' module
  *
  * see network.c for further information
+ *   STYLE: you mean network.h?
  *
  * nunchuck_buccaneers, May 2021
  */
@@ -24,6 +25,11 @@
 
 /**************** local types ****************/
 
+/* 
+  STYLE: place a comment on each line to explain each member.  And why
+  is this called 'loopArgs'?  I can guess... but think of a better
+  name.
+ */
 typedef struct loopArgs {
   gameInfo_t* gameinfo;
   char* playerID;
@@ -108,6 +114,13 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
     exit(3);
   }
 
+/* 
+  STYLE: there should be no need to convert port to string, because
+  the port number was originally provided as a string.  Indeed, that's
+  why message_setAddr allows/expects the port number to br provided as
+  a string... so your client would not need to bother with converting
+  it ;-)
+ */
   //Convert port to string
   char portStr[10];
   sprintf(portStr, "%d", *port);
@@ -142,6 +155,10 @@ startNetworkClient(char* serverHost, int* port, FILE* errorFile, char* name)
 
 /**************** tokenizeMessage() ****************/
 /* see network.h for description */
+/* 
+  STYLE: there should be no need to tokenize messages in our protocol
+  - all the messages are designed to be easily parsed with sscanf().
+ */
 char**
 tokenizeMessage(char* message)
 {
@@ -212,6 +229,12 @@ return tokens;
 bool
 handleMessage(void* arg, const addr_t from, const char* message)
 {
+/* 
+  STYLE: Break up this function so each case is a call to a
+  message-specific handleXYZ function.  Recall the hint about breaking
+  up large code blocks:
+  https://github.com/cs50spring2021/nuggets-info#break-down-big-functions
+ */
   gameInfo_t* gameinfo;
 
   char** tokens;
@@ -258,6 +281,10 @@ handleMessage(void* arg, const addr_t from, const char* message)
     int ncols = 0; 
     pos2D_t* pos2D = NULL;
 
+/* 
+  STYLE: this code should be vastly simpler (one line!):
+    if (sscanf(message, "GRID %d %d%c", &nrows, &ncols, &excess) == 2) { ...
+ */
    /*
     * check to see if tokens has 3 total args
     * make sure that int chars* are passed, not alphabetical chars*
@@ -339,8 +366,17 @@ handleMessage(void* arg, const addr_t from, const char* message)
       mem_free(tokens);
      return leaveUser(gameinfo, from);
     } else {
+/* 
+  STYLE: your code is the same as if you wrote:
+      char validKeystrokes[] = "hlkjyubnHLKJYUBNQ";
+  except my version is more readable (and has a null terminator, FWIW).
+ */
       char validKeystrokes[] = {'h', 'l', 'k', 'j', 'y', 'u', 'b', 'n', 'H', 'L', 'K',
                     'J', 'Y', 'U', 'B', 'N', 'Q'};
+/* 
+  STYLE: then this loop could be replaced with one line:
+     bool valid = (index(validKeystrokes, *(tokens[1])) != NULL);
+ */
       // error checking: see if keystroke is valid (in above array of 17 chars)
       bool valid = false;
       for (int i = 0; i < 17; i++) {
@@ -377,6 +413,10 @@ handleMessage(void* arg, const addr_t from, const char* message)
     int n = 0;
     int p = 0;
     int r = 0;
+/* 
+  STYLE: this code should be vastly simpler (one line!):
+    if (sscanf(message, "GOLD %d %d %d%c", &n, &p, &r, &excess) == 3) { ...
+ */
 
     // check number of args
     if (numSlots(tokens) != 4) {
@@ -421,10 +461,19 @@ handleMessage(void* arg, const addr_t from, const char* message)
 
 /**************** handleInput() ****************/
 /* see network.h for description */
+/* 
+  STYLE: is this function for the client or for the server? I assume
+  for the client because server does not have input.
+ */
 bool
 handleInput(void* arg) {
   if (arg != NULL) {
 
+/* 
+  STYLE: see above for my suggestion about valid keystrokes.  And, if
+  you need them in multiple places, define it as a global named
+  constant.
+ */
     // character array for valid keystroke input.
     char array[] = {'h', 'l', 'k', 'j', 'y', 'u', 'b', 'n', 'H', 'L', 'K',
                     'J', 'Y', 'U', 'B', 'N', 'Q'};
@@ -442,6 +491,10 @@ handleInput(void* arg) {
       return true;
     }
 
+/* 
+  STYLE: why are you reading from stdin? is this code for testing?  in
+  the game, input must be fetched from curses via `getch()`
+ */
     char key = '\0';
     key = fgetc(stdin);
     fprintf(stderr, "%c\n", key);
@@ -450,6 +503,10 @@ handleInput(void* arg) {
     }
     fprintf(stderr, "USERID: %c\n", *userID);
     if (*userID != '@') {
+/* 
+  STYLE: client should not be testing validity of the keystroke; just
+  sned it to the server as-is.
+ */
       int knownKey = 0;     // tracks if we have found the key in array
       // loops over all of the valid keystrokes that can be inputted
       for (int i = 0; i < arrayItems; i++) {
@@ -465,6 +522,10 @@ handleInput(void* arg) {
         displayAction("unknown keystroke");
       }
     } else {
+/* 
+  STYLE: yes 'Q' is the only valid keystroke for spectator, but that's
+  for the server to decide, not the client.
+ */
       /* userID is 25, which means the user is a spectator. The spectator is
       only allowed to input "Q"). */
       if (key == 'Q') {
